@@ -1,6 +1,6 @@
 # 도서관리시스템 프로젝트
 
-<div align="center">
+<div align="left">
 <img width="600" alt="image" src="https://github.com/guswlsakfls/Reptile_website/assets/46312017/e8cf78f2-75bb-4a3c-bf53-0a9716e8d6d0">
 
 </div>
