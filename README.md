@@ -1,5 +1,5 @@
 # 도서관리시스템 프로젝트
-
+기업 내 도서 및 자료를 효율적으로 관리하기 위한 도서관리시스템 개발
 <div align="left">
 <img width="600" alt="image" src="https://github.com/guswlsakfls/Reptile_website/assets/46312017/e8cf78f2-75bb-4a3c-bf53-0a9716e8d6d0">
 
@@ -20,9 +20,6 @@
 |   <img width="160px" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/0b4ebec3-22c0-44d6-b169-3ab30b4b2014" />    |
 |   [@guswlsakfls](https://github.com/guswlsakfls)   |
 | 42seoul 교육생 |
-
-## 프로젝트 소개
-기업 내 도서 및 자료를 효율적으로 관리하기 위한 도서관리시스템 개발
 
 ## 시작 가이드
 ### 필요사항
