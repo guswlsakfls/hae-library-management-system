@@ -25,29 +25,20 @@
 기업 내 도서 및 자료를 효율적으로 관리하기 위한 도서관리시스템 개발
 
 ## 시작 가이드
-### Requirements
-For building and running the application you need:
+### 필요사항
+웹 서비스를 실행하기 위한 빌드 및 설치
 
 <!-- - [Node.js 14.19.3](https://nodejs.org/ca/blog/release/v14.19.3/)
 - [Npm 9.2.0](https://www.npmjs.com/package/npm/v/9.2.0)
 - [Strapi 3.6.6](https://www.npmjs.com/package/strapi/v/3.6.6) -->
 
-### Installation
+### 설치
 ``` bash
 $ git clone https://github.com/guswlsakfls/hae-library-management-system.git
 $ cd hae-library-management-system
 ```
 
-### Backend
-<!-- #### Backend
-```
-$ cd strapi-backend
-$ nvm use v.14.19.3
-$ npm install
-$ npm run develop
-``` -->
-
-### Frontend
+### 프론트엔드
 <!-- #### Frontend
 ```
 $ cd voluntain-app
@@ -56,26 +47,36 @@ $ npm install
 $ npm run dev
 ``` -->
 
+
+### 백엔드
+<!-- #### Backend
+```
+$ cd strapi-backend
+$ nvm use v.14.19.3
+$ npm install
+$ npm run develop
+``` -->
+
 ---
 
-## Stacks 🐈
+## 🐈 기술스택
 
-### Environment
+### 환경
 ![Intellij](https://img.shields.io/badge/INTELLIJ-000000?style=for-the-badge&logo=IntelliJ%20IDEA&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white)
 ![Github](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)             
 
-### Config
+### 구성
 ![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)        
 
-### Development
-#### Frontend
+### 개발
+#### 프론트
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=Bootstrap&logoColor=white)
 ![Material UI](https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=MUI&logoColor=white)
 
-#### Backend
+#### 
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=Spring&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-3766AB?style=for-the-badge&logo=Java&logoColor=white)
 ![Maria DB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
@@ -84,7 +85,7 @@ $ npm run dev
 ## 🗒 ERD (Updated at 2023.06.12)
 ![erd_backend]()
 
-## 화면 구성 📺
+## 📺 화면 구성
 | 홈 페이지  |  도서 목록 페이지   |
 | :-------------------------------------------: | :------------: |
 |  <img width="329" src=""/> |  <img width="329" src=""/>|  
@@ -92,7 +93,7 @@ $ npm run dev
 | <img width="329" src=""/>   |  <img width="329" src=""/>     |
 
 ---
-## 주요 기능 📦
+## 📦 주요 기능
 
 ### ⭐️ 도서 검색
 - 옵션을 선택하여 원하는 도서 검색 가능
