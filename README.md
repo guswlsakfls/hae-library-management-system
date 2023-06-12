@@ -80,6 +80,8 @@ $ npm run dev
 ![Java](https://img.shields.io/badge/Java-3766AB?style=for-the-badge&logo=Java&logoColor=white)
 ![Maria DB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 
+## 🗒 ERD (Updated at 2023.06.12)
+![erd_backend]()
 
 ---
 ## 화면 구성 📺
