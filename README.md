@@ -5,7 +5,7 @@
 
 </div>
 
-# 🗓 버전 v1.0
+# 🗓 버전 v0.1
 > **42seoul 교욱생** <br/> **개발기간: 2023.06.12 ~ 2023.07.21**
 
 ## 📮 배포 주소
@@ -36,13 +36,10 @@ $ cd hae-library-management-system
 ```
 
 ### 프론트엔드
-<!-- #### Frontend
-```
-$ cd voluntain-app
-$ nvm use v.14.19.3
+
 $ npm install 
 $ npm run dev
-``` -->
+
 
 
 ### 백엔드
