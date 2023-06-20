@@ -55,6 +55,7 @@ $ npm run develop
 ---
 
 ## 🐈 기술스택
+![MAC M1](https://img.shields.io/badge/MacOS--9cf?logo=Apple&style=social)
 
 ### 환경
 ![Intellij](https://img.shields.io/badge/INTELLIJ-000000?style=for-the-badge&logo=IntelliJ%20IDEA&logoColor=white)
