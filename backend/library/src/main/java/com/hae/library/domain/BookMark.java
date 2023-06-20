@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 public class BookMark extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "book_mark_id")
+    private Long id;
 
-    @Column(name = "userId", nullable = false)
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "bookId", nullable = false)
-    private int bookId;
-
-    @Column(name = "comment", length = 255)
-    private String comment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_info_id")
+    private BookInfo bookInfo;
 }
