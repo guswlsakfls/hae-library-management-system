@@ -2,13 +2,14 @@ package com.hae.library.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 
 @Entity
 @Table(name = "book_info")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 public class BookInfo extends BaseTimeEntity{
 
     @Id
@@ -39,7 +40,7 @@ public class BookInfo extends BaseTimeEntity{
     private String title;
 
     @Column(name = "author")
-    private int author;
+    private String author;
 
     @Column(name = "publisher")
     private String publisher;
@@ -50,4 +51,14 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "published_at")
     private String publishedAt;
 
+    @Builder
+    public BookInfo(String isbn, String title, String author, String publisher, String image,
+                    String publishedAt) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.image = image;
+        this.publishedAt = publishedAt;
+    }
 }

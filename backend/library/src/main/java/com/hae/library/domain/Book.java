@@ -2,13 +2,16 @@ package com.hae.library.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 
 @Entity
+@Getter
 @Table(name = "book")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 public class Book extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +36,13 @@ public class Book extends BaseTimeEntity{
 
     @Column(nullable = false, length = 10)
     private String donator;
+
+    @Builder
+    public Book(BookInfo bookInfoId, String isbn, String callSign, Integer status, String donator) {
+        this.bookInfoId = bookInfoId;
+        this.isbn = isbn;
+        this.callSign = callSign;
+        this.status = status;
+        this.donator = donator;
+    }
 }
