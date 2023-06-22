@@ -19,9 +19,9 @@ public class Reservation {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_info_id")
-    private BookInfo bookInfo;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "book_info_id")
+//    private BookInfo bookInfo;
 
     @Column(name = "status", nullable = false)
     private byte status;

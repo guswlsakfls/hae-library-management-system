@@ -1,5 +1,6 @@
 package com.hae.library.controller;
 
+import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.service.BookInfoService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +12,8 @@ public class BookInfoController {
     private final BookInfoService bookInfoService;
 
     @PostMapping(value = "/v1/bookinfo")
-    public String createBookInfo() {
-        bookInfoService.createBookInfo();
+    public String createBookInfo(RequestBookInfoDto requestBookInfoDto) {
+        bookInfoService.createBookInfo(requestBookInfoDto);
 
         return "BookInfoController";
     }

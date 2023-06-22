@@ -1,10 +1,13 @@
 package com.hae.library.service;
 
 import com.hae.library.domain.BookInfo;
+import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.repository.BookInfoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -12,16 +15,17 @@ public class BookInfoService {
     private final BookInfoRepository bookInfoRepo;
 
     @Transactional
-    public void createBookInfo() {
+    public boolean createBookInfo(RequestBookInfoDto requestBookInfoDto) {
         BookInfo bookInfo = new BookInfo().builder()
-                .title("title")
-                .isbn("isbn")
-                .author("author")
-                .publisher("publisher")
-                .image("image")
-                .publishedAt("publishedAt")
+                .title(requestBookInfoDto.getTitle())
+                .isbn(requestBookInfoDto.getIsbn())
+                .author(requestBookInfoDto.getAuthor())
+                .publisher(requestBookInfoDto.getPublisher())
+                .image(requestBookInfoDto.getImage())
+                .publishedAt(requestBookInfoDto.getPublishedAt())
                 .build();
-        bookInfoRepo.save(bookInfo);
+        Optional<BookInfo> optionalSavedBookInfo = Optional.ofNullable(bookInfoRepo.save(bookInfo));
+        return optionalSavedBookInfo.isPresent();
     }
 
     @Transactional
