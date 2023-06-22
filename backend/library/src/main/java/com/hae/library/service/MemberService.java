@@ -49,7 +49,7 @@ public class MemberService {
         // 회원 비밀번호 수정 로직 구현
         Optional<Member> optionalMember = memberRepo.findById(memberId);
         optionalMember.ifPresent(member -> {
-            member.setPassword(newPassword);
+            member.updatePassword(newPassword);
             memberRepo.save(member);
         });
     }

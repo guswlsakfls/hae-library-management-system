@@ -23,6 +23,9 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_id")
     private Long id;
 
+    @OneToMany(mappedBy = "user")
+    private List<Lending> LendingList = new ArrayList<Lending>();
+
     @OneToMany(mappedBy = "member")
     private List<LoginInfo> loginInfoList = new ArrayList<LoginInfo>();
 
@@ -62,11 +65,11 @@ public class Member extends BaseTimeEntity{
         this.penaltyEndDate = penaltyEndDate;
     }
 
-    public void setPassword(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 
-    public void setPenaltyEndDate(LocalDateTime penaltyEndDate) {
+    public void updatePenaltyEndDate(LocalDateTime penaltyEndDate) {
         this.penaltyEndDate = penaltyEndDate;
     }
 

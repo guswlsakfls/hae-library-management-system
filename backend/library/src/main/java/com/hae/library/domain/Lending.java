@@ -18,18 +18,19 @@ public class Lending extends BaseTimeEntity{
     @Column(name = "lending_id")
     private Long id;
 
-    @Column(name = "title")
-    private String title;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Member user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lendingLibrarian_id")
     private Member lendingLibrarian;
 
-    @Column(name = "lending_condition")
+    @Column(name = "lending_condition", nullable = false, length = 300 )
     private String lendingCondition;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,11 +43,13 @@ public class Lending extends BaseTimeEntity{
     @Column(name = "returning_at")
     private LocalDateTime returningAt;
 
-    private boolean renew;
+    @Column(name = "renew")
+    private boolean renew = false;
 
     @Builder
-    public Lending(String title, Book book, Member lendingLibrarian, String lendingCondition, Member returningLibrarian, String returningCondition, LocalDateTime returningAt, boolean renew) {
-        this.title = title;
+    public Lending(Book book, Member user ,Member lendingLibrarian, String lendingCondition,
+                   Member returningLibrarian, String returningCondition, LocalDateTime returningAt, boolean renew) {
+        this.user = user;
         this.book = book;
         this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
@@ -54,6 +57,10 @@ public class Lending extends BaseTimeEntity{
         this.returningCondition = returningCondition;
         this.returningAt = returningAt;
         this.renew = renew;
+    }
+
+    public void updateIdTest(Long id) {
+        this.id = id;
     }
 
     private void setRenew(boolean renew) {
@@ -65,8 +72,24 @@ public class Lending extends BaseTimeEntity{
         this.lendingCondition = lendingCondition;
     }
 
-    public void setRenew() {
+    public void renewLending() {
         this.returningAt = this.returningAt.plusDays(7);
         this.setRenew(true);
     }
+
+    public void checkConditionLength(String condition) {
+        final int MIN_LENDING_CONDITION_LENGTH = 4;
+        final int MAX_LENDING_CONDITION_LENGTH = 300;
+
+        if (condition.length() < MIN_LENDING_CONDITION_LENGTH || condition.length() > MAX_LENDING_CONDITION_LENGTH) {
+            throw new IllegalArgumentException("lendingCondition은 최소 " + MIN_LENDING_CONDITION_LENGTH + ", 최대 " + MAX_LENDING_CONDITION_LENGTH + " 글자 이상이어야 합니다.");
+        }
+    }
+
+    public void updateReturning(Member returninglibrarian, String returningCondition) {
+        this.returningLibrarian = returninglibrarian;
+        this.returningCondition = returningCondition;
+        this.returningAt = LocalDateTime.now();
+    }
+
 }

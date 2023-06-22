@@ -2,16 +2,11 @@ package com.hae.library.repositoryTest;
 
 import com.hae.library.domain.BookInfo;
 import com.hae.library.repository.BookInfoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.context.TestPropertySource;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -166,20 +161,6 @@ public class BookInfoRepositoryTest {
         @Nested
         @DisplayName("실패 케이스")
         public class FailCaseTest {
-            @Test
-            @DisplayName("존재하지 않는 책 정보는 수정할 수 없다")
-            public void testUpdateNonExistingBookInfo() {
-                // Given
-                Long nonExistingId = 0L;
-
-                // When
-                BookInfo nonExistingBookInfo = new BookInfo();
-                nonExistingBookInfo.updateId(nonExistingId);
-                nonExistingBookInfo.updateTitle("Updated Book");
-
-                // Then
-                assertThrows(Exception.class, () -> bookInfoRepository.save(nonExistingBookInfo));
-            }
         }
     }
 

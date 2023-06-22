@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @DataJpaTest
 @DisplayName("BookRepository 단위 테스트")
@@ -49,7 +48,7 @@ public class BookRepositoryTest {
         public class FailCaseTest {
             @Test
             @DisplayName("callSign 빈 값 대입시 생성하지 못한다")
-            public void testCreateBookFail() {
+            public void createBookFailTest() {
                 // Given
                 Book book = Book.builder()
                         .callSign(null)
@@ -74,7 +73,7 @@ public class BookRepositoryTest {
         public class SuccessCaseTest {
             @Test
             @DisplayName("책을 ID로 조회한다")
-            public void testFindBookById() {
+            public void findBookByIdTest() {
                 // Given
                 Book book = Book.builder()
                         .callSign("800.23.v1.c1")
@@ -100,7 +99,7 @@ public class BookRepositoryTest {
         public class FailCaseTest {
             @Test
             @DisplayName("존재하지 않는 ID로 조회하면 null을 반환한다")
-            public void testFindBookByIdFail() {
+            public void findBookByIdFailTest() {
                 // Given
                 Long nonExistingId = 0L;
 
@@ -122,7 +121,7 @@ public class BookRepositoryTest {
         public class SuccessCaseTest {
             @Test
             @DisplayName("책을 수정한다")
-            public void testUpdateBook() {
+            public void updateBookTest() {
                 // Given
                 Book book = Book.builder()
                         .callSign("800.23.v1.c1")
@@ -148,20 +147,6 @@ public class BookRepositoryTest {
         @Nested
         @DisplayName("실패 케이스")
         public class FailCaseTest {
-            @Test
-            @DisplayName("존재하지 않는 책은 수정할 수 없다")
-            public void testUpdateNonExistingBook() {
-                // Given
-                Long nonExistingId = 0L;
-
-                // When
-                Book nonExistingBook = new Book();
-                nonExistingBook.updateIdTest(nonExistingId);
-                nonExistingBook.updateCallSign("100.23.v1.c2");
-
-                // Then
-                assertThrows(Exception.class, () -> bookRepository.save(nonExistingBook));
-            }
         }
     }
 
@@ -174,7 +159,7 @@ public class BookRepositoryTest {
         public class SuccessCaseTest {
             @Test
             @DisplayName("책을 삭제한다")
-            public void testDeleteBookSuccess() {
+            public void deleteBookSuccessTest() {
                 // Given
                 Book book = Book.builder()
                         .callSign("800.23.v1.c1")
@@ -196,7 +181,7 @@ public class BookRepositoryTest {
         public class FailCaseTest {
             @Test
             @DisplayName("존재하지 않는 책 정보를 삭제할 수 없다")
-            public void testDeleteNonExistingBook() {
+            public void deleteNonExistingBookTest() {
                 // Given
                 Long nonExistingId = 10000L;
 

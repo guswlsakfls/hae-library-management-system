@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 public class ResponseLendingDto {
     private Long id;
-    private String title;
     private Long bookId;
     private Long lendingLibrarianId;
     private String lendingCondition;
@@ -22,7 +21,6 @@ public class ResponseLendingDto {
     public static ResponseLendingDto from(Lending lending) {
         ResponseLendingDto dto = new ResponseLendingDto();
         dto.setId(lending.getId());
-        dto.setTitle(lending.getTitle());
         dto.setBookId(lending.getBook().getId());
         dto.setLendingLibrarianId(lending.getLendingLibrarian().getId());
         dto.setLendingCondition(lending.getLendingCondition());
