@@ -7,15 +7,18 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "request_book")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestBook {
+public class RequestBook extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "request_book_id")
+    private Long id;
 
-    @Column(name = "userId", nullable = false)
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "bookId", nullable = false)
-    private int bookId;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "book_info_id")
+//    private BookInfo bookInfo;
 
 }

@@ -1,23 +1,27 @@
 package com.hae.library.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "reservation_id")
+    private Long id;
 
-    @Column(name = "userId", nullable = false)
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "bookId", nullable = false)
-    private int bookId;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "book_info_id")
+//    private BookInfo bookInfo;
 
     @Column(name = "status", nullable = false)
     private byte status;
