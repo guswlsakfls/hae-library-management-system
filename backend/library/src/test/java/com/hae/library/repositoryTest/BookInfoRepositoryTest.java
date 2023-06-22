@@ -155,7 +155,7 @@ public class BookInfoRepositoryTest {
 
                 // When
                 String newTitle = "Updated Book";
-                bookInfo.setTitle(newTitle);
+                bookInfo.updateTitle(newTitle);
                 BookInfo updatedBookInfo = bookInfoRepository.save(bookInfo);
 
                 // Then
@@ -174,7 +174,8 @@ public class BookInfoRepositoryTest {
 
                 // When
                 BookInfo nonExistingBookInfo = new BookInfo();
-                nonExistingBookInfo.setTitle("Updated Book");
+                nonExistingBookInfo.updateId(nonExistingId);
+                nonExistingBookInfo.updateTitle("Updated Book");
 
                 // Then
                 assertThrows(Exception.class, () -> bookInfoRepository.save(nonExistingBookInfo));

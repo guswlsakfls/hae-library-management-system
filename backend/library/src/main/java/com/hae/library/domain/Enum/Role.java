@@ -1,4 +1,4 @@
-package com.hae.library.domain;
+package com.hae.library.domain.Enum;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

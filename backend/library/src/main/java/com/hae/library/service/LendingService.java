@@ -22,7 +22,7 @@ public class LendingService {
         // 도서 대출 로직 구현
         Lending lending = new Lending().builder()
                 .title("title")
-                .book(Book.builder().isbn("isbn").build())
+                .book(Book.builder().callSign("100.32.v1.c2").build())
                 .lendingLibrarian(Member.builder().build())
                 .lendingCondition("lendingCondition")
                 .build();

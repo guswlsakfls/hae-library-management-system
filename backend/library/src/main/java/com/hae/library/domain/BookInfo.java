@@ -64,8 +64,12 @@ public class BookInfo extends BaseTimeEntity{
         this.publishedAt = publishedAt;
     }
 
-    public void setTitle(String title) {
+    public void updateTitle(String title) {
         this.title = title;
+    }
+
+    public void updateId(Long nonExistingId) {
+        this.id = nonExistingId;
     }
 
 }

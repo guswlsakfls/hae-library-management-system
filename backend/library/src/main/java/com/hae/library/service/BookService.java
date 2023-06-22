@@ -2,6 +2,7 @@ package com.hae.library.service;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,8 @@ public class BookService {
     @Transactional
     public void createBook() {
         Book book = new Book().builder()
-                        .isbn("isbn")
                         .callSign("callSign")
-                        .status(1)
+                        .status(BookStatus.FINE)
                         .donator("donator")
                         .build();
         bookRepo.save(book);

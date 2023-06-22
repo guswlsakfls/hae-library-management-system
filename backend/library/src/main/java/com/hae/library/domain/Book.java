@@ -1,5 +1,7 @@
 package com.hae.library.domain;
 
+import com.hae.library.domain.Enum.BookStatus;
+import com.hae.library.domain.Enum.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,24 +27,39 @@ public class Book extends BaseTimeEntity{
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
     private Lending lending;
 
-    @Column(nullable = false)
-    private String isbn;
-
-    @Column(name = "call_sign")
+    @Column(name = "call_sign", nullable = false, unique = true)
     private String callSign;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer status;
+    private BookStatus status = BookStatus.FINE;
 
     @Column(nullable = false, length = 10)
     private String donator;
 
     @Builder
-    public Book(BookInfo bookInfoId, String isbn, String callSign, Integer status, String donator) {
+    public Book(BookInfo bookInfoId, String callSign, BookStatus status, String donator) {
         this.bookInfoId = bookInfoId;
-        this.isbn = isbn;
         this.callSign = callSign;
         this.status = status;
         this.donator = donator;
+    }
+
+    public void updateBookStatus(BookStatus status) {
+        this.status = status;
+    }
+
+    public void updateCallSign(String callSign) {
+        this.callSign = callSign;
+    }
+
+    public void updateIdTest(Long id) {
+        this.id = id;
+    }
+
+    public void updateBook(String newCallSign, BookStatus newStatus, String newDonator) {
+        this.callSign = newCallSign;
+        this.status = newStatus;
+        this.donator = newDonator;
     }
 }
