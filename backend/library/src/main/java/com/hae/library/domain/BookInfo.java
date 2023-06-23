@@ -54,7 +54,20 @@ public class BookInfo extends BaseTimeEntity{
     private String publishedAt;
 
     @Builder
-    public BookInfo(String isbn, String title, String author, String publisher, String image,
+    public BookInfo(Long id, String isbn, String title, String author, String publisher,
+                    String image,
+                    String publishedAt) {
+        this.id = id;
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.image = image;
+        this.publishedAt = publishedAt;
+    }
+
+    public void updateBookInfo(String isbn, String title, String author, String publisher,
+                            String image,
                     String publishedAt) {
         this.isbn = isbn;
         this.title = title;

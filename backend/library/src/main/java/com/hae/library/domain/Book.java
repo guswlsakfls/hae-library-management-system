@@ -22,7 +22,7 @@ public class Book extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_info_id")
-    private BookInfo bookInfoId;
+    private BookInfo bookInfo;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
     private Lending lending;
@@ -38,11 +38,17 @@ public class Book extends BaseTimeEntity{
     private String donator;
 
     @Builder
-    public Book(BookInfo bookInfoId, String callSign, BookStatus status, String donator) {
-        this.bookInfoId = bookInfoId;
+    public Book(BookInfo bookInfo, String callSign, BookStatus status, String donator) {
+        this.bookInfo = bookInfo;
         this.callSign = callSign;
         this.status = status;
         this.donator = donator;
+    }
+
+    public void updateBook(String newCallSign, BookStatus newStatus, String newDonator) {
+        this.callSign = newCallSign;
+        this.status = newStatus;
+        this.donator = newDonator;
     }
 
     public void updateBookStatus(BookStatus status) {
@@ -57,9 +63,4 @@ public class Book extends BaseTimeEntity{
         this.id = id;
     }
 
-    public void updateBook(String newCallSign, BookStatus newStatus, String newDonator) {
-        this.callSign = newCallSign;
-        this.status = newStatus;
-        this.donator = newDonator;
-    }
 }

@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
 
     Optional<BookInfo> findById(Long bookInfoId); // 테스트 케이스 에러나서 작성했는데 필요 한가?
+
+    BookInfo findByIsbn(String isbn);
 }
