@@ -11,8 +11,4 @@ public enum BookStatus {
     LOST("BOOK_LOST");
 
     private final String type;
-
-    public String getType() {
-        return type;
-    }
 }

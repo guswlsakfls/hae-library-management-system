@@ -21,10 +21,10 @@ public class ResponseLendingDto {
     public static ResponseLendingDto from(Lending lending) {
         ResponseLendingDto dto = new ResponseLendingDto();
         dto.setId(lending.getId());
-        dto.setBookId(lending.getBook().getId());
-        dto.setLendingLibrarianId(lending.getLendingLibrarian().getId());
+//        dto.setBookId(lending.getBook().getId());
+//        dto.setLendingLibrarianId(lending.getLendingLibrarian().getId());
         dto.setLendingCondition(lending.getLendingCondition());
-        dto.setReturningLibrarianId(lending.getReturningLibrarian().getId());
+//        dto.setReturningLibrarianId(lending.getReturningLibrarian().getId());
         dto.setReturningCondition(lending.getReturningCondition());
         dto.setReturningAt(lending.getReturningAt().toString());
         dto.setRenew(lending.isRenew());

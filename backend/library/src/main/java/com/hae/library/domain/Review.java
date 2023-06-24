@@ -13,9 +13,9 @@ public class Review {
     @Column(name = "review_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member_id")
+//    private Member member;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "book_info_id")

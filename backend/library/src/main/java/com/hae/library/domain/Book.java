@@ -1,33 +1,27 @@
 package com.hae.library.domain;
 
 import com.hae.library.domain.Enum.BookStatus;
-import com.hae.library.domain.Enum.Role;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
+import lombok.*;
 
 @Entity
 @Getter
-@Table(name = "book")
 @NoArgsConstructor()
+@Table(name = "BOOK")
 public class Book extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "book_id")
+    @Column(name = "BOOK_ID")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_info_id")
-    private BookInfo bookInfoId;
+    @JoinColumn(name = "BOOK_INFO_ID")
+    private BookInfo bookInfo;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
-    private Lending lending;
+//    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private Lending lending;
 
-    @Column(name = "call_sign", nullable = false, unique = true)
+    @Column(name = "CALL_SIGN", nullable = false, unique = true)
     private String callSign;
 
     @Enumerated(EnumType.STRING)
@@ -38,11 +32,25 @@ public class Book extends BaseTimeEntity{
     private String donator;
 
     @Builder
-    public Book(BookInfo bookInfoId, String callSign, BookStatus status, String donator) {
-        this.bookInfoId = bookInfoId;
+    public Book(String callSign, BookStatus status, String donator) {
         this.callSign = callSign;
         this.status = status;
         this.donator = donator;
+    }
+
+    public void updateBook(String newCallSign, BookStatus newStatus, String newDonator) {
+        this.callSign = newCallSign;
+        this.status = newStatus;
+        this.donator = newDonator;
+    }
+
+    public void addBookInfo(BookInfo bookInfo) {
+        this.bookInfo = bookInfo;
+
+        // 무한루프 체크
+        if (!bookInfo.getBookList().contains(this)) {
+            bookInfo.getBookList().add(this);
+        }
     }
 
     public void updateBookStatus(BookStatus status) {
@@ -57,9 +65,7 @@ public class Book extends BaseTimeEntity{
         this.id = id;
     }
 
-    public void updateBook(String newCallSign, BookStatus newStatus, String newDonator) {
-        this.callSign = newCallSign;
-        this.status = newStatus;
-        this.donator = newDonator;
+    public void updateBookInfo(BookInfo bookInfo) {
+        this.bookInfo = bookInfo;
     }
 }
