@@ -7,21 +7,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
-@Table(name = "book_info")
 @Getter
+@Table(name = "BOOK_INFO")
 @NoArgsConstructor()
 public class BookInfo extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "book_info_id")
+    @Column(name = "BOOK_INFO_ID")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "CATEGORY")
     private Category category;
+
+    @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.REMOVE)
+    private List<Book> bookList = new ArrayList<Book>();
 
 //    @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
 //    private ArrayList<RequestBook> requestBookList = new ArrayList<RequestBook>();
@@ -67,14 +72,19 @@ public class BookInfo extends BaseTimeEntity{
     }
 
     public void updateBookInfo(String isbn, String title, String author, String publisher,
-                            String image,
-                    String publishedAt) {
+                               String image,
+                               String publishedAt) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
         this.image = image;
         this.publishedAt = publishedAt;
+    }
+
+    public void changeBookList(Book book) {
+        this.bookList.add(book);
+        book.updateBookInfo(this);
     }
 
     public void updateTitle(String title) {
@@ -86,3 +96,6 @@ public class BookInfo extends BaseTimeEntity{
     }
 
 }
+
+
+
