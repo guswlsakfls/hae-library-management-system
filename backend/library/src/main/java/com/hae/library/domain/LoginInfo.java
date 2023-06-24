@@ -15,11 +15,11 @@ public class LoginInfo extends BaseTimeEntity {
     @Column(name = "login_info_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member_id")
+//    private Member member;
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
+//    public void setMember(Member member) {
+//        this.member = member;
+//    }
 }

@@ -9,7 +9,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class ResponseBookDto {
+public class ResponseBookWithBookInfoDto {
     private Long id;
     private ResponseBookInfoDto bookInfo;
     private String callSign;
@@ -17,7 +17,8 @@ public class ResponseBookDto {
     private String donator;
 
     @Builder
-    public ResponseBookDto(Long id, ResponseBookInfoDto bookInfo, String callSign, BookStatus status, String donator) {
+    public ResponseBookWithBookInfoDto(Long id, ResponseBookInfoDto bookInfo, String callSign,
+                            BookStatus status, String donator) {
         this.id = id;
         this.bookInfo = bookInfo;
         this.callSign = callSign;
@@ -25,8 +26,8 @@ public class ResponseBookDto {
         this.donator = donator;
     }
 
-    public static ResponseBookDto from(Book book) {
-        return ResponseBookDto.builder()
+    public static ResponseBookWithBookInfoDto from(Book book) {
+        return ResponseBookWithBookInfoDto.builder()
                 .id(book.getId())
                 .bookInfo(ResponseBookInfoDto.from(book.getBookInfo()))
                 .callSign(book.getCallSign())

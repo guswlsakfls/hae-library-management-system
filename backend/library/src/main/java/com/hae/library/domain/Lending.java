@@ -10,50 +10,50 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "lending")
+@Table(name = "LENDING")
 @NoArgsConstructor()
 public class Lending extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lending_id")
+    @Column(name = "LENDING_ID")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private Book book;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "BOOK_ID")
+//    private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Member user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "USER")
+//    private Member user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lendingLibrarian_id")
-    private Member lendingLibrarian;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "LENDING_LIBRARIAN")
+//    private Member lendingLibrarian;
 
-    @Column(name = "lending_condition", nullable = false, length = 300 )
+    @Column(name = "LENDING_CONDITION", nullable = false, length = 300 )
     private String lendingCondition;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "returning_id")
-    private Member returningLibrarian;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "RETURNING_ID")
+//    private Member returningLibrarian;
 
-    @Column(name = "returning_condition")
+    @Column(name = "RETURNING_CONDITION")
     private String returningCondition;
 
-    @Column(name = "returning_at")
+    @Column(name = "RETURNING_AT")
     private LocalDateTime returningAt;
 
-    @Column(name = "renew")
+    @Column(name = "RENEW")
     private boolean renew = false;
 
     @Builder
     public Lending(Book book, Member user ,Member lendingLibrarian, String lendingCondition,
                    Member returningLibrarian, String returningCondition, LocalDateTime returningAt, boolean renew) {
-        this.user = user;
-        this.book = book;
-        this.lendingLibrarian = lendingLibrarian;
+//        this.user = user;
+//        this.book = book;
+//        this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
-        this.returningLibrarian = returningLibrarian;
+//        this.returningLibrarian = returningLibrarian;
         this.returningCondition = returningCondition;
         this.returningAt = returningAt;
         this.renew = renew;
@@ -68,7 +68,7 @@ public class Lending extends BaseTimeEntity{
     }
 
     public void setReturning(Member member, String lendingCondition) {
-        this.returningLibrarian = member;
+//        this.returningLibrarian = member;
         this.lendingCondition = lendingCondition;
     }
 
@@ -87,7 +87,7 @@ public class Lending extends BaseTimeEntity{
     }
 
     public void updateReturning(Member returninglibrarian, String returningCondition) {
-        this.returningLibrarian = returninglibrarian;
+//        this.returningLibrarian = returninglibrarian;
         this.returningCondition = returningCondition;
         this.returningAt = LocalDateTime.now();
     }

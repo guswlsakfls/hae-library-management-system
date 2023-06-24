@@ -23,23 +23,23 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_id")
     private Long id;
 
-    @OneToMany(mappedBy = "user")
-    private List<Lending> LendingList = new ArrayList<Lending>();
-
-    @OneToMany(mappedBy = "member")
-    private List<LoginInfo> loginInfoList = new ArrayList<LoginInfo>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Reservation> reservationList = new ArrayList<Reservation>();
-
-    @OneToMany(mappedBy = "member")
-    private List<RequestBook> requestBookList = new ArrayList<RequestBook>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Review> reviewList = new ArrayList<Review>();
-
-    @OneToMany(mappedBy = "member")
-    private List<BookMark> bookMarkList = new ArrayList<BookMark>();
+//    @OneToMany(mappedBy = "user")
+//    private List<Lending> LendingList = new ArrayList<Lending>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<LoginInfo> loginInfoList = new ArrayList<LoginInfo>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Reservation> reservationList = new ArrayList<Reservation>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<RequestBook> requestBookList = new ArrayList<RequestBook>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Review> reviewList = new ArrayList<Review>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<BookMark> bookMarkList = new ArrayList<BookMark>();
 
     @Column(name = "member_name", length = 10, nullable = false)
     private String name;
