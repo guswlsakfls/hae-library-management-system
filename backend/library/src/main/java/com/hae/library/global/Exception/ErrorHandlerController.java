@@ -1,4 +1,4 @@
-package com.hae.library.controller;
+package com.hae.library.global.Exception;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;

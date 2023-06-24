@@ -3,6 +3,7 @@ package com.hae.library.controller;
 import com.hae.library.domain.Book;
 import com.hae.library.dto.Book.RequestBookDto;
 import com.hae.library.dto.Book.ResponseBookDto;
+import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.errorCode.CommonErrorCode;
@@ -37,10 +38,10 @@ public class BookController {
 
     @GetMapping(value = "/v1/book/all")
     public ResponseResultDto getAllBook() {
-        List<ResponseBookDto> bookList = bookService.getAllBook();
+        List<ResponseBookWithBookInfoDto> bookList = bookService.getAllBook();
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("책 목록 조회에 성공하였습니다")
+                .message("모든 책 조회에 성공하였습니다")
                 .data(bookList)
                 .build();
     }
@@ -48,23 +49,23 @@ public class BookController {
     @GetMapping(value = "/v1/book/{bookId}")
     public ResponseResultDto getBookById(@PathVariable("bookId") Long bookId) {
         log.info("bookId: {}", bookId);
-        ResponseBookDto responseBookDto = bookService.getBookById(bookId);
+        ResponseBookWithBookInfoDto  bookWithBookInfoDto = bookService.getBookById(bookId);
 
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("책 조회에 성공하였습니다")
-                .data(responseBookDto)
+                .message("하나의 책 조회에 성공하였습니다")
+                .data(bookWithBookInfoDto)
                 .build();
     }
 
     @PutMapping(value = "/v1/book/modify")
     public ResponseResultDto<Object> updateBookById(@RequestBody RequestBookDto requestBookDto) {
         log.info("requestBookDto: {}", requestBookDto.toString());
-        Book updateBook = bookService.updateBookById(requestBookDto);
+        ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBookById(requestBookDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("책 정보 수정에 성공하였습니다")
-                .data(updateBook)
+                .message("책 수정에 성공하였습니다")
+                .data(bookWithBookInfo)
                 .build();
     }
 
@@ -74,7 +75,7 @@ public class BookController {
 
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("책 정보 삭제에 성공하였습니다")
+                .message("책 삭제에 성공하였습니다")
                 .data(null)
                 .build();
     }
