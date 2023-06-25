@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
-    BookInfo findByIsbn(String isbn);
+    Optional<BookInfo> findByIsbn(String isbn);
 }

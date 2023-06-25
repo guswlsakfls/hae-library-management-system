@@ -3,8 +3,7 @@ package com.hae.library.service;
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Enum.BookStatus;
-import com.hae.library.dto.Book.RequestBookDto;
-import com.hae.library.dto.Book.ResponseBookDto;
+import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,16 +28,22 @@ public class BookService {
     private final BookInfoService bookInfoService;
 
     @Transactional
-    public void createBook(RequestBookDto requestBookDto) {
-        log.error("requestBookDto: {}", requestBookDto);
-        if (bookRepo.existsByCallSign(requestBookDto.getCallSign())) {
+    public void createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+        log.error("requestBookDto: {}", requestBookWithBookInfoDto);
+        if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
             throw new RestApiException(BookErrorCode.DUPLICATE_BOOK);
         }
 
-        BookInfo bookInfo = bookInfoRepo.findByIsbn(requestBookDto.getIsbn());
-        if (bookInfo == null) {
-            ResponseBookInfoDto responseBookInfo = bookInfoService.createBookInfo(requestBookDto);
-            bookInfo = BookInfo.builder()
+        Optional<BookInfo> bookInfoOptional = bookInfoRepo.findByIsbn(requestBookWithBookInfoDto.getIsbn());
+
+        if (bookInfoOptional.isPresent()) {
+            // BookInfo가 존재하는 경우
+            BookInfo bookInfo = bookInfoOptional.get();
+            saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
+        } else {
+            // BookInfo가 존재하지 않는 경우
+            ResponseBookInfoDto responseBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+            BookInfo bookInfo = BookInfo.builder()
                     .id(responseBookInfo.getId())
                     .title(responseBookInfo.getTitle())
                     .author(responseBookInfo.getAuthor())
@@ -46,15 +52,16 @@ public class BookService {
                     .publisher(responseBookInfo.getPublisher())
                     .publishedAt(responseBookInfo.getPublishedAt())
                     .build();
+            saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         }
+    }
 
+    private void saveBookWithBookInfo(RequestBookWithBookInfoDto requestBookWithBookInfoDto, BookInfo bookInfo) {
         Book book = Book.builder()
-//                .bookInfo(bookInfo)
-                .callSign(requestBookDto.getCallSign())
-                .status(BookStatus.valueOf(requestBookDto.getStatus()))
-                .donator(requestBookDto.getDonator())
+                .callSign(requestBookWithBookInfoDto.getCallSign())
+                .status(BookStatus.valueOf(requestBookWithBookInfoDto.getStatus()))
+                .donator(requestBookWithBookInfoDto.getDonator())
                 .build();
-//        bookInfo.changeBookList(book);
         book.addBookInfo(bookInfo);
         bookRepo.save(book);
     }
@@ -74,18 +81,18 @@ public class BookService {
         return ResponseBookWithBookInfoDto.from(book);
     }
 
-    public ResponseBookWithBookInfoDto updateBookById(RequestBookDto requestBook) {
-        log.error("updateBookById", requestBook);
+    public ResponseBookWithBookInfoDto updateBookById(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+        log.error("updateBookById", requestBookWithBookInfoDto);
         // 도서 ID로 도서 업데이트 로직 구현
-        Book book = bookRepo.findById(requestBook.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
+        Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
         BookInfo bookInfo = book.getBookInfo();
 
-        bookInfo.updateBookInfo(requestBook.getTitle(), requestBook.getIsbn(), requestBook.getAuthor(),
-                requestBook.getPublisher(), requestBook.getPublishedAt(), requestBook.getImage());
+        bookInfo.updateBookInfo(requestBookWithBookInfoDto.getTitle(), requestBookWithBookInfoDto.getIsbn(), requestBookWithBookInfoDto.getAuthor(),
+                requestBookWithBookInfoDto.getPublisher(), requestBookWithBookInfoDto.getPublishedAt(), requestBookWithBookInfoDto.getImage());
         bookInfoRepo.save(bookInfo);
 
-        book.updateBook(requestBook.getCallSign(),
-                BookStatus.valueOf(requestBook.getStatus()), requestBook.getDonator());
+        book.updateBook(requestBookWithBookInfoDto.getCallSign(),
+                BookStatus.valueOf(requestBookWithBookInfoDto.getStatus()), requestBookWithBookInfoDto.getDonator());
         bookRepo.save(book);
 
         return ResponseBookWithBookInfoDto.from(book);

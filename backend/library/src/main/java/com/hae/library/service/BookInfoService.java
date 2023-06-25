@@ -2,7 +2,7 @@ package com.hae.library.service;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
-import com.hae.library.dto.Book.RequestBookDto;
+import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
@@ -23,8 +23,9 @@ import java.util.stream.Collectors;
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepo;
 
+    // bookService.createBook에 쓰인다
     @Transactional
-    public ResponseBookInfoDto createBookInfo(RequestBookDto requestBookDto) {
+    public ResponseBookInfoDto createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
         BookInfo bookInfo = BookInfo.builder()
                 .title(requestBookDto.getTitle())
                 .author(requestBookDto.getAuthor())
@@ -34,8 +35,8 @@ public class BookInfoService {
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
 
-        bookInfoRepo.save(bookInfo);
-        return ResponseBookInfoDto.from(bookInfo);
+        BookInfo newBookInfo = bookInfoRepo.save(bookInfo);
+        return ResponseBookInfoDto.from(newBookInfo);
     }
 
     @Transactional
@@ -58,19 +59,20 @@ public class BookInfoService {
         return ResponseBookInfoWithBookDto.from(bookInfo);
     }
 
-    @Transactional
-    public ResponseBookInfoDto updateBookInfoById(RequestBookInfoDto requestBookInfoDto) {
-        BookInfo bookInfo = new BookInfo().builder()
-                .title("title")
-                .isbn("isbn")
-                .author("author")
-                .publisher("publisher")
-                .image("image")
-                .publishedAt("publishedAt")
-                .build();
-        bookInfoRepo.save(bookInfo);
-        return null;
-    }
+    //TODO: 책 정보만 수정할 때는 없을 것 같다(나중에 삭제)
+//    @Transactional
+//    public ResponseBookInfoDto updateBookInfoById(RequestBookInfoDto requestBookInfoDto) {
+//        BookInfo bookInfo = new BookInfo().builder()
+//                .title("title")
+//                .isbn("isbn")
+//                .author("author")
+//                .publisher("publisher")
+//                .image("image")
+//                .publishedAt("publishedAt")
+//                .build();
+//        bookInfoRepo.save(bookInfo);
+//        return null;
+//    }
 
     @Transactional
     public void deleteBookInfoById(Long id) {

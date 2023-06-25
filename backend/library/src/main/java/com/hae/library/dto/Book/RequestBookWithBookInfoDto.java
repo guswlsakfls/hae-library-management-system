@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class RequestBookDto {
+public class RequestBookWithBookInfoDto {
     private Long id;
 
 //    @NotBlank(message = "도서 번호를 입력해주세요.")
@@ -45,19 +45,19 @@ public class RequestBookDto {
 //    @Size(max = 20, message = "기증자는 20자를 넘을 수 없습니다.")
     private String donator;
 
-//    @Builder
-//    public RequestBookDto(String callSign, String isbn, String title,
-//                           String author, String publisher,
-//                          String image, String publishedAt, String status, String donator) {
-//        this.callSign = callSign;
-//        this.isbn = isbn;
-//        this.title = title;
-//        this.author = author;
-//        this.publisher = publisher;
-//        this.image = image;
-//        this.publishedAt = publishedAt;
-//        this.status = status;
-//        this.donator = donator;
-//    }
+    @Builder
+    public RequestBookWithBookInfoDto(String callSign, String isbn, String title,
+                           String author, String publisher,
+                          String image, String publishedAt, String status, String donator) {
+        this.callSign = callSign;
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.image = image;
+        this.publishedAt = publishedAt;
+        this.status = status;
+        this.donator = donator;
+    }
 }
 

@@ -8,32 +8,32 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api")
 public class MemberContorller {
 
-    @PostMapping(value = "/v1/member/signup")
+    @PostMapping(value = "/member/signup")
     public String signUp() {
         return "MemberContorller";
     }
 
-    @PostMapping(value = "/v1/member/login")
+    @PostMapping(value = "/member/login")
     public String loginMember() {
         return "MemberContorller";
     }
 
-    @GetMapping(value = "/v1/member/{memberId}/me")
+    @GetMapping(value = "/member/{memberId}/me")
     public String getMemberMe() {
         return "MemberContorller";
     }
 
-    @PutMapping(value = "/v1/member/{memberId}/password")
+    @PutMapping(value = "/member/{memberId}/password")
     public String updateMemberPassword() {
         return "MemberContorller";
     }
 
-    @PutMapping(value = "/v1/member/{memberId}/name")
+    @PutMapping(value = "/member/{memberId}/name")
     public String updateMembername() {
         return "MemberContorller";
     }
 
-    @DeleteMapping(value = "/v1/member/{memberId}/delete")
+    @DeleteMapping(value = "/member/{memberId}/delete")
     public String deleteMember() {
         return "MemberContorller";
     }
