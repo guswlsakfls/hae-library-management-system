@@ -27,8 +27,7 @@ public class TokenProvider {
     private static final String BEARER_TYPE = "bearer";
     private final Key key;
 
-    @Value("${jwt.expiration}")
-    private static long ACCESS_TOKEN_EXPIRE_TIME;
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000000 * 60 * 60 * 24 * 7L; // 7일
 
 
 
@@ -47,10 +46,9 @@ public class TokenProvider {
 
         long now = (new Date()).getTime();
 
-
         Date tokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
 
-        System.out.println(tokenExpiresIn);
+        log.error(String.valueOf(tokenExpiresIn));
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())

@@ -44,12 +44,4 @@ public class AuthService {
 
         return ResponseMemberDto.from(memberRepository.save(member));
     }
-
-    public TokenDto login(RequestMemberDto requestDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
-
-        Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-
-        return tokenProvider.createToken(authentication);
-    }
 }
