@@ -59,7 +59,7 @@ public class BookInfoController {
 //                .build();
 //    }
 
-    @DeleteMapping(value = "/bookinfo/{bookInfoId}")
+    @DeleteMapping(value = "/bookinfo/{bookInfoId}/delete")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
         bookInfoService.deleteBookInfoById(bookInfoId);
 
