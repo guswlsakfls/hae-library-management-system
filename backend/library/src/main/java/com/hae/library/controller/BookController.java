@@ -24,14 +24,15 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
+    @ResponseBody
     @PostMapping(value = "/book/create")
-    public ResponseResultDto createBook(@RequestBody RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+    public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.error("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
-        bookService.createBook(requestBookWithBookInfoDto);
+        ResponseBookWithBookInfoDto responseBookWithBookInfoDto = bookService.createBook(requestBookWithBookInfoDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책이 성공적으로 등록되었습니다")
-                .data(null)
+                .data(responseBookWithBookInfoDto)
                 .build();
     }
 
@@ -45,7 +46,7 @@ public class BookController {
                 .build();
     }
 
-    @GetMapping(value = "/book/{bookId}")
+    @GetMapping(value = "/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") Long bookId) {
         log.info("bookId: {}", bookId);
         ResponseBookWithBookInfoDto  bookWithBookInfoDto = bookService.getBookById(bookId);
@@ -58,9 +59,9 @@ public class BookController {
     }
 
     @PutMapping(value = "/book/modify")
-    public ResponseResultDto<Object> updateBookById(@RequestBody RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+    public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
-        ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBookById(requestBookWithBookInfoDto);
+        ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBook(requestBookWithBookInfoDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 수정에 성공하였습니다")
@@ -68,7 +69,7 @@ public class BookController {
                 .build();
     }
 
-    @DeleteMapping(value = "/book/{bookId}")
+    @DeleteMapping(value = "/book/{bookId}/delete")
     public ResponseResultDto<Object> deleteBookById(@PathVariable("bookId") Long bookId) {
         bookService.deleteBookById(bookId);
 

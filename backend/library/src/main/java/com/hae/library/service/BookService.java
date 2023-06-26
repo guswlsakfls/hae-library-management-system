@@ -6,6 +6,7 @@ import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
+import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.repository.BookInfoRepository;
@@ -28,7 +29,7 @@ public class BookService {
     private final BookInfoService bookInfoService;
 
     @Transactional
-    public void createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+    public ResponseBookWithBookInfoDto createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.error("requestBookDto: {}", requestBookWithBookInfoDto);
         if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
             throw new RestApiException(BookErrorCode.DUPLICATE_BOOK);
@@ -36,10 +37,13 @@ public class BookService {
 
         Optional<BookInfo> bookInfoOptional = bookInfoRepo.findByIsbn(requestBookWithBookInfoDto.getIsbn());
 
+        ResponseBookWithBookInfoDto responseBookWithBookInfoDto;
         if (bookInfoOptional.isPresent()) {
             // BookInfo가 존재하는 경우
             BookInfo bookInfo = bookInfoOptional.get();
-            saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
+            responseBookWithBookInfoDto =
+                    saveBookWithBookInfo(requestBookWithBookInfoDto,
+                    bookInfo);
         } else {
             // BookInfo가 존재하지 않는 경우
             ResponseBookInfoDto responseBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
@@ -52,18 +56,23 @@ public class BookService {
                     .publisher(responseBookInfo.getPublisher())
                     .publishedAt(responseBookInfo.getPublishedAt())
                     .build();
-            saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
+            responseBookWithBookInfoDto =
+                    saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         }
+
+        return responseBookWithBookInfoDto;
     }
 
-    private void saveBookWithBookInfo(RequestBookWithBookInfoDto requestBookWithBookInfoDto, BookInfo bookInfo) {
+    private ResponseBookWithBookInfoDto saveBookWithBookInfo(RequestBookWithBookInfoDto requestBookWithBookInfoDto,
+                                                             BookInfo bookInfo) {
         Book book = Book.builder()
                 .callSign(requestBookWithBookInfoDto.getCallSign())
                 .status(BookStatus.valueOf(requestBookWithBookInfoDto.getStatus()))
                 .donator(requestBookWithBookInfoDto.getDonator())
                 .build();
         book.addBookInfo(bookInfo);
-        bookRepo.save(book);
+        Book updateBook = bookRepo.save(book);
+        return ResponseBookWithBookInfoDto.from(updateBook);
     }
 
     @Transactional
@@ -77,14 +86,14 @@ public class BookService {
 
     @Transactional
     public ResponseBookWithBookInfoDto getBookById(Long bookId) {
-        Book book = bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
+        Book book = bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         return ResponseBookWithBookInfoDto.from(book);
     }
 
-    public ResponseBookWithBookInfoDto updateBookById(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+    public ResponseBookWithBookInfoDto updateBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.error("updateBookById", requestBookWithBookInfoDto);
         // 도서 ID로 도서 업데이트 로직 구현
-        Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
+        Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         BookInfo bookInfo = book.getBookInfo();
 
         bookInfo.updateBookInfo(requestBookWithBookInfoDto.getTitle(), requestBookWithBookInfoDto.getIsbn(), requestBookWithBookInfoDto.getAuthor(),
@@ -100,9 +109,7 @@ public class BookService {
 
     public void deleteBookById(Long bookId) {
         Book book =
-                bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
+                bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         bookRepo.deleteById(bookId);
     }
-
-
 }

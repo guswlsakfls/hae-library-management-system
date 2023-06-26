@@ -53,7 +53,7 @@ public class BookInfoService {
     public ResponseBookInfoWithBookDto getBookInfoById(Long bookInfoId) {
         log.info("bookInfoId: {}", bookInfoId);// 또는 log 등을 사용하여 로그로 출력
         BookInfo bookInfo =
-                bookInfoRepo.findById(bookInfoId).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOKINFO_BY_ID));
+                bookInfoRepo.findById(bookInfoId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO_BY_ID));
         List<Book> bookList = bookInfo.getBookList();
         log.info("bookList: {}", bookList.toString());// 또는 log 등을 사용하여 로그로 출력
         return ResponseBookInfoWithBookDto.from(bookInfo);
@@ -76,7 +76,7 @@ public class BookInfoService {
 
     @Transactional
     public void deleteBookInfoById(Long id) {
-        BookInfo bookInfo = bookInfoRepo.findById(id).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_FOUND_BOOK));
+        BookInfo bookInfo = bookInfoRepo.findById(id).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         bookInfoRepo.deleteById(id);
     }
 }
