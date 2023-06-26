@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -44,10 +42,10 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_name", length = 10, nullable = false)
     private String name;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String email;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private String password;
 
     @Column(name = "penalty_end_date")
@@ -55,13 +53,18 @@ public class Member extends BaseTimeEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Role role = Role.ROLE_USER;
+
+    @Column(name = "activated")
+    private boolean activated = true;
 
     @Builder
-    public Member(String name, String email, String password, LocalDateTime penaltyEndDate) {
+    public Member(String name, String email, String password, Role role,
+                  LocalDateTime penaltyEndDate) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
         this.penaltyEndDate = penaltyEndDate;
     }
 
@@ -73,11 +76,11 @@ public class Member extends BaseTimeEntity{
         this.penaltyEndDate = penaltyEndDate;
     }
 
-    public void setRole(Role role) {
+    public void updateRole(Role role) {
         this.role = role;
     }
 
-    public void setName(String name) {
+    public void updateName(String name) {
         this.name = name;
     }
 }

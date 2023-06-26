@@ -1,77 +1,40 @@
 package com.hae.library.service;
 
+import com.hae.library.util.SecurityUtil;
 import com.hae.library.domain.Member;
-import com.hae.library.dto.Member.LoginRequestDto;
-import com.hae.library.dto.Member.SignupRequestDto;
+import com.hae.library.dto.Member.ResponseMemberDto;
 import com.hae.library.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class MemberService {
-    private final MemberRepository memberRepo;
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public Member signup(SignupRequestDto signupRequestDto) {
-        // 회원 가입 로직 구현
-        Member member = Member.builder()
-                .name(signupRequestDto.getName())
-                .email(signupRequestDto.getEmail())
-                .password(signupRequestDto.getPassword())
-                .build();
-        return memberRepo.save(member);
+    public ResponseMemberDto getMyInfoBySecurity() {
+        return memberRepository.findById(SecurityUtil.getCurrentMemberId())
+                .map(ResponseMemberDto::from)
+                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
     }
 
-    // TODO: accessToken 발행 되야 하지 않나?
-    public boolean login(LoginRequestDto loginRequestDto) {
-        // 로그인 로직 구현
-        Optional<Member> optionalMember = memberRepo.findByEmail(loginRequestDto.getEmail());
-        if (optionalMember.isPresent()) {
-            Member member = optionalMember.get();
-            if (member.getPassword().equals(loginRequestDto.getPassword())) {
-                return true;
-            }
+    @Transactional
+    public ResponseMemberDto changeMemberName(String email, String name) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        member.updateName(name);
+        return ResponseMemberDto.from(memberRepository.save(member));
+    }
+
+    @Transactional
+    public ResponseMemberDto changeMemberPassword(String email, String exPassword, String newPassword) {
+        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        if (!passwordEncoder.matches(exPassword, member.getPassword())) {
+            throw new RuntimeException("비밀번호가 맞지 않습니다");
         }
-        return false;
-    }
-
-    public Member getMemberById(Long memberId) {
-        // 특정 회원 조회 로직 구현
-        return memberRepo.findById(memberId).orElse(null);
-    }
-
-    @Transactional
-    public void updateMemberPassword(Long memberId, String newPassword) {
-        // 회원 비밀번호 수정 로직 구현
-        Optional<Member> optionalMember = memberRepo.findById(memberId);
-        optionalMember.ifPresent(member -> {
-            member.updatePassword(newPassword);
-            memberRepo.save(member);
-        });
-    }
-
-    @Transactional
-    public void updateMemberName(Long memberId, String newName) {
-        // 회원 이름 수정 로직 구현
-        Optional<Member> optionalMember = memberRepo.findById(memberId);
-        optionalMember.ifPresent(member -> {
-            member.setName(newName);
-            memberRepo.save(member);
-        });
-    }
-
-    @Transactional
-    public boolean deleteMember(Long memberId) {
-        // 회원 삭제 로직 구현
-        Optional<Member> optionalMember = memberRepo.findById(memberId);
-        if (optionalMember.isPresent()) {
-            memberRepo.deleteById(memberId);
-            return true;
-        }
-        return false;
+        member.updatePassword(passwordEncoder.encode((newPassword)));
+        return ResponseMemberDto.from(memberRepository.save(member));
     }
 }
