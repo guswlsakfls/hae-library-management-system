@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -18,8 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-@AllArgsConstructor
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<Object> handleCustomException(RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
@@ -33,16 +35,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(errorCode, e.getMessage());
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Object> handleMethodArgumentNotValid(
-//            final MethodArgumentNotValidException e,
-//            final HttpHeaders headers,
-//            final HttpStatus status,
-//            final WebRequest request) {
-//        log.warn("handleIllegalArgument", e);
-//        final ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
-//        return handleExceptionInternal(e, errorCode);
-//    }
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public ResponseEntity<Object> handleMethodArgumentNotValid (
+            final MethodArgumentNotValidException e) {
+        log.error("handleIllegalArgument!!!!!!!!!", e);
+        final ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+        return handleExceptionInternal(e, errorCode);
+    }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(Exception ex) {
@@ -53,6 +52,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(errorCode));
     }
 
@@ -65,6 +65,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
         return ResponseEntity.status(errorCode.getHttpStatus())
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(errorCode, message));
     }
 
@@ -77,6 +78,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(e, errorCode));
     }
 

@@ -1,8 +1,7 @@
 package com.hae.library.controller;
 
 import com.hae.library.domain.Book;
-import com.hae.library.dto.Book.RequestBookDto;
-import com.hae.library.dto.Book.ResponseBookDto;
+import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
@@ -25,18 +24,19 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
-    @PostMapping(value = "/v1/book/create")
-    public ResponseResultDto createBook(@RequestBody RequestBookDto requestBookDto) {
-        log.error("requestBookDto: {}", requestBookDto.toString());
-        bookService.createBook(requestBookDto);
+    @ResponseBody
+    @PostMapping(value = "/book/create")
+    public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+        log.error("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
+        ResponseBookWithBookInfoDto responseBookWithBookInfoDto = bookService.createBook(requestBookWithBookInfoDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책이 성공적으로 등록되었습니다")
-                .data(null)
+                .data(responseBookWithBookInfoDto)
                 .build();
     }
 
-    @GetMapping(value = "/v1/book/all")
+    @GetMapping(value = "/book/all")
     public ResponseResultDto getAllBook() {
         List<ResponseBookWithBookInfoDto> bookList = bookService.getAllBook();
         return ResponseResultDto.builder()
@@ -46,7 +46,7 @@ public class BookController {
                 .build();
     }
 
-    @GetMapping(value = "/v1/book/{bookId}")
+    @GetMapping(value = "/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") Long bookId) {
         log.info("bookId: {}", bookId);
         ResponseBookWithBookInfoDto  bookWithBookInfoDto = bookService.getBookById(bookId);
@@ -58,10 +58,10 @@ public class BookController {
                 .build();
     }
 
-    @PutMapping(value = "/v1/book/modify")
-    public ResponseResultDto<Object> updateBookById(@RequestBody RequestBookDto requestBookDto) {
-        log.info("requestBookDto: {}", requestBookDto.toString());
-        ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBookById(requestBookDto);
+    @PutMapping(value = "/book/modify")
+    public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
+        log.info("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
+        ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBook(requestBookWithBookInfoDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 수정에 성공하였습니다")
@@ -69,7 +69,7 @@ public class BookController {
                 .build();
     }
 
-    @DeleteMapping(value = "/v1/book/{bookId}")
+    @DeleteMapping(value = "/book/{bookId}/delete")
     public ResponseResultDto<Object> deleteBookById(@PathVariable("bookId") Long bookId) {
         bookService.deleteBookById(bookId);
 

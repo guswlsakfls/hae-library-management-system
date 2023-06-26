@@ -20,14 +20,14 @@ public class BookInfoController {
     private final BookInfoService bookInfoService;
 
 //    // TODO: 실물 책을 가지고 하는 것이라면, 실물 책이 있을시에만 책 정보를 등록한다.(bookContoller에서 bookInfo를 등록한다.)
-//    @PostMapping(value = "/v1/bookinfo")
+//    @PostMapping(value = "/bookinfo")
 //    public String createBookInfo(RequestBookInfoDto requestBookInfoDto) {
 //        bookInfoService.createBookInfo(requestBookInfoDto);
 //
 //        return "BookInfoController";
 //    }
 
-    @GetMapping(value = "/v1/bookinfo/all")
+    @GetMapping(value = "/bookinfo/all")
     public ResponseResultDto getAllBookInfo() {
         List<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoService.getAllBookInfo();
         return ResponseResultDto.builder()
@@ -37,7 +37,7 @@ public class BookInfoController {
                 .build();
     }
 
-    @GetMapping(value = "/v1/bookinfo/{bookInfoId}")
+    @GetMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> getBookInfoById(@PathVariable Long bookInfoId) {
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoById(bookInfoId);
         return ResponseResultDto.builder()
@@ -48,7 +48,7 @@ public class BookInfoController {
     }
 
     // TODO: 실물 책 정보까지 한번에 수정(BookController에서 bookInfo를 수정한다. / 추후 고민)
-//    @PutMapping(value = "/v1/bookinfo/modify")
+//    @PutMapping(value = "/bookinfo/modify")
 //    public ResponseResultDto<Object> updateBookInfoById(@RequestBody RequestBookInfoDto requestBookInfoDto) {
 //        log.info("requestBookInfoDto: {}", requestBookInfoDto.toString());
 //        ResponseBookInfoDto responseBookInfoDto = bookInfoService.updateBookInfoById(requestBookInfoDto);
@@ -59,7 +59,7 @@ public class BookInfoController {
 //                .build();
 //    }
 
-    @DeleteMapping(value = "/v1/bookinfo/{bookInfoId}")
+    @DeleteMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
         bookInfoService.deleteBookInfoById(bookInfoId);
 

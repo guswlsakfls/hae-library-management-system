@@ -2,16 +2,15 @@ package com.hae.library.repositoryTest;
 
 import com.hae.library.domain.BookInfo;
 import com.hae.library.repository.BookInfoRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-//@TestPropertySource("classpath:application-test.properties") // 필요 없는 듯
 @DisplayName("BookInfoRepository 단위 테스트")
 public class BookInfoRepositoryTest {
     @Autowired
@@ -25,7 +24,7 @@ public class BookInfoRepositoryTest {
         public class SuccessCaseTest {
             @Test
             @DisplayName("책 정보를 입력받아 생성한다")
-            public void CreateBookInfoSuccessTest() {
+            public void createBookInfoTest() {
                 // Given
                 BookInfo bookInfo = BookInfo.builder()
                         .isbn("9791168473690")
@@ -40,13 +39,14 @@ public class BookInfoRepositoryTest {
                 BookInfo createdBookInfo = bookInfoRepository.save(bookInfo);
 
                 // Then
-                assertNotNull(createdBookInfo.getId());
-                assertEquals(bookInfo.getIsbn(), createdBookInfo.getIsbn());
-                assertEquals(bookInfo.getTitle(), createdBookInfo.getTitle());
-                assertEquals(bookInfo.getAuthor(), createdBookInfo.getAuthor());
-                assertEquals(bookInfo.getPublisher(), createdBookInfo.getPublisher());
-                assertEquals(bookInfo.getImage(), createdBookInfo.getImage());
-                assertEquals(bookInfo.getPublishedAt(), createdBookInfo.getPublishedAt());
+                Assertions.assertThat(createdBookInfo).isNotNull();
+                Assertions.assertThat(createdBookInfo.getId()).isNotNull();
+                Assertions.assertThat(createdBookInfo.getIsbn()).isEqualTo(bookInfo.getIsbn());
+                Assertions.assertThat(createdBookInfo.getTitle()).isEqualTo(bookInfo.getTitle());
+                Assertions.assertThat(createdBookInfo.getAuthor()).isEqualTo(bookInfo.getAuthor());
+                Assertions.assertThat(createdBookInfo.getPublisher()).isEqualTo(bookInfo.getPublisher());
+                Assertions.assertThat(createdBookInfo.getImage()).isEqualTo(bookInfo.getImage());
+                Assertions.assertThat(createdBookInfo.getPublishedAt()).isEqualTo(bookInfo.getPublishedAt());
             }
         }
         @Nested
@@ -54,7 +54,7 @@ public class BookInfoRepositoryTest {
         public class FailCaseTest {
             @Test
             @DisplayName("isbn null 값 대입시 생성하지 못한다")
-            public void testCreateBookInfoFail() {
+            public void createBookInfoTest() {
                 // Given
                 BookInfo bookInfo = BookInfo.builder()
                         .isbn(null)
@@ -66,10 +66,68 @@ public class BookInfoRepositoryTest {
                         .build();
 
                 // When
-                assertThrows(Exception.class, () -> bookInfoRepository.save(bookInfo));
+                Assertions.assertThatThrownBy(() -> bookInfoRepository.save(bookInfo))
+                        .isInstanceOf(Exception.class);
 
                 // Then
                 // 예외가 발생하여 저장에 실패해야 함
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("모든 책 정보 조회")
+    public class FindAllBookInfoTest {
+        @Nested
+        @DisplayName("성공 케이스")
+        public class SuccessCaseTest {
+            @Test
+            @DisplayName("모든 책 정보를 조회한다")
+            public void findAllBookInfoTest() {
+                // Given
+                BookInfo bookInfo1 = BookInfo.builder()
+                        .isbn("1234567890")
+                        .title("Test Book")
+                        .author("John Doe")
+                        .publisher("Test Publisher")
+                        .image("test.jpg")
+                        .publishedAt("2023-06-30")
+                        .build();
+                bookInfoRepository.save(bookInfo1);
+
+                BookInfo bookInfo2 = BookInfo.builder()
+                        .isbn("1234517890")
+                        .title("Test Book")
+                        .author("John Doe")
+                        .publisher("Test Publisher")
+                        .image("test.jpg")
+                        .publishedAt("2023-06-30")
+                        .build();
+                bookInfoRepository.save(bookInfo2);
+
+                // When
+                Iterable<BookInfo> foundBookInfoList = bookInfoRepository.findAll();
+
+                // Then
+                Assertions.assertThat(foundBookInfoList).isNotNull();
+                Assertions.assertThat(foundBookInfoList.spliterator().getExactSizeIfKnown()).isEqualTo(2);
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        public class FailCaseTest {
+            @Test
+            @DisplayName("저장된 책 정보가 없을 때 빈 리스트를 반환한다")
+            public void findAllBookInfoFailTest() {
+                // Given
+
+                // When
+                Iterable<BookInfo> foundBookInfoList = bookInfoRepository.findAll();
+
+                // Then
+                Assertions.assertThat(foundBookInfoList).isNotNull();
+                Assertions.assertThat(foundBookInfoList.spliterator().getExactSizeIfKnown()).isEqualTo(0);
             }
         }
     }
@@ -82,7 +140,7 @@ public class BookInfoRepositoryTest {
         public class SuccessCaseTest {
             @Test
             @DisplayName("책 정보를 ID로 조회한다")
-            public void testFindBookInfoById() {
+            public void FindBookInfoByIdTest() {
                 // Given
                 BookInfo bookInfo = BookInfo.builder()
                         .isbn("1234567890")
@@ -98,14 +156,43 @@ public class BookInfoRepositoryTest {
                 BookInfo foundBookInfo = bookInfoRepository.findById(bookInfo.getId()).orElse(null);
 
                 // Then
-                assertNotNull(foundBookInfo);
-                assertEquals(bookInfo.getId(), foundBookInfo.getId());
-                assertEquals(bookInfo.getIsbn(), foundBookInfo.getIsbn());
-                assertEquals(bookInfo.getTitle(), foundBookInfo.getTitle());
-                assertEquals(bookInfo.getAuthor(), foundBookInfo.getAuthor());
-                assertEquals(bookInfo.getPublisher(), foundBookInfo.getPublisher());
-                assertEquals(bookInfo.getImage(), foundBookInfo.getImage());
-                assertEquals(bookInfo.getPublishedAt(), foundBookInfo.getPublishedAt());
+                Assertions.assertThat(foundBookInfo).isNotNull();
+                Assertions.assertThat(foundBookInfo.getId()).isEqualTo(bookInfo.getId());
+                Assertions.assertThat(foundBookInfo.getIsbn()).isEqualTo(bookInfo.getIsbn());
+                Assertions.assertThat(foundBookInfo.getTitle()).isEqualTo(bookInfo.getTitle());
+                Assertions.assertThat(foundBookInfo.getAuthor()).isEqualTo(bookInfo.getAuthor());
+                Assertions.assertThat(foundBookInfo.getPublisher()).isEqualTo(bookInfo.getPublisher());
+                Assertions.assertThat(foundBookInfo.getImage()).isEqualTo(bookInfo.getImage());
+                Assertions.assertThat(foundBookInfo.getPublishedAt()).isEqualTo(bookInfo.getPublishedAt());
+            }
+
+            @Test
+            @DisplayName("책 정보를 ISBN으로 조회한다")
+            public void FindBookInfoByISBNTest() {
+                // Given
+                BookInfo bookInfo = BookInfo.builder()
+                        .isbn("1234567890")
+                        .title("Test Book")
+                        .author("John Doe")
+                        .publisher("Test Publisher")
+                        .image("test.jpg")
+                        .publishedAt("2023-06-30")
+                        .build();
+                bookInfoRepository.save(bookInfo);
+
+                // When
+                BookInfo foundBookInfo =
+                        bookInfoRepository.findByIsbn(bookInfo.getIsbn()).orElse(null);
+
+                // Then
+                Assertions.assertThat(foundBookInfo).isNotNull();
+                Assertions.assertThat(foundBookInfo.getId()).isEqualTo(bookInfo.getId());
+                Assertions.assertThat(foundBookInfo.getIsbn()).isEqualTo(bookInfo.getIsbn());
+                Assertions.assertThat(foundBookInfo.getTitle()).isEqualTo(bookInfo.getTitle());
+                Assertions.assertThat(foundBookInfo.getAuthor()).isEqualTo(bookInfo.getAuthor());
+                Assertions.assertThat(foundBookInfo.getPublisher()).isEqualTo(bookInfo.getPublisher());
+                Assertions.assertThat(foundBookInfo.getImage()).isEqualTo(bookInfo.getImage());
+                Assertions.assertThat(foundBookInfo.getPublishedAt()).isEqualTo(bookInfo.getPublishedAt());
             }
         }
 
@@ -122,7 +209,7 @@ public class BookInfoRepositoryTest {
                 BookInfo foundBookInfo = bookInfoRepository.findById(nonExistingId).orElse(null);
 
                 // Then
-                assertNull(foundBookInfo);
+                Assertions.assertThat(foundBookInfo).isNull();
             }
         }
     }
@@ -149,12 +236,25 @@ public class BookInfoRepositoryTest {
                 bookInfoRepository.save(bookInfo);
 
                 // When
+                String newIsbn = "09877654331";
                 String newTitle = "Updated Book";
-                bookInfo.updateTitle(newTitle);
+                String newAuthor = "Doen Dken";
+                String newPublisher = "Updated Publisher";
+                String newImage = "updated.jpg";
+                String newPublishedAt = "2023-07-01";
+
+                bookInfo.updateBookInfo(newIsbn, newTitle, newAuthor, newPublisher, newImage, newPublishedAt);
                 BookInfo updatedBookInfo = bookInfoRepository.save(bookInfo);
 
                 // Then
-                assertEquals(newTitle, updatedBookInfo.getTitle());
+                Assertions.assertThat(updatedBookInfo).isNotNull();
+                Assertions.assertThat(updatedBookInfo.getId()).isEqualTo(bookInfo.getId());
+                Assertions.assertThat(updatedBookInfo.getIsbn()).isEqualTo(newIsbn);
+                Assertions.assertThat(updatedBookInfo.getTitle()).isEqualTo(newTitle);
+                Assertions.assertThat(updatedBookInfo.getAuthor()).isEqualTo(newAuthor);
+                Assertions.assertThat(updatedBookInfo.getPublisher()).isEqualTo(newPublisher);
+                Assertions.assertThat(updatedBookInfo.getImage()).isEqualTo(newImage);
+                Assertions.assertThat(updatedBookInfo.getPublishedAt()).isEqualTo(newPublishedAt);
             }
         }
 
@@ -189,7 +289,7 @@ public class BookInfoRepositoryTest {
                 bookInfoRepository.deleteById(bookInfo.getId());
 
                 // Then
-                assertFalse(bookInfoRepository.existsById(bookInfo.getId()));
+                Assertions.assertThat(bookInfoRepository.findById(bookInfo.getId()).orElse(null)).isNull();
             }
         }
 
