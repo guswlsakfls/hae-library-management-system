@@ -2,6 +2,7 @@ package com.hae.library.domain;
 
 
 import com.hae.library.domain.Enum.Role;
+import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -68,19 +69,32 @@ public class Member extends BaseTimeEntity{
         this.penaltyEndDate = penaltyEndDate;
     }
 
+    public void updateMemberInfo(RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
+        this.name = requestChangeMemberInfoDto.getName();
+        this.email = requestChangeMemberInfoDto.getEmail();
+        this.penaltyEndDate = requestChangeMemberInfoDto.getPenaltyEndDate();
+        this.role = requestChangeMemberInfoDto.getRole();
+        this.activated = requestChangeMemberInfoDto.isActivated();
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
     public void updatePassword(String password) {
         this.password = password;
+    }
+    public void updateRole(Role role) {
+        this.role = role;
     }
 
     public void updatePenaltyEndDate(LocalDateTime penaltyEndDate) {
         this.penaltyEndDate = penaltyEndDate;
     }
 
-    public void updateRole(Role role) {
-        this.role = role;
+    public void updateActivated(boolean activated) {
+        this.activated = activated;
     }
 
-    public void updateName(String name) {
-        this.name = name;
-    }
+
 }

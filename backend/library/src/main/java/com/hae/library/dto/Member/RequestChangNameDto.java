@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestChangePasswordDto {
-    private String id;
-    private String exPassword;
-    private String newPassword;
+public class RequestChangNameDto {
+    private Long id;
+    private String name;
+
 }

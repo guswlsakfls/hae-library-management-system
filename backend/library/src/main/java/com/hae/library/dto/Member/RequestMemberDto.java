@@ -12,20 +12,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Setter
 @NoArgsConstructor
 public class RequestMemberDto {
+    private Long id;
     private String email;
     private String password;
     private String name;
 
-    public Member from(PasswordEncoder passwordEncoder) {
-        return Member.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .name(name)
-                .role(Role.ROLE_USER)
-                .build();
-    }
+//    public Member from(PasswordEncoder passwordEncoder) {
+//        return Member.builder()
+//                .email(email)
+//                .password(passwordEncoder.encode(password))
+//                .name(name)
+//                .role(Role.ROLE_USER)
+//                .build();
+//    }
 
-    public UsernamePasswordAuthenticationToken toAuthentication() {
-        return new UsernamePasswordAuthenticationToken(email, password);
-    }
+//    public UsernamePasswordAuthenticationToken toAuthentication() {
+//        return new UsernamePasswordAuthenticationToken(email, password);
+//    }
 }

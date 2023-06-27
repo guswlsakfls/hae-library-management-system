@@ -9,19 +9,29 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ResponseMemberDto {
+    private Long id;
     private String email;
-    private String nickname;
+    private String name;
+    private Role role;
+    private LocalDateTime penaltyEndDate;
+    private boolean activated;
 
 
     public static ResponseMemberDto from(Member member) {
         return ResponseMemberDto.builder()
+                .id(member.getId())
                 .email(member.getEmail())
-                .nickname(member.getName())
+                .name(member.getName())
+                .role(member.getRole())
+                .penaltyEndDate(member.getPenaltyEndDate())
+                .activated(member.isActivated())
                 .build();
     }
 }
