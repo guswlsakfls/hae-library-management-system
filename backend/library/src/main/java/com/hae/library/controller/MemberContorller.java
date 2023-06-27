@@ -89,8 +89,8 @@ public class MemberContorller {
 
     // TODO: 회원 탈퇴시 boolean으로 처리(1: 회원, 0: 탈퇴)
     @PutMapping(value = "/member/withdrawal")
-    public ResponseResultDto<Object> memberWithdrawal() {
-        memberService.memberWithdrawal();
+    public ResponseResultDto<Object> memberWithdrawal(@RequestBody Long memberId) {
+        memberService.memberWithdrawal(memberId);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 탈퇴에 성공하였습니다")

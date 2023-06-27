@@ -18,44 +18,45 @@ public class Lending extends BaseTimeEntity{
     @Column(name = "LENDING_ID")
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "BOOK_ID")
-//    private Book book;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BOOK")
+    private Book book;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "USER")
-//    private Member user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER")
+    private Member user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "LENDING_LIBRARIAN")
-//    private Member lendingLibrarian;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LENDING_LIBRARIAN")
+    private Member lendingLibrarian;
 
     @Column(name = "LENDING_CONDITION", nullable = false, length = 300 )
     private String lendingCondition;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "RETURNING_ID")
-//    private Member returningLibrarian;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RETURNING_LIBRARIAN")
+    private Member returningLibrarian;
 
     @Column(name = "RETURNING_CONDITION")
     private String returningCondition;
 
     @Column(name = "RETURNING_AT")
-    private LocalDateTime returningAt;
+    private LocalDateTime returningEndAt;
 
     @Column(name = "RENEW")
     private boolean renew = false;
 
     @Builder
     public Lending(Book book, Member user ,Member lendingLibrarian, String lendingCondition,
-                   Member returningLibrarian, String returningCondition, LocalDateTime returningAt, boolean renew) {
-//        this.user = user;
-//        this.book = book;
-//        this.lendingLibrarian = lendingLibrarian;
+                   Member returningLibrarian, String returningCondition,
+                   LocalDateTime returningEndAt, boolean renew) {
+        this.book = book;
+        this.user = user;
+        this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
-//        this.returningLibrarian = returningLibrarian;
+        this.returningLibrarian = returningLibrarian;
         this.returningCondition = returningCondition;
-        this.returningAt = returningAt;
+        this.returningEndAt = returningEndAt;
         this.renew = renew;
     }
 
@@ -63,18 +64,14 @@ public class Lending extends BaseTimeEntity{
         this.id = id;
     }
 
-    private void setRenew(boolean renew) {
+    private void updateRenew(boolean renew) {
         this.renew = renew;
     }
 
-    public void setReturning(Member member, String lendingCondition) {
-//        this.returningLibrarian = member;
-        this.lendingCondition = lendingCondition;
-    }
-
+    // TODO: 유저가 연장 신청
     public void renewLending() {
-        this.returningAt = this.returningAt.plusDays(7);
-        this.setRenew(true);
+        this.returningEndAt = this.returningEndAt.plusDays(7);
+        this.updateRenew(true);
     }
 
     public void checkConditionLength(String condition) {
@@ -86,10 +83,10 @@ public class Lending extends BaseTimeEntity{
         }
     }
 
-    public void updateReturning(Member returninglibrarian, String returningCondition) {
-//        this.returningLibrarian = returninglibrarian;
+    public void updateReturning(Member returninglibrarian, String returningCondition, LocalDateTime returningEndAt) {
+        this.returningLibrarian = returninglibrarian;
         this.returningCondition = returningCondition;
-        this.returningAt = LocalDateTime.now();
+        this.returningEndAt = returningEndAt;
     }
 
 }
