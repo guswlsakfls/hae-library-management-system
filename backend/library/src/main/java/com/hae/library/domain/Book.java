@@ -18,8 +18,8 @@ public class Book extends BaseTimeEntity{
     @JoinColumn(name = "BOOK_INFO_ID")
     private BookInfo bookInfo;
 
-//    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    private Lending lending;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Lending lending;
 
     @Column(name = "CALL_SIGN", nullable = false, unique = true)
     private String callSign;

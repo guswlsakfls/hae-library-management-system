@@ -63,8 +63,9 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseMemberDto memberWithdrawal() {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RuntimeException(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
+    public ResponseMemberDto memberWithdrawal(Long memberId) {
+        Member member =
+                memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
         member.updateActivated(false);
         return ResponseMemberDto.from(memberRepository.save(member));
     }
