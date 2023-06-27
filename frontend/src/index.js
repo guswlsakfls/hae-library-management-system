@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Router from './Router';
+import Router from './page/Router';
 import 'tailwindcss/tailwind.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
