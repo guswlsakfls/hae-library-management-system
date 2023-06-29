@@ -2,39 +2,23 @@ import React from 'react';
 import styled from 'styled-components';
 import Pagin from 'react-js-pagination';
 
-const items = [
-  {
-    id: 1,
-    title: 'Back End Developer',
-    department: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote',
-  },
-  {
-    id: 2,
-    title: 'Front End Developer',
-    department: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote',
-  },
-  {
-    id: 3,
-    title: 'User Interface Designer',
-    department: 'Design',
-    type: 'Full-time',
-    location: 'Remote',
-  },
-];
-
-export default function Pagination() {
+export default function Pagination({
+  activePage,
+  countPerPage,
+  totalItemsCount,
+  pageRangeDisplayed,
+  handlePageChange,
+}) {
   return (
     <PaginationBox>
       <Pagin
-        activePage={1}
-        itemsCountPerPage={5}
-        totalItemsCount={300}
-        pageRangeDisplayed={5}
-        // onChange={handlePageChange}
+        activePage={activePage}
+        itemsCountPerPage={countPerPage}
+        totalItemsCount={totalItemsCount}
+        pageRangeDisplayed={pageRangeDisplayed}
+        prevPageText={'‹'}
+        nextPageText={'›'}
+        onChange={handlePageChange}
       ></Pagin>
     </PaginationBox>
   );

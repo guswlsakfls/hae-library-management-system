@@ -39,6 +39,7 @@ public class SpringSecurityConfig {
             "/api/member/signup",
             "/api/member/login",
             "/api/auth",
+            "/api/**"
     };
 
     @Bean

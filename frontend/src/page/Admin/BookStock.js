@@ -4,23 +4,12 @@ import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
 
-const product = {
-  name: 'Basic Tee 6-Pack ',
-  price: '$192',
-  rating: 3.9,
-  reviewCount: 117,
-  href: '#',
-  imageSrc:
-    'https://tailwindui.com/img/ecommerce-images/product-quick-preview-02-detail.jpg',
-  imageAlt: 'Two each of gray, white, and black shirts arranged on table.',
-};
-
 const books = [
   {
     title: '책 제목',
     callSign: '청구기호',
-    renew: '1회',
-    status: '대출중',
+    lendingStatus: '대출중',
+    status: '양호',
     createAt: '2021-10-10',
     updateAt: '2021-10-10',
   },
@@ -33,7 +22,14 @@ export default function BookStock() {
     setIsOpen(!isOpen);
   }
 
-  const TableRow = ({ title, callSign, renew, status, createAt, updateAt }) => (
+  const TableRow = ({
+    title,
+    callSign,
+    lendingStatus,
+    status,
+    createAt,
+    updateAt,
+  }) => (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {title}
@@ -42,7 +38,7 @@ export default function BookStock() {
         {callSign}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {renew}
+        {lendingStatus}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {status}
@@ -130,7 +126,7 @@ export default function BookStock() {
                 key={index}
                 title={book.title}
                 callSign={book.callSign}
-                renew={book.renew}
+                lendingStatus={book.lendingStatus}
                 status={book.status}
                 createAt={book.createAt}
                 updateAt={book.updateAt}

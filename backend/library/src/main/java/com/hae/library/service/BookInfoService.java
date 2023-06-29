@@ -11,6 +11,10 @@ import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +44,13 @@ public class BookInfoService {
     }
 
     @Transactional
-    public List<ResponseBookInfoDto> getAllBookInfo() {
-        List<BookInfo> bookInfoList = bookInfoRepo.findAll();
+    public Page<ResponseBookInfoDto> getAllBookInfo(String searchKey, int page,
+                                                    int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+
+        Page<BookInfo> bookInfoList = bookInfoRepo.findAll(pageable);
         log.error("bookInfoList: {}", bookInfoList);
-        List<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.stream()
-                .map(ResponseBookInfoDto::from)
-                .collect(Collectors.toList());
+        Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
         return responseBookInfoDtoList;
     }
 

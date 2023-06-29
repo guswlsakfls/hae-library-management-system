@@ -28,7 +28,7 @@ const Router = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Route>
-          <Route path="/book" element={<BookList />} />
+          <Route path="/booklist" element={<BookList />} />
           <Route path="/info" element={<Info />} />
           <Route path="/book/:id" element={<BookInfo />} />
           {/* <Route element={<LimitedRoute isLoginOnly />}> */}
