@@ -6,7 +6,7 @@ const serverIp = 'http://localhost:8080/api';
 const getBookList = async (search, page, size) => {
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
-      searchKey: search,
+      search: search,
       page: page === null ? 1 : page,
       size: size === null ? 10 : size,
     },

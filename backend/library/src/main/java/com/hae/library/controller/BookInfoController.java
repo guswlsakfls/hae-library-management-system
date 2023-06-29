@@ -25,16 +25,17 @@ public class BookInfoController {
 
     // 모든 책 정보를 조회하는 요청을 처리합니다.
     @GetMapping(value = "/bookinfo/all")
-    public ResponseResultDto getAllBookInfo(
-            @RequestParam(required = false) String searchKey,
+    public ResponseResultDto getAllBookInfoByOptions(
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
             @RequestParam(required = false) int size
     ) {
+        log.info("API called: /bookinfo/all with parameters - search: {}, page: {}, size: {}", search, page, size);
         // 검색 키워드와 페이지네이션 정보를 인자로 주어 책 정보를 가져옵니다.
         Page<ResponseBookInfoDto> responseBookInfoDtoList =
-                bookInfoService.getAllBookInfo(searchKey, page, size);
+                bookInfoService.getAllBookInfo(search, page, size);
 
-        // HTTP 상태 코드, 메시지, 데이터를 포함하는 응답 DTO를 반환합니다.
+        // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("bookInfoList", responseBookInfoDtoList.getContent());
         responseData.put("totalElements", responseBookInfoDtoList.getTotalElements());

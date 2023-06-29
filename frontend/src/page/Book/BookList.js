@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom/dist';
 export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || null;
-  const [page, setPage] = useState(parseInt(searchParams.get('page')) || 0);
+  const [page, setPage] = useState(parseInt(searchParams.get('page')) || 1);
   const [size, setSize] = useState(parseInt(searchParams.get('size')) || 5);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
@@ -26,7 +26,7 @@ export default function BookList() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
+        // console.log(res);
       })
       .catch(err => {
         alert(err.response.data.message);

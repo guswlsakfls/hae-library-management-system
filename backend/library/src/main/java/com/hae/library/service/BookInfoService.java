@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,15 +45,25 @@ public class BookInfoService {
     }
 
     @Transactional
-    public Page<ResponseBookInfoDto> getAllBookInfo(String searchKey, int page,
-                                                    int size) {
+    public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
-        Page<BookInfo> bookInfoList = bookInfoRepo.findAll(pageable);
+        // Specification을 이용해 동적 쿼리 생성
+        Specification<BookInfo> spec = (root, query, cb) -> {
+            if (search == null || search.trim().isEmpty()) {
+                return cb.conjunction(); // 모든 결과 반환
+            }
+            // 검색어가 포함된 경우 해당 결과 반환
+            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+        };
+
+        Page<BookInfo> bookInfoList = bookInfoRepo.findAll(spec, pageable);
+
         log.error("bookInfoList: {}", bookInfoList);
         Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
         return responseBookInfoDtoList;
     }
+
 
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoById(Long bookInfoId) {
