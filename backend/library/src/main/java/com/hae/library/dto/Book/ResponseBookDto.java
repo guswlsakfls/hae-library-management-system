@@ -12,14 +12,16 @@ public class ResponseBookDto {
     private String callSign;
     private BookStatus status;
     private String donator;
+    private String isAvailable;
 
     @Builder
     public ResponseBookDto(Long id, String callSign,
-                                       BookStatus status, String donator) {
+                                       BookStatus status, String donator, String isAvailable) {
         this.id = id;
         this.callSign = callSign;
         this.status = status;
         this.donator = donator;
+        this.isAvailable = isAvailable;
     }
 
     public static ResponseBookDto from(Book book) {
@@ -28,6 +30,7 @@ public class ResponseBookDto {
                 .callSign(book.getCallSign())
                 .status(book.getStatus())
                 .donator(book.getDonator())
+                .isAvailable(book.getLending() == null ? "대출 가능" : "대출 중")
                 .build();
     }
 }

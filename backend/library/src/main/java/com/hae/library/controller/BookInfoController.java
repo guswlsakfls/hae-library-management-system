@@ -52,8 +52,21 @@ public class BookInfoController {
     // 하나의 책 정보를 조회하는 요청을 처리합니다.
     @GetMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> getBookInfoById(@PathVariable Long bookInfoId) {
-        // 특정 책 정보를 가져오고
+        // 특정 책 정보를 보유도서와 함께 가져옵니다.
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoById(bookInfoId);
+        // HTTP 상태 코드, 메시지, 데이터를 포함하는 응답 DTO를 반환합니다.
+        return ResponseResultDto.builder()
+                .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정
+                .message("책 한 개 정보 조회에 성공하였습니다")  // 메시지 설정
+                .data(responseBookInfoDto)  // 특정 책 정보를 데이터로 설정
+                .build();
+    }
+
+    // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
+    @GetMapping(value = "/bookinfo/isbn/{isbn}")
+    public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable String isbn) {
+        // 특정 책 정보를 보유도서와 함께 가져옵니다.
+        ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
         // HTTP 상태 코드, 메시지, 데이터를 포함하는 응답 DTO를 반환합니다.
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정

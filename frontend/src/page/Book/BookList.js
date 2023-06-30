@@ -3,7 +3,7 @@ import SearchBar from '../../component/common/SearchBar';
 import Footer from '../../component/Footer';
 import Pagination from '../../component/common/Pagination';
 import { useState, useEffect } from 'react';
-import { getBookList } from '../../api/bookApi';
+import { getBookList } from '../../api/BookApi';
 import { useSearchParams } from 'react-router-dom/dist';
 
 export default function BookList() {

@@ -145,7 +145,7 @@ public class BookInfoControllerTest {
             @DisplayName("[GET] id로 책 정보 조회시 책 정보가 없을 경우 404 반환")
             public void getBookInfoWithBookByIdTest() throws Exception {
                 //Given
-                given(bookInfoService.getBookInfoById(1L)).willThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO_BY_ID));
+                given(bookInfoService.getBookInfoById(1L)).willThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
 
                 // When & Then
                 mockMvc.perform(get("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))
@@ -179,7 +179,7 @@ public class BookInfoControllerTest {
             @DisplayName("[DELETE] id로 책 정보 삭제시 책 정보가 없을 경우 404 반환")
             public void deleteBookInfoByIdTest() throws Exception {
                 //Given
-                doThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO_BY_ID)).when(bookInfoService).deleteBookInfoById(1L);
+                doThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO)).when(bookInfoService).deleteBookInfoById(1L);
 
                 // When & Then
                 mockMvc.perform(delete("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))

@@ -1,23 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Footer from '../../component/Footer';
+import { getBookInfoById } from '../../api/BookApi';
 
-const product = {
-  name: 'Basic Tee 6-Pack ',
-  price: '$192',
-  rating: 3.9,
-  reviewCount: 117,
-  href: '#',
-  imageSrc:
-    'https://tailwindui.com/img/ecommerce-images/product-quick-preview-02-detail.jpg',
-  imageAlt: 'Two each of gray, white, and black shirts arranged on table.',
+const statusText = {
+  FINE: '양호',
+  BREAK: '손상',
+  LOST: '분실',
 };
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
-
 export default function BookInfo() {
-  const [open, setOpen] = useState(false);
+  const [bookInfo, setBookInfo] = useState([]);
+
+  const bookId = window.location.pathname.split('/')[2];
+
+  useEffect(() => {
+    getBookInfoById(bookId)
+      .then(res => {
+        setBookInfo(res.data);
+        console.log(res.data);
+      })
+      .catch(err => {
+        alert(err.response.data.message);
+        window.location.href = '/error';
+      });
+  }, []);
 
   return (
     <>
@@ -39,14 +45,14 @@ export default function BookInfo() {
       <div className="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8 px-32 pt-16">
         <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
           <img
-            src={product.imageSrc}
-            alt={product.imageAlt}
+            src={bookInfo.image}
+            alt={bookInfo.title}
             className="object-cover object-center"
           />
         </div>
         <div className="sm:col-span-8 lg:col-span-7">
           <h1 className="text-5xl font-bold text-gray-900 sm:pr-12 border-b pb-2">
-            {product.name}
+            {bookInfo.title}
           </h1>
 
           <section aria-labelledby="options-heading" className="mt-5">
@@ -56,7 +62,7 @@ export default function BookInfo() {
                 저자
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                asdfsadf
+                {bookInfo.author}
               </dd>
             </div>
             <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -64,7 +70,7 @@ export default function BookInfo() {
                 출판사
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                asdfsadf
+                {bookInfo.publisher}
               </dd>
             </div>
             <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -72,7 +78,7 @@ export default function BookInfo() {
                 발행연월
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                asdfsadf
+                {bookInfo.publishedAt}
               </dd>
             </div>
             <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -80,7 +86,7 @@ export default function BookInfo() {
                 ISBN
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                asdfsadf
+                {bookInfo.isbn}
               </dd>
             </div>
 
@@ -89,27 +95,36 @@ export default function BookInfo() {
               <div className="flex items-center justify-between border-b">
                 <h4 className="text-2xl font-medium text-gray-900">보유도서</h4>
               </div>
-              {/* 테이블로 청구기호 대출상태 나타대기 */}
-              <div className="mt-6">
-                <div className="flex items-center">
-                  <h4 className="text-sm font-medium text-gray-900 mr-5">
-                    청구기호
-                  </h4>
-                  <h4 className="text-sm font-medium text-gray-900">
-                    대출상태
-                  </h4>
-                </div>
-              </div>
-              <div className="mt-6">
-                <div className="flex items-center">
-                  <h4 className="text-sm font-medium text-gray-900 mr-5">
-                    청구기호
-                  </h4>
-                  <h4 className="text-sm font-medium text-gray-900">
-                    대출상태
-                  </h4>
-                </div>
-              </div>
+              {/* 배열에 대한 .map() 함수 사용 */}
+              {bookInfo.bookList === undefined
+                ? null
+                : bookInfo.bookList.map((book, index) => (
+                    <div className="mt-6" key={index}>
+                      <div className="flex items-center">
+                        <h4 className="text-sm font-medium text-gray-900 mr-5">
+                          {book.callSign} {/* 청구기호 */}
+                        </h4>
+                        <h4
+                          className={`text-sm font-medium mr-5 ${
+                            book.isAvailable === '대출 가능'
+                              ? 'text-blue-500'
+                              : 'text-red-500'
+                          }`}
+                        >
+                          {book.isAvailable} {/* 대출상태 */}
+                        </h4>
+                        <h4
+                          className={`text-sm font-medium mr-5 ${
+                            book.status === 'FINE'
+                              ? 'text-blue-500'
+                              : 'text-red-500'
+                          }`}
+                        >
+                          {statusText[book.status]} {/* 대출상태 */}
+                        </h4>
+                      </div>
+                    </div>
+                  ))}
             </div>
           </section>
         </div>

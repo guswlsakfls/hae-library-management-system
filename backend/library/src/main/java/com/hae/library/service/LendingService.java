@@ -37,7 +37,7 @@ public class LendingService {
     public ResponseLendingDto lendingBook(RequestLendingDto requestLendingDto) {
         // 도서가 있는지 조회
         Book book =
-                bookRepo.findById(requestLendingDto.getBookId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO_BY_ID));
+                bookRepo.findById(requestLendingDto.getBookId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
 
         // 대출된 도서인지 확인
         Boolean existslending =
@@ -61,13 +61,13 @@ public class LendingService {
         LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusWeeks(2);
 
         Lending newLending = Lending.builder()
-                .book(book)
                 .user(user)
                 .lendingLibrarian(lendingLibrarian)
                 .lendingCondition(requestLendingDto.getLendingCondition())
                 .returningEndAt(now)
                 .build();
 
+        newLending.addBook(book);
         lendingRepo.save(newLending);
 
 

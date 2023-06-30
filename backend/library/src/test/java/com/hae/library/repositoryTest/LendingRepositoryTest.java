@@ -41,11 +41,11 @@ public class LendingRepositoryTest {
                 // When
                 Lending lending = Lending.builder()
                         .user(user)
-                        .book(book)
                         .lendingLibrarian(librarian)
                         .lendingCondition(lendingCondition)
                         .build();
 
+                lending.addBook(book);
                 Lending createdLending = lendingRepo.save(lending);
 
                 // Then
@@ -117,11 +117,11 @@ public class LendingRepositoryTest {
                 // When
                 Lending lending = Lending.builder()
                         .user(user)
-                        .book(book)
                         .lendingLibrarian(librarian)
                         .lendingCondition(lendingCondition)
                         .build();
 
+                lending.addBook(book);
                 // Then
                 assertThrows(IllegalArgumentException.class,
                         () -> lending.checkConditionLength(lending.getLendingCondition()));
@@ -396,12 +396,14 @@ public class LendingRepositoryTest {
                 LocalDateTime returningAt = LocalDateTime.now();
 
                 Lending lending = Lending.builder()
-                        .book(book)
                         .user(user)
                         .lendingLibrarian(librarian)
                         .lendingCondition(lendingCondition)
-                        .returningAt(returningAt)
+                        .returningEndAt(returningAt)
                         .build();
+
+                lending.addBook(book);
+
                 lendingRepo.save(lending);
 
                 // When
@@ -410,7 +412,7 @@ public class LendingRepositoryTest {
 
                 // Then
                 assertEquals(lending.isRenew(), updateRenewLending.isRenew());
-                assertEquals(lending.getReturningAt(), updateRenewLending.getReturningAt());
+                assertEquals(lending.getReturningEndAt(), updateRenewLending.getReturningEndAt());
             }
         }
 
@@ -438,11 +440,11 @@ public class LendingRepositoryTest {
 
                 Lending lending = Lending.builder()
                         .user(user)
-                        .book(book)
                         .user(user)
                         .lendingLibrarian(librarian)
                         .lendingCondition(lendingCondition)
                         .build();
+                lending.addBook(book);
 
                 lendingRepo.save(lending);
 

@@ -15,4 +15,41 @@ const getBookList = async (search, page, size) => {
   return res.data; // 최신화 위해 역순으로 정렬.
 };
 
-export { getBookList };
+const getBookInfoById = async id => {
+  const res = await axios.get(serverIp + '/bookinfo/' + id);
+  return res.data;
+};
+
+const getAddBookByIsbn = async isbn => {
+  const res = await axios.get(serverIp + '/bookinfo/isbn/' + isbn);
+  return res.data;
+};
+
+const postAddBook = async (
+  title,
+  image,
+  author,
+  publisher,
+  publishedAt,
+  isbn,
+  category,
+  callSign,
+  donator,
+  status
+) => {
+  const res = await axios.post(serverIp + '/book/create', {
+    title: title,
+    image: image,
+    author: author,
+    publisher: publisher,
+    publishedAt: publishedAt,
+    isbn: isbn,
+    category: category,
+    callSign: callSign,
+    donator: donator,
+    status: status,
+  });
+  return res.data;
+};
+
+export { getBookList, getBookInfoById, getAddBookByIsbn, postAddBook };
