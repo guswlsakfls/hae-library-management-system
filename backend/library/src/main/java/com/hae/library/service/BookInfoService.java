@@ -73,7 +73,7 @@ public class BookInfoService {
 
         Page<BookInfo> bookInfoList = bookInfoRepo.findAll(spec, pageable);
 
-        log.error("bookInfoList: {}", bookInfoList);
+        log.error("bookInfoList: {}", bookInfoList.toList());
         Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
         return responseBookInfoDtoList;
     }

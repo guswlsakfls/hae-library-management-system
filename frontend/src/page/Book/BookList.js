@@ -8,15 +8,15 @@ import { useSearchParams } from 'react-router-dom/dist';
 
 export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const search = searchParams.get('search') || null;
-  const [page, setPage] = useState(parseInt(searchParams.get('page')) || 1);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 5);
+  const search = searchParams.get('search') || '';
+  const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 20);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
 
   const handlePageChange = page => {
-    setPage(page);
-    setSearchParams({ search, page, size });
+    setPage(page - 1);
+    setSearchParams({ search, page: page, size });
   };
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function BookList() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        // console.log(res);
+        console.log(res);
       })
       .catch(err => {
         alert(err.response.data.message);
@@ -105,9 +105,9 @@ export default function BookList() {
 
       <div className="mt-3">
         <Pagination
-          activePage={page}
+          activePage={page + 1}
           itemsCountPerPage={size}
-          totalItemsCount={total}
+          totalItemsCount={(total / size) * 10}
           pageRangeDisplayed={5}
           prevPageText={'‹'}
           nextPageText={'›'}

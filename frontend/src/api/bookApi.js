@@ -4,10 +4,11 @@ const serverIp = 'http://localhost:8080/api';
 
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
 const getBookList = async (search, page, size) => {
+  console.log(page);
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
       search: search,
-      page: page === null ? 1 : page,
+      page: page === null ? 0 : page,
       size: size === null ? 10 : size,
     },
   });

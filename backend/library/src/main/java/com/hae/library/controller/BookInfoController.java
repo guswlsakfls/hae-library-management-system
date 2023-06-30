@@ -35,6 +35,7 @@ public class BookInfoController {
         Page<ResponseBookInfoDto> responseBookInfoDtoList =
                 bookInfoService.getAllBookInfo(search, page, size);
 
+        log.error("responseBookInfoDtoList: {}", responseBookInfoDtoList.toString());
         // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("bookInfoList", responseBookInfoDtoList.getContent());
