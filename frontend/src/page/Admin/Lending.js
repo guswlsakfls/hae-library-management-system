@@ -1,11 +1,8 @@
-import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
-
-const user = {
-  email: 'guswlsakfls@gmail.com',
-  lendingCount: 2,
-  penaltyDate: '2021-10-10',
-};
+import { useState, useEffect } from 'react';
+import { getUserByEmail } from '../../api/UserApi';
+import { getBookByCallSign, lendingBook } from '../../api/BookApi';
+import DefaultSearchBar from '../../component/common/DefaultSearchBar';
 
 const book = {
   title: 'Regional Paradigm Technician',
@@ -14,6 +11,93 @@ const book = {
 };
 
 export default function Lending() {
+  const [searchEmail, serSearchEmail] = useState('');
+  const [searchCallSign, setSearchCallSign] = useState('');
+  const [lendingCondition, setLendingCondition] = useState('');
+  const [user, setUser] = useState({});
+  const [book, setBook] = useState({});
+  const [returningAt, setReturningAt] = useState('');
+
+  const handleGetUser = () => {
+    getUserByEmail(searchEmail)
+      .then(res => {
+        setUser(res.data);
+        console.log(res);
+      })
+      .catch(err => {
+        setUser({});
+        alert(err.response.data.message);
+        console.log(err.response.data);
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
+  const handleGetBook = () => {
+    getBookByCallSign(searchCallSign)
+      .then(res => {
+        setBook(res.data);
+
+        setReturningAt(
+          (() => {
+            // 현재 날짜를 가져옵니다.
+            const now = new Date();
+
+            // 현재 날짜에 2주를 더합니다. (1주는 7일이고 1일은 24*60*60*1000 밀리초입니다.)
+            now.setDate(now.getDate() + 14);
+
+            // 날짜를 YYYY-MM-DD 형식의 문자열로 변환합니다.
+            const returnDate = now.toISOString().split('T')[0];
+
+            return returnDate;
+          })()
+        );
+        console.log(res);
+      })
+      .catch(err => {
+        setBook({});
+        setReturningAt('');
+        alert(err.response.data.message);
+        console.log(err.response.data);
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
+  const handleLendingBook = () => {
+    lendingBook(user.id, book.id, lendingCondition)
+      .then(res => {
+        alert(res.message);
+        setUser({});
+        setBook({});
+        setReturningAt('');
+      })
+      .catch(err => {
+        alert(err.response.data.message);
+        console.log(err.response.data);
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
       <div className="flex justify-center items-center my-10 mx-48">
@@ -21,7 +105,12 @@ export default function Lending() {
       </div>
       <div className="flex justify-center items-center my-10 mx-48">
         <h1 className="text-2xl font-bold mr-6">유저 검색</h1>
-        <SearchBar text="이메일을 입력해 주세요."></SearchBar>
+        <DefaultSearchBar
+          text="이메일을 입력해 주세요."
+          value={searchEmail}
+          setValue={serSearchEmail}
+          handler={handleGetUser}
+        ></DefaultSearchBar>
       </div>
 
       <div className="flex justify-center items-center my-10 mx-80 border-2 border-gray-900">
@@ -29,26 +118,26 @@ export default function Lending() {
           <dl className="divide-y divide-gray-100">
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                이메일
+                이메일 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.email}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.email ? user.email : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                대출 수
+                대출 수 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.lendingCount}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.lendingList ? user.lendingList.length : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                연체현황
+                연체현황 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.penaltyDate}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.penaltyDate ? user.penaltyDate : '-'}
               </dd>
             </div>
           </dl>
@@ -56,40 +145,60 @@ export default function Lending() {
       </div>
       <div className="flex justify-center items-center mt-24 mx-48">
         <h1 className="text-2xl font-bold mr-6">도서 검색</h1>
-        <SearchBar text="청구기호를 입력해 주세요."></SearchBar>
+        <DefaultSearchBar
+          text="청구기호를 입력해 주세요."
+          value={searchCallSign}
+          setValue={setSearchCallSign}
+          handler={handleGetBook}
+        ></DefaultSearchBar>
       </div>
       <div className="flex justify-center items-center my-10 mx-80 border-2 border-gray-900">
         <div className="m-6 border-b border-gray-100">
           <dl className="divide-y divide-gray-100">
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                제목
+                제목 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {book.title}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {book.bookInfo && book.bookInfo.title
+                  ? book.bookInfo.title
+                  : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                청구기호
+                청구기호 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {book.callSign}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {book.callSign ? book.callSign : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                반납 예정일
+                반납 예정일 :
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {book.returningDate}
+              <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {returningAt ? returningAt : '-'}
               </dd>
             </div>
           </dl>
         </div>
       </div>
       <div className="flex justify-center items-center my-10 mx-48">
-        <DefaultButton size="large">대출 신청</DefaultButton>
+        <textarea
+          id="returnMessage"
+          name="returnMessage"
+          rows="3"
+          className="pl-1 border-t shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm rounded-md"
+          placeholder=" 특이사항을 적어주세요. (4~100자 이내)"
+          value={lendingCondition}
+          onChange={event => setLendingCondition(event.target.value)}
+        ></textarea>
+      </div>
+      <div className="flex justify-center items-center my-10 mx-48">
+        <DefaultButton size="large" click={handleLendingBook}>
+          대출 신청
+        </DefaultButton>
       </div>
     </main>
   );

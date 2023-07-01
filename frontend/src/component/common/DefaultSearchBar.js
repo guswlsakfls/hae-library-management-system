@@ -1,19 +1,7 @@
-import { useState, useEffect } from 'react';
-import queryString from 'query-string';
-
-export default function SearchBar(props) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const parsed = queryString.parse(window.location.search);
-    if (parsed.search) {
-      setSearchTerm(parsed.search);
-    }
-  }, []);
-
+export default function DefaultSearchBar(props) {
   const handleSubmit = event => {
-    event.preventDefault();
-    window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+    event.preventDefault(); // prevent form from attempting to refresh the page
+    props.handler(); // call the API
   };
 
   return (
@@ -28,8 +16,8 @@ export default function SearchBar(props) {
           id="price"
           className="block w-96 h-10 rounded-md border-0 py-2 pl-8 pr-2 text-base text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
           placeholder={props.text}
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          value={props.user}
+          onChange={e => props.setValue(e.target.value)}
         />
       </form>
     </div>

@@ -1,19 +1,11 @@
-import { useState, useEffect } from 'react';
-import queryString from 'query-string';
+import React, { useState } from 'react';
 
-export default function SearchBar(props) {
+export default function PostInputBar(props) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    const parsed = queryString.parse(window.location.search);
-    if (parsed.search) {
-      setSearchTerm(parsed.search);
-    }
-  }, []);
-
-  const handleSubmit = event => {
-    event.preventDefault();
-    window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+  const handleSubmit = e => {
+    e.preventDefault();
+    props.onSubmit(searchTerm);
   };
 
   return (
@@ -31,6 +23,7 @@ export default function SearchBar(props) {
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
+        <input type="submit" style={{ display: 'none' }} />
       </form>
     </div>
   );

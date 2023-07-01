@@ -53,6 +53,11 @@ public class Book extends BaseTimeEntity{
         }
     }
 
+    public void addLending(Lending lending) {
+        this.lending = lending;
+
+    }
+
     public void updateBookStatus(BookStatus status) {
         this.status = status;
     }

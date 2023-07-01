@@ -18,6 +18,8 @@ public class ResponseBookInfoWithBookDto {
     private String image;
     private String publisher;
     private String publishedAt;
+    private String category;
+    private String callSign;
     private List<ResponseBookDto> bookList;
 
     public static ResponseBookInfoWithBookDto from(BookInfo bookInfo) {

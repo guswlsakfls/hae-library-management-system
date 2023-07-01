@@ -10,7 +10,7 @@ function Main() {
           어서오세요, 현대오토에버 도서관입니다.
         </div>
         <div className="text-2xl">도서관에 오신 것을 환영합니다.</div>
-        <SearchBar />
+        <SearchBar text="제목 또는 저자를 입력해주세요." />
       </div>
       <Footer />
     </>

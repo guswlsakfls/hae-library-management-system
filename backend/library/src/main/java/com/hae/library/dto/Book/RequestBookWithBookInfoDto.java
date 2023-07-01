@@ -41,7 +41,7 @@ public class RequestBookWithBookInfoDto {
     @NotBlank(message = "출판일을 입력해주세요.")
     private String publishedAt;
 
-    @NotBlank(message = "도서 상태를 입력해주세요.")
+//    @NotBlank(message = "도서 상태를 입력해주세요.")
     private String status;
 
 //    @Size(max = 20, message = "기증자는 20자를 넘을 수 없습니다.")

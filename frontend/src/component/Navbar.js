@@ -11,8 +11,9 @@ export default function Navbar() {
   const [current, setCurrent] = useState('/search');
 
   const navigation = [
+    { name: '관리자페이지', href: '/admin', current: current === '/admin' },
     { name: '안내사항', href: '/info', current: current === '/info' },
-    { name: '도서목록', href: '/book', current: current === '/book' },
+    { name: '도서목록', href: '/booklist', current: current === '/booklist' },
     { name: '로그인', href: '/login', current: current === '/login' },
   ];
 

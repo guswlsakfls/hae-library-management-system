@@ -47,10 +47,9 @@ public class Lending extends BaseTimeEntity{
     private boolean renew = false;
 
     @Builder
-    public Lending(Book book, Member user ,Member lendingLibrarian, String lendingCondition,
+    public Lending(Member user ,Member lendingLibrarian, String lendingCondition,
                    Member returningLibrarian, String returningCondition,
                    LocalDateTime returningEndAt, boolean renew) {
-        this.book = book;
         this.user = user;
         this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
@@ -89,4 +88,26 @@ public class Lending extends BaseTimeEntity{
         this.returningEndAt = returningEndAt;
     }
 
+    // 관계 매핑
+    public void addBook(Book book) {
+        this.book = book;
+
+        // 무한루프 체크
+        if (book.getLending() != this) {
+            book.addLending(this);
+        }
+    }
+
+    public void addUser(Member user) {
+        this.user = user;
+
+        // 무한루프 체크
+        if (!user.getLendingList().contains(this)) {
+            user.getLendingList().add(this);
+        }
+    }
+
+    public void updateMember(Member member) {
+        this.user = member;
+    }
 }
