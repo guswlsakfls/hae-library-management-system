@@ -90,6 +90,17 @@ public class BookService {
         return ResponseBookWithBookInfoDto.from(book);
     }
 
+    @Transactional
+    public ResponseBookWithBookInfoDto getBookByCallSign(String callSign) {
+        Book book = bookRepo.findByCallSign(callSign).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
+
+        // 대출 된 도서이면 에러 메시지를 반환합니다.
+        if (book.getLending() != null) {
+            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
+        }
+        return ResponseBookWithBookInfoDto.from(book);
+    }
+
     public ResponseBookWithBookInfoDto updateBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.error("updateBookById", requestBookWithBookInfoDto);
         // 도서 ID로 도서 업데이트 로직 구현

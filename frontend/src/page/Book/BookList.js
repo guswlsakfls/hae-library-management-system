@@ -10,7 +10,7 @@ export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 20);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
 

@@ -97,4 +97,17 @@ public class Lending extends BaseTimeEntity{
             book.addLending(this);
         }
     }
+
+    public void addUser(Member user) {
+        this.user = user;
+
+        // 무한루프 체크
+        if (!user.getLendingList().contains(this)) {
+            user.getLendingList().add(this);
+        }
+    }
+
+    public void updateMember(Member member) {
+        this.user = member;
+    }
 }

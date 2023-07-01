@@ -1,13 +1,11 @@
 package com.hae.library.controller;
 
 import com.hae.library.config.Security.RoleInterface;
-import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
-import com.hae.library.dto.Member.RequestChangePasswordDto;
-import com.hae.library.dto.Member.RequestMemberDto;
-import com.hae.library.dto.Member.ResponseMemberDto;
+import com.hae.library.dto.Member.*;
 import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.service.AuthService;
 import com.hae.library.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +40,7 @@ public class MemberContorller {
                 .build();
     }
 
-    @GetMapping(value = "/member/me")
+    @GetMapping(value = "/memberInfo/me")
     public ResponseResultDto<Object> getMemberMe() {
         ResponseMemberDto responseMemberDto = memberService.getMyInfoBySecurity();
         return ResponseResultDto.builder()
@@ -50,7 +48,16 @@ public class MemberContorller {
                 .message("회원 정보 조회에 성공하였습니다")
                 .data(responseMemberDto)
                 .build();
+    }
 
+    @PostMapping(value = "/memberInfo")
+    public ResponseResultDto<Object> getMemberByEmail(@RequestBody @Valid RequestEmailDto requestEmailDto) {
+        ResponseMemberDto responseMemberDto = memberService.getMemberByEmail(requestEmailDto);
+        return ResponseResultDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("회원 정보 조회에 성공하였습니다")
+                .data(responseMemberDto)
+                .build();
     }
 
     @RoleInterface.AdminAuthorize

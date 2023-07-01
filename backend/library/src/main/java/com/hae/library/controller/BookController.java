@@ -9,9 +9,14 @@ import com.hae.library.global.Exception.errorCode.CommonErrorCode;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.service.BookService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.NumberFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +26,7 @@ import java.util.Optional;
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/api")
+@Validated
 public class BookController {
     private final BookService bookService;
 
@@ -47,9 +53,22 @@ public class BookController {
     }
 
     @GetMapping(value = "/book/{bookId}/info")
-    public ResponseResultDto getBookById(@PathVariable("bookId") Long bookId) {
+    public ResponseResultDto getBookById(@PathVariable("bookId") @Positive Long bookId) {
         log.info("bookId: {}", bookId);
         ResponseBookWithBookInfoDto  bookWithBookInfoDto = bookService.getBookById(bookId);
+
+        return ResponseResultDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("하나의 책 조회에 성공하였습니다")
+                .data(bookWithBookInfoDto)
+                .build();
+    }
+
+    @GetMapping(value = "/book/callsign")
+    public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
+            "청구기호를 입력해 주세요.") String callSign) {
+        log.info("callSign: {}", callSign);
+        ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(callSign);
 
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())

@@ -50,8 +50,9 @@ public class LendingService {
         Member user =
                 memberRepo.findById(requestLendingDto.getUserId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 대출자 회원인지 확인
-        Member lendingLibrarian = memberRepo.findById(requestLendingDto.getLendingLibrarianId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        // 대출자 회원인지 확인(현재 로그인한 회원, token으로 확인)
+        Member lendingLibrarian =
+                memberRepo.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         log.error("{}, {}, {} {}", requestLendingDto.getLendingCondition(),
                 requestLendingDto.getBookId(),

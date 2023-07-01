@@ -10,11 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member")
+@Table(name = "MEMBER")
 public class Member extends BaseTimeEntity{
 
     @Id
@@ -22,8 +24,8 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_id")
     private Long id;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Lending> LendingList = new ArrayList<Lending>();
+    @OneToMany(mappedBy = "user")
+    private List<Lending> LendingList = new ArrayList<Lending>();
 //
 //    @OneToMany(mappedBy = "member")
 //    private List<LoginInfo> loginInfoList = new ArrayList<LoginInfo>();
@@ -94,6 +96,11 @@ public class Member extends BaseTimeEntity{
 
     public void updateActivated(boolean activated) {
         this.activated = activated;
+    }
+
+    public void addLending(Lending lending) {
+        lending.updateMember(this);
+        this.LendingList.add(lending);
     }
 
 
