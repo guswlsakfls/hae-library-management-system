@@ -4,6 +4,8 @@ import com.hae.library.domain.Lending;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.format.DateTimeFormatter;
+
 @Getter
 public class ResponseLendingDto {
     private Long id;
@@ -14,6 +16,7 @@ public class ResponseLendingDto {
     private String lendingCondition;
     private String returningLibrarianEmail;
     private String returningCondition;
+    private String createdAt;
     private String returningAt;
     private boolean renew;
 
@@ -25,10 +28,11 @@ public class ResponseLendingDto {
         dto.userEmail = lending.getUser().getEmail();
         dto.lendingLibrarianEmail = lending.getLendingLibrarian().getEmail();
         dto.lendingCondition = lending.getLendingCondition();
+        dto.createdAt = lending.getCreatedAt().toLocalDate().toString();
         if (lending.getReturningLibrarian() != null) {
             dto.returningLibrarianEmail = lending.getReturningLibrarian().getEmail();
             dto.returningCondition = lending.getReturningCondition();
-            dto.returningAt = lending.getReturningEndAt().toString();
+            dto.returningAt = lending.getReturningEndAt().toLocalDate().toString();
         }
         dto.renew = lending.isRenew();
         return dto;

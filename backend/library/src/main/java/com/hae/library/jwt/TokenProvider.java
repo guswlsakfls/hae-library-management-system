@@ -1,4 +1,4 @@
-package com.hae.library.JWT;
+package com.hae.library.jwt;
 
 import com.hae.library.dto.Jwt.TokenDto;
 import io.jsonwebtoken.*;
@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Configuration
 public class TokenProvider {
-    private static final String AUTHORITIES_KEY = "auth";
+//    private static final String AUTHORITIES_KEY = "auth";
+    private static final String AUTHORITIES_KEY = "ADMIN";
     private static final String BEARER_TYPE = "bearer";
     private final Key key;
 
@@ -78,7 +79,6 @@ public class TokenProvider {
 
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
-//        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
     }
 

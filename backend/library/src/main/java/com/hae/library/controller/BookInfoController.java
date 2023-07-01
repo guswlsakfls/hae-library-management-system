@@ -1,5 +1,6 @@
 package com.hae.library.controller;
 
+import com.hae.library.config.Security.RoleInterface;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
@@ -64,6 +65,7 @@ public class BookInfoController {
     }
 
     // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
+//    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/bookinfo/isbn/{isbn}")
     public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable String isbn) {
         // 특정 책 정보를 보유도서와 함께 가져옵니다.

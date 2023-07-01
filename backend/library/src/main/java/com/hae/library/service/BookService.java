@@ -94,10 +94,10 @@ public class BookService {
     public ResponseBookWithBookInfoDto getBookByCallSign(String callSign) {
         Book book = bookRepo.findByCallSign(callSign).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
 
-        // 대출 된 도서이면 에러 메시지를 반환합니다.
-        if (book.getLending() != null) {
-            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
-        }
+//        // 대출 된 도서이면 에러 메시지를 반환합니다.
+//        if (book.getLending() != null) {
+//            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
+//        }
         return ResponseBookWithBookInfoDto.from(book);
     }
 

@@ -30,7 +30,7 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
-    @ResponseBody
+
     @PostMapping(value = "/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.error("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
@@ -52,6 +52,7 @@ public class BookController {
                 .build();
     }
 
+
     @GetMapping(value = "/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") @Positive Long bookId) {
         log.info("bookId: {}", bookId);
@@ -64,6 +65,7 @@ public class BookController {
                 .build();
     }
 
+    // 대출, 반납을 위한 책 조회
     @GetMapping(value = "/book/callsign")
     public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
             "청구기호를 입력해 주세요.") String callSign) {

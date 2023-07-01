@@ -1,16 +1,24 @@
+import { NavLink } from 'react-router-dom/dist';
+
 export default function SideBar() {
   return (
     <aside
       id="default-sidebar"
-      className="left-0 z-40 w-64 h-full transition-transform -translate-x-full sm:translate-x-0"
+      className="left-0 z-40 w-64 h-full transition-transform sm:translate-x-0"
       aria-label="Sidebar"
     >
       <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul className="space-y-2 font-medium">
           <li>
-            <a
-              href="/admin/lending"
+            <NavLink
+              to="/admin/lending"
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              style={({ isActive }) => ({
+                color:
+                  isActive || window.location.pathname === '/admin'
+                    ? 'rgb(150,180,200)'
+                    : 'white',
+              })}
             >
               <svg
                 aria-hidden="true"
@@ -23,12 +31,15 @@ export default function SideBar() {
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
               </svg>
               <span className="ml-3">대출/반납 신청</span>
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a
-              href="/admin/lending-history"
+            <NavLink
+              to="/admin/lending-history"
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              style={({ isActive }) => ({
+                color: isActive ? 'rgb(150,180,200)' : 'white',
+              })}
             >
               <svg
                 aria-hidden="true"
@@ -42,12 +53,15 @@ export default function SideBar() {
               <span className="flex-1 ml-3 whitespace-nowrap">
                 대출/반납 기록
               </span>
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a
-              href="/admin/addbook"
+            <NavLink
+              to="/admin/addbook"
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              style={({ isActive }) => ({
+                color: isActive ? 'rgb(150,180,200)' : 'white',
+              })}
             >
               <svg
                 aria-hidden="true"
@@ -63,12 +77,15 @@ export default function SideBar() {
                 ></path>
               </svg>
               <span className="flex-1 ml-3 whitespace-nowrap">도서 추가</span>
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a
-              href="/admin/book-stock"
+            <NavLink
+              to="/admin/book-stock"
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              style={({ isActive }) => ({
+                color: isActive ? 'rgb(150,180,200)' : 'white',
+              })}
             >
               <svg
                 aria-hidden="true"
@@ -84,12 +101,15 @@ export default function SideBar() {
                 ></path>
               </svg>
               <span className="flex-1 ml-3 whitespace-nowrap">도서 관리</span>
-            </a>
+            </NavLink>
           </li>
           <li>
-            <a
-              href="/admin/member"
+            <NavLink
+              to="/admin/member"
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              style={({ isActive }) => ({
+                color: isActive ? 'rgb(150,180,200)' : 'white',
+              })}
             >
               <svg
                 aria-hidden="true"
@@ -105,7 +125,7 @@ export default function SideBar() {
                 ></path>
               </svg>
               <span className="flex-1 ml-3 whitespace-nowrap">회원 관리</span>
-            </a>
+            </NavLink>
           </li>
         </ul>
       </div>

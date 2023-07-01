@@ -1,4 +1,4 @@
-package com.hae.library.JWT;
+package com.hae.library.jwt;
 
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.ServletException;
@@ -14,6 +14,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException, java.io.IOException {
         // 필요한 권한이 없이 접근하려 할때 403
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
-//        response.sendRedirect("/login");
+        response.sendRedirect("/error");
     }
 }

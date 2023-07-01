@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     // 모든 타입의 예외를 처리합니다. 이 메소드는 다른 메소드에서 처리하지 못한 예외를 처리합니다.
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(Exception ex) {
-        log.warn("handleAllException", ex);
+        log.warn("handleAllException: ", ex);
         ErrorCode errorCode = CommonErrorCode.RESOURCE_NOT_FOUND;
         return handleExceptionInternal(errorCode);
     }

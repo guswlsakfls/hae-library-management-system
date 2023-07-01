@@ -7,11 +7,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@ToString
 public class RequestLendingDto {
     @NotNull(message = "책 아이디는 필수 입력 값입니다.")
     private Long bookId;

@@ -1,10 +1,9 @@
 package com.hae.library.controller;
 
-import com.hae.library.JWT.JwtFilter;
-import com.hae.library.JWT.TokenProvider;
+import com.hae.library.jwt.JwtFilter;
+import com.hae.library.jwt.TokenProvider;
 import com.hae.library.dto.Jwt.TokenDto;
 import com.hae.library.dto.Member.RequestLoginDto;
-import com.hae.library.dto.Member.RequestMemberDto;
 import com.hae.library.dto.ResponseResultDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     @PostMapping("/auth")
-    public ResponseResultDto<Object> authorize(@Valid @RequestBody RequestLoginDto loginDto) {
+    public ResponseResultDto<Object> authorize(@RequestBody @Valid RequestLoginDto loginDto) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(),

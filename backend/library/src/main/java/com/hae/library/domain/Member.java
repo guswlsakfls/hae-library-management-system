@@ -27,6 +27,22 @@ public class Member extends BaseTimeEntity{
     @OneToMany(mappedBy = "user")
     private List<Lending> LendingList = new ArrayList<Lending>();
 //
+    @Column(nullable = false, length = 30)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "penalty_end_date")
+    private LocalDateTime penaltyEndDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
+    @Column(name = "activated")
+    private boolean activated = true;
+
 //    @OneToMany(mappedBy = "member")
 //    private List<LoginInfo> loginInfoList = new ArrayList<LoginInfo>();
 //
@@ -42,29 +58,10 @@ public class Member extends BaseTimeEntity{
 //    @OneToMany(mappedBy = "member")
 //    private List<BookMark> bookMarkList = new ArrayList<BookMark>();
 
-    @Column(name = "member_name", length = 10, nullable = false)
-    private String name;
-
-    @Column(nullable = false, length = 30)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(name = "penalty_end_date")
-    private LocalDateTime penaltyEndDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.ROLE_USER;
-
-    @Column(name = "activated")
-    private boolean activated = true;
 
     @Builder
-    public Member(String name, String email, String password, Role role,
+    public Member(String email, String password, Role role,
                   LocalDateTime penaltyEndDate) {
-        this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -72,15 +69,10 @@ public class Member extends BaseTimeEntity{
     }
 
     public void updateMemberInfo(RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
-        this.name = requestChangeMemberInfoDto.getName();
         this.email = requestChangeMemberInfoDto.getEmail();
         this.penaltyEndDate = requestChangeMemberInfoDto.getPenaltyEndDate();
         this.role = requestChangeMemberInfoDto.getRole();
         this.activated = requestChangeMemberInfoDto.isActivated();
-    }
-
-    public void updateName(String name) {
-        this.name = name;
     }
 
     public void updatePassword(String password) {

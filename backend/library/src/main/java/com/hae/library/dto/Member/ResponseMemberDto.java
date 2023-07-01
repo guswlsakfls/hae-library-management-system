@@ -32,7 +32,6 @@ public class ResponseMemberDto {
         return ResponseMemberDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
-                .name(member.getName())
                 .role(member.getRole())
                 .penaltyEndDate(member.getPenaltyEndDate())
                 .activated(member.isActivated())

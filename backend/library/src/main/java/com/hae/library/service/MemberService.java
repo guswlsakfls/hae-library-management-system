@@ -1,5 +1,6 @@
 package com.hae.library.service;
 
+import com.hae.library.domain.Enum.Role;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.Lending.ResponseLendingDto;
 import com.hae.library.dto.Member.*;
@@ -24,6 +25,25 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public ResponseMemberDto signup(RequestSignupDto requestSignupDto) {
+        // 비밀번호 재확인이 일치하지 않는다면, MEMBER_PASSWORD_NOT_MATCH 오류를 발생시킨다.
+        if (!requestSignupDto.isPasswordMatching()) {
+            throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
+        }
+
+        if (memberRepository.findByEmail(requestSignupDto.getEmail()).orElse(null) != null) {
+            throw new RestApiException(MemberErrorCode.MEMBER_ALREADY_EXIST);
+        }
+
+        Member member = Member.builder()
+                .email(requestSignupDto.getEmail())
+                .password(passwordEncoder.encode(requestSignupDto.getPassword()))
+                .role(Role.valueOf("USER"))
+                .build();
+
+        return ResponseMemberDto.from(memberRepository.save(member));
+    }
+
     public List<ResponseMemberDto> getAllMember() {
         List<Member> memberList = memberRepository.findAll();
         List<ResponseMemberDto> responseMemberDtoList = memberList.stream()
@@ -33,7 +53,7 @@ public class MemberService {
     }
 
     public ResponseMemberDto getMyInfoBySecurity() {
-        return memberRepository.findById(SecurityUtil.getCurrentMemberId())
+        return memberRepository.findByEmail(SecurityUtil.getCurrentMemberId())
                 .map(ResponseMemberDto::from)
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
@@ -69,18 +89,9 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseMemberDto changeMemberName(String newName) {
-        Member member =
-                memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(
-                MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateName(newName);
-        return ResponseMemberDto.from(memberRepository.save(member));
-    }
-
-    @Transactional
     public ResponseMemberDto changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
         Member member =
-                memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                memberRepository.findByEmail(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         if (!passwordEncoder.matches(requestChangePasswordDto.getExPassword(), member.getPassword())) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
