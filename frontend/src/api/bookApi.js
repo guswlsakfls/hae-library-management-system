@@ -105,6 +105,34 @@ const returningBookApi = async (bookId, userId, returningCondition) => {
   return res.data;
 };
 
+const getBookStockListApi = async (search, page, size) => {
+  const res = await axios.get(serverIp + '/book/all', {
+    params: {
+      search: search,
+      page: page === null ? 0 : page,
+      size: size === null ? 10 : size,
+    },
+  });
+
+  return res.data; // 최신화 위해 역순으로 정렬.
+};
+
+const updateBookStockApi = async editBook => {
+  const res = await axios.put(serverIp + '/book/update', {
+    id: editBook.bookInfo.id,
+    title: editBook.bookInfo.title,
+    isbn: editBook.bookInfo.isbn,
+    author: editBook.bookInfo.author,
+    image: editBook.bookInfo.image,
+    callSign: editBook.callSign,
+    donator: editBook.donator,
+    status: editBook.status,
+    publisher: editBook.bookInfo.publisher,
+    publishedAt: editBook.bookInfo.publishedAt,
+  });
+  return res.data;
+};
+
 export {
   getBookListApi,
   getBookInfoByIdApi,
@@ -114,4 +142,6 @@ export {
   lendingBookApi,
   returningBookApi,
   getLendingListApi,
+  getBookStockListApi,
+  updateBookStockApi,
 };

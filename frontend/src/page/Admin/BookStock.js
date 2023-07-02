@@ -1,57 +1,149 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dropdown from '../../component/common/Dropdown';
 import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
+import { useSearchParams } from 'react-router-dom/dist';
+import { getBookStockListApi, updateBookStockApi } from '../../api/BookApi';
 
-const books = [
-  {
-    title: '책 제목',
-    callSign: '청구기호',
-    lendingStatus: '대출중',
-    status: '양호',
-    createAt: '2021-10-10',
-    updateAt: '2021-10-10',
-  },
-];
+const statusText = {
+  FINE: '양호',
+  BREAK: '손상',
+  LOST: '분실',
+};
 
 export default function BookStock() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('search') || '';
+  const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
+  const [bookStockList, setBookStockList] = useState([]);
+  const [total, setTotal] = useState(0);
+  // 수정할 책 정보를 관리하는 state 추가
+  const [editBook, setEditBook] = useState(null);
 
   function toggleModal() {
     setIsOpen(!isOpen);
   }
+  // 수정 버튼 클릭 시 호출되는 함수
+  const handleEditClick = book => {
+    setEditBook(book);
+    toggleModal();
+    console.log(book);
+  };
 
-  const TableRow = ({
-    title,
-    callSign,
-    lendingStatus,
-    status,
-    createAt,
-    updateAt,
-  }) => (
+  const handlePageChange = page => {
+    setPage(page - 1);
+    setSearchParams({ search, page: page, size });
+  };
+
+  const handleInputChange = event => {
+    console.log(event.target.name, event.target.value);
+    const { name, value } = event.target;
+    setEditBook(prevBook => {
+      // 'bookInfo' 객체에 속한 속성인지 확인
+      if (
+        [
+          'title',
+          'author',
+          'publisher',
+          'category',
+          'isbn',
+          'image',
+          'publishedAt',
+        ].includes(name)
+      ) {
+        return {
+          ...prevBook,
+          bookInfo: {
+            ...prevBook.bookInfo,
+            [name]: value,
+          },
+        };
+      }
+      // 그렇지 않다면, 직접 변경
+      else {
+        return {
+          ...prevBook,
+          [name]: value,
+        };
+      }
+    });
+    console.log(editBook);
+  };
+
+  const onSubmit = e => {
+    updateBookStockApi(editBook)
+      .then(res => {
+        console.log(res);
+        alert(res.message);
+        toggleModal();
+        window.location.reload();
+      })
+      .catch(err => {
+        console.log(err.response);
+        if (err.response.status === 401 || err.response.status === 403) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+          return;
+        }
+        alert(err.response.data.message);
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
+  useEffect(() => {
+    getBookStockListApi(search, page, size)
+      .then(res => {
+        setBookStockList(res.data.bookList);
+        setTotal(res.data.totalElements);
+        setPage(res.data.currentPage);
+        setSize(res.data.size);
+        console.log(res);
+      })
+      .catch(err => {
+        if (err.response.status === 401 || err.response.status === 403) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+          return;
+        }
+        console.log(err.response);
+        alert(err.response.data.message);
+      });
+  }, [search, page, size]);
+
+  const TableRow = ({ book }) => (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {title}
+        {book.bookInfo.title}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {callSign}
+        {book.callSign}
+      </td>
+
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
+        {book.lending ? '대출중' : '대출가능'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {lendingStatus}
+        {statusText[book.status]}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {status}
+        {book.createdAt}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {createAt}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {updateAt}
+        {book.updatedAt}
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton size="small" onClick={toggleModal}>
-          삭제
+        <DefaultButton size="small" onClick={() => handleEditClick(book)}>
+          수정
         </DefaultButton>
       </td>
     </tr>
@@ -121,23 +213,24 @@ export default function BookStock() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {books.map((book, index) => (
-              <TableRow
-                key={index}
-                title={book.title}
-                callSign={book.callSign}
-                lendingStatus={book.lendingStatus}
-                status={book.status}
-                createAt={book.createAt}
-                updateAt={book.updateAt}
-              />
-            ))}
+            {bookStockList &&
+              bookStockList.map((book, index) => (
+                <TableRow key={index} book={book} />
+              ))}
           </tbody>
           <tfoot className="bg-white divide-y divide-gray-200">
             <tr>
               <td colSpan={6}>
                 <div className="flex justify-center py-3">
-                  <Pagination />
+                  <Pagination
+                    activePage={page + 1}
+                    itemsCountPerPage={size}
+                    totalItemsCount={(total / size) * 10}
+                    pageRangeDisplayed={5}
+                    prevPageText={'‹'}
+                    nextPageText={'›'}
+                    handlePageChange={handlePageChange}
+                  ></Pagination>
                 </div>
               </td>
             </tr>
@@ -152,7 +245,7 @@ export default function BookStock() {
               width: 'fit-content',
               maxWidth: '80vw',
               height: 'fit-content',
-              maxHeight: '80vh',
+              maxHeight: '100vh',
               overflow: 'auto',
             }}
           >
@@ -173,10 +266,10 @@ export default function BookStock() {
                     type="text"
                     name="title"
                     id="title"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="제목을 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.bookInfo.title}
+                    onChange={handleInputChange}
                   />
                   <label
                     htmlFor="author"
@@ -188,10 +281,10 @@ export default function BookStock() {
                     type="text"
                     name="author"
                     id="author"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="저자를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.bookInfo.author}
+                    onChange={handleInputChange}
                   />
                   <label
                     htmlFor="publisher"
@@ -203,10 +296,10 @@ export default function BookStock() {
                     type="text"
                     name="publisher"
                     id="publisher"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="출판사를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.bookInfo.publisher}
+                    onChange={handleInputChange}
                   />
                   <label
                     htmlFor="category"
@@ -218,10 +311,10 @@ export default function BookStock() {
                     type="text"
                     name="category"
                     id="category"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="카테고리를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.bookInfo.category}
+                    onChange={handleInputChange}
                   />
                   <label
                     htmlFor="isbn"
@@ -233,10 +326,10 @@ export default function BookStock() {
                     type="text"
                     name="isbn"
                     id="isbn"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="isbn을 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.bookInfo.isbn}
+                    onChange={handleInputChange}
                   />
                   <label
                     htmlFor="callSign"
@@ -248,10 +341,10 @@ export default function BookStock() {
                     type="text"
                     name="callSign"
                     id="callSign"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
                     placeholder="청구기호를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={editBook.callSign}
+                    onChange={handleInputChange}
                   />
 
                   <label
@@ -263,9 +356,9 @@ export default function BookStock() {
                   <select
                     id="role"
                     name="role"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                    // value={role}
-                    // onChange={onChangeRole}
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md text-gray-500"
+                    value={editBook.status}
+                    onChange={handleInputChange}
                   >
                     <option value="BOOK_FINE">보통</option>
                     <option value="BOOK_BREAK">파손</option>
@@ -281,45 +374,38 @@ export default function BookStock() {
                     type="text"
                     name="donator"
                     id="donator"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md text-gray-500"
                     placeholder="기부자를 입력하세요."
-                    // value={penalty}
-                    // onChange={onChangePenalty}
+                    value={editBook.donator}
+                    onChange={handleInputChange}
                   />
 
                   <label
-                    htmlFor="imageUrl"
+                    htmlFor="image"
                     className="block text-sm font-medium text-gray-700 mt-3"
                   >
                     이미지 url
                   </label>
                   <input
                     type="text"
-                    name="imageUrl"
-                    id="imageUrl"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mb-5"
+                    name="image"
+                    id="image"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mb-5 text-gray-500"
                     placeholder="이미지 주소를 입력하세요."
-                    // value={penalty}
-                    // onChange={onChangePenalty}
+                    value={editBook.bookInfo.image}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
               {/* 버튼 */}
               <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                  onClick={toggleModal}
-                >
-                  취소하기
-                </button>
-                <button
-                  type="button"
-                  className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                  onClick={toggleModal}
-                >
-                  확인
-                </button>
+                <DefaultButton onClick={toggleModal} color={'red'}>
+                  취소
+                </DefaultButton>
+
+                <DefaultButton onClick={onSubmit} color={'blue'}>
+                  수정
+                </DefaultButton>
               </div>
             </div>
           </div>

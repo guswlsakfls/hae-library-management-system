@@ -1,5 +1,12 @@
-export default function DefaultButton({ children, size, click, ...rest }) {
+export default function DefaultButton({
+  children,
+  size,
+  click,
+  color,
+  ...rest
+}) {
   let buttonSizeClass = ''; // 버튼 크기를 나타내는 클래스를 저장할 변수
+  let buttonColorClass = ''; // 버튼 색상을 나타내는 클래스를 저장할 변수
 
   // size 값에 따라 버튼 크기 클래스 지정
   switch (size) {
@@ -14,9 +21,24 @@ export default function DefaultButton({ children, size, click, ...rest }) {
       break;
   }
 
+  switch (color) {
+    case 'blue':
+      buttonColorClass = 'bg-blue-500 hover:bg-blue-700';
+      break;
+    case 'red':
+      buttonColorClass = 'bg-red-500 hover:bg-red-700';
+      break;
+    case 'green':
+      buttonColorClass = 'bg-green-500 hover:bg-green-700';
+      break;
+    default:
+      buttonColorClass = 'bg-blue-500 hover:bg-blue-700';
+      break;
+  }
+
   return (
     <button
-      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold rounded m-2 ${buttonSizeClass}`}
+      className={`bg-blue-500 ${buttonColorClass} text-white font-bold rounded m-2 ${buttonSizeClass}`}
       onClick={click}
       {...rest}
     >

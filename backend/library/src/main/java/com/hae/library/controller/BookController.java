@@ -14,12 +14,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -43,12 +46,24 @@ public class BookController {
     }
 
     @GetMapping(value = "/book/all")
-    public ResponseResultDto getAllBook() {
-        List<ResponseBookWithBookInfoDto> bookList = bookService.getAllBook();
+    public ResponseResultDto getAllBook(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size
+    ) {
+        Page<ResponseBookWithBookInfoDto> responseBookList = bookService.getAllBook(search, page,
+                size);
+
+        // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("bookList", responseBookList.getContent());
+        responseData.put("totalElements", responseBookList.getTotalElements());
+        responseData.put("currentPage", responseBookList.getNumber());
+        responseData.put("size", responseBookList.getSize());
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("모든 책 조회에 성공하였습니다")
-                .data(bookList)
+                .data(responseData)
                 .build();
     }
 
@@ -79,7 +94,7 @@ public class BookController {
                 .build();
     }
 
-    @PutMapping(value = "/book/modify")
+    @PutMapping(value = "/book/update")
     public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("requestBookWithBookInfoDto: {}", requestBookWithBookInfoDto.toString());
         ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBook(requestBookWithBookInfoDto);
