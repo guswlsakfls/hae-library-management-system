@@ -21,10 +21,11 @@ import java.util.List;
 public class ResponseMemberDto {
     private Long id;
     private String email;
-    private String name;
     private Role role;
     private LocalDateTime penaltyEndDate;
     private List<ResponseLendingDto> lendingList;
+    private String createdAt;
+    private String updatedAt;
     private boolean activated;
 
 
@@ -35,6 +36,8 @@ public class ResponseMemberDto {
                 .role(member.getRole())
                 .penaltyEndDate(member.getPenaltyEndDate())
                 .activated(member.isActivated())
+                .createdAt(member.getCreatedAt().toLocalDate().toString())
+                .updatedAt(member.getUpdatedAt().toLocalDate().toString())
                 .build();
     }
 

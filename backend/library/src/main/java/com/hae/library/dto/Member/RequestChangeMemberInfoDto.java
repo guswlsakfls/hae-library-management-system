@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 public class RequestChangeMemberInfoDto {
     private Long id;
     private String email;
-    private String name;
     private LocalDateTime penaltyEndDate;
     private Role role;
     private boolean activated;

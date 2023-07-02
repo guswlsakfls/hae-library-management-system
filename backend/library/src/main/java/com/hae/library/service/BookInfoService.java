@@ -62,12 +62,12 @@ public class BookInfoService {
     public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
-        // Specification을 이용해 동적 쿼리 생성
+        // Specification을 이용해 동적 쿼리 생성합니다.
         Specification<BookInfo> spec = (root, query, cb) -> {
             if (search == null || search.trim().isEmpty()) {
                 return cb.conjunction(); // 모든 결과 반환
             }
-            // 검색어가 포함된 경우 해당 결과 반환
+            // 검색어가 포함된 경우 해당 결과 반환합니다.
             return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
         };
 

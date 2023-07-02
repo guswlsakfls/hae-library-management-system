@@ -10,10 +10,13 @@ import com.hae.library.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -36,12 +39,24 @@ public class MemberContorller {
 
 //    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/member/all")
-    public ResponseResultDto<Object> getAllMember() {
-        List<ResponseMemberDto> responseMemberDtoList = memberService.getAllMember();
+    public ResponseResultDto<Object> getAllMember(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size
+    ) {
+        // 검색 키워드와 페이진이션 정보를 인자로 주어 회원 정보를 가져옵니다.
+        Page<ResponseMemberDto> responseMemberDtoList = memberService.getAllMember(search, page,
+                size);
+        // 회원 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("memberList", responseMemberDtoList.getContent());
+        responseData.put("totalElements", responseMemberDtoList.getTotalElements());
+        responseData.put("currentPage", responseMemberDtoList.getNumber());
+        responseData.put("size", responseMemberDtoList.getSize());
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 전체 조회에 성공하였습니다")
-                .data(responseMemberDtoList)
+                .data(responseData)
                 .build();
     }
 
@@ -66,7 +81,7 @@ public class MemberContorller {
     }
 
 //    @RoleInterface.AdminAuthorize
-    @PutMapping(value = "/member/modify")
+    @PutMapping(value = "/member/update")
     public ResponseResultDto<Object> modifyMemberInfo(@RequestBody RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         ResponseMemberDto responseMemberDto =
                 memberService.modifyMemberInfo(requestChangeMemberInfoDto);

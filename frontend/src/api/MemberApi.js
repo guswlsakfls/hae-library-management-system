@@ -3,6 +3,17 @@ import axios from 'axios';
 const serverIp = 'http://localhost:8080/api';
 const accessToken = localStorage.getItem('accessToken');
 
+const getMemberListApi = async (search, page, size) => {
+  const res = await axios.get(serverIp + '/member/all', {
+    params: {
+      search: search,
+      page: page === null ? 0 : page,
+      size: size === null ? 10 : size,
+    },
+  });
+  return res.data;
+};
+
 const getUserByEmailApi = async email => {
   const res = await axios.post(
     serverIp + '/memberInfo',
@@ -29,4 +40,21 @@ const memberLoginApi = async (email, password) => {
   return res.data;
 };
 
-export { getUserByEmailApi, memberSignupApi, memberLoginApi };
+const updateMemberApi = async editMember => {
+  const res = await axios.put(serverIp + `/member/update`, {
+    id: editMember.id,
+    email: editMember.email,
+    role: editMember.role,
+    penaltyEndDate: editMember.penaltyEndDate,
+    activated: editMember.activated,
+  });
+  return res.data;
+};
+
+export {
+  getUserByEmailApi,
+  memberSignupApi,
+  memberLoginApi,
+  getMemberListApi,
+  updateMemberApi,
+};
