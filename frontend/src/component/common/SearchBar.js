@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import queryString from 'query-string';
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchBar(props) {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const parsed = queryString.parse(window.location.search);
@@ -11,9 +13,14 @@ export default function SearchBar(props) {
     }
   }, []);
 
+  // const handleSubmit = event => {
+  //   event.preventDefault();
+  //   window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+  // };
+
   const handleSubmit = event => {
     event.preventDefault();
-    window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+    navigate(`/${props.url}?search=${searchTerm}`);
   };
 
   return (

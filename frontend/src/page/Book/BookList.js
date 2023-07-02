@@ -36,7 +36,6 @@ export default function BookList() {
         }
         console.log(err.response);
         alert(err.response.data.message);
-        // window.location.href = '/error';
       });
   }, [search, page, size]);
 
@@ -57,7 +56,10 @@ export default function BookList() {
       </div>
       <div className="flex justify-between items-center my-10 mx-72">
         <h1 className="text-2xl font-bold">도서 검색</h1>
-        <SearchBar text="제목 또는 저자를 입력해 주세요."></SearchBar>
+        <SearchBar
+          text="제목 또는 저자를 입력해 주세요."
+          url="booklist"
+        ></SearchBar>
         <div className="flex">
           <div className="mr-2">
             <Dropdown option1="전체"></Dropdown>

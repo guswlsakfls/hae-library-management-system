@@ -100,6 +100,10 @@ export default function BookStock() {
       });
   };
 
+  // const handleSearch = searchKey = {
+  //   setSearchParams({ search: searchKey, page: 0, size });
+  // };
+
   useEffect(() => {
     getBookStockListApi(search, page, size)
       .then(res => {
@@ -157,7 +161,10 @@ export default function BookStock() {
         </div>
         <div className="flex justify-between items-center my-10 mx-48">
           <h1 className="text-2xl font-bold">보유 도서 검색</h1>
-          <SearchBar text="청구기호를 입력해 주세요."></SearchBar>
+          <SearchBar
+            text="제목 또는 청구기호로 검색해 주세요."
+            url="admin/book-stock"
+          ></SearchBar>
           <div className="flex">
             <div className="mr-2">
               <Dropdown option1="대출일 순"></Dropdown>
