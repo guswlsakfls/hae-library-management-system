@@ -14,26 +14,27 @@ import lombok.*;
 public class RequestBookWithBookInfoDto {
     private Long id;
 
+    // TODO: 각 변수에 맞는 validation 추가해야한다.
     @NotBlank(message = "도서 번호를 입력해주세요.")
 //    @Pattern(regexp = "^[A-Z]{2}[0-9]{4}$", message = "도서 번호는 2자의 대문자와 4자의 숫자로 이루어져야 합니다.")
     private String callSign;
 
-//    @Pattern(regexp = "^[0-9]{13}$", message = "ISBN은 13자의 숫자로 이루어져야 합니다.")
-    @NotBlank(message = "ISBN을 입력해주세요.")
+    @Pattern(regexp = "^[0-9]{13}$", message = "ISBN은 13자의 숫자로 이루어져야 합니다.")
     private String isbn;
 
-//    @Size(max = 200, message = "도서 제목은 200자를 넘을 수 없습니다.")
+    @Size(max = 200, message = "도서 제목은 200자를 넘을 수 없습니다.")
     @NotBlank(message = "도서 제목을 입력해주세요.")
     private String title;
 
-//    @Size(max = 100, message = "저자는 100자를 넘을 수 없습니다.")
+    @Size(max = 20, message = "저자는 20자를 넘을 수 없습니다.")
     @NotBlank(message = "저자를 입력해주세요.")
     private String author;
 
-//    @Size(max = 20, message = "출판사는 20자를 넘을 수 없습니다.")
+    @Size(max = 20, message = "출판사는 20자를 넘을 수 없습니다.")
     @NotBlank(message = "출판사를 입력해주세요.")
     private String publisher;
 
+    @Size(max = 100, message = "이미지url은 100자를 넘을 수 없습니다.")
     @NotBlank(message = "이미지를 입력해주세요.")
     private String image;
 

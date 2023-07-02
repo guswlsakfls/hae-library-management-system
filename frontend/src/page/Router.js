@@ -24,10 +24,8 @@ const Router = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           {/* <Route element={<LimitedRoute isLogoutOnly />}> */}
-          <Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/booklist" element={<BookList />} />
           <Route path="/info" element={<Info />} />
           <Route path="/book/:id" element={<BookInfo />} />

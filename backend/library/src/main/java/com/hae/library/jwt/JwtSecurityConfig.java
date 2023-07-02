@@ -1,4 +1,4 @@
-package com.hae.library.JWT;
+package com.hae.library.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;

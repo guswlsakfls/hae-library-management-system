@@ -1,11 +1,6 @@
 package com.hae.library.dto.Member;
-
-import com.hae.library.domain.Enum.Role;
-import com.hae.library.domain.Member;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @Setter
@@ -13,11 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestLoginDto {
-    @NotBlank
-    @Size(min = 3, max = 50)
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "이메일 형식이 올바르지 않습니다")
     private String email;
 
-    @NotBlank
-    @Size(min = 3, max = 100)
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9]).{8,20}$", message = "비밀번호는 영문, 숫자를 포함한 8~20자리여야 합니다")
     private String password;
 }

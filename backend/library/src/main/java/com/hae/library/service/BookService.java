@@ -13,6 +13,11 @@ import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,11 +81,24 @@ public class BookService {
     }
 
     @Transactional
-    public List<ResponseBookWithBookInfoDto> getAllBook() {
-        List<Book> bookList= bookRepo.findAll();
-        List<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.stream()
-                .map(ResponseBookWithBookInfoDto::from)
-                .collect(Collectors.toList());
+    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+
+        // Specification을 이용해 동적 쿼리 생성을 구현합니다.
+        Specification<Book> spec = (root, query, cb) -> {
+            if (search == null || search.trim().isEmpty()) {
+                return cb.conjunction(); // 모든 결과를 반환합니다.
+            }
+            // 검색어가 포함된 경우 해당 결과 반환합니다.
+            return cb.or(
+                    cb.like(cb.lower(root.get("bookInfo").get("title")),
+                            "%" + search.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
+            );
+        };
+
+        Page<Book> bookList = bookRepo.findAll(spec, pageable);
+        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
         return responseBookWithBookInfoDtoList;
     }
 
@@ -94,15 +112,15 @@ public class BookService {
     public ResponseBookWithBookInfoDto getBookByCallSign(String callSign) {
         Book book = bookRepo.findByCallSign(callSign).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
 
-        // 대출 된 도서이면 에러 메시지를 반환합니다.
-        if (book.getLending() != null) {
-            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
-        }
+//        // 대출 된 도서이면 에러 메시지를 반환합니다.
+//        if (book.getLending() != null) {
+//            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
+//        }
         return ResponseBookWithBookInfoDto.from(book);
     }
 
     public ResponseBookWithBookInfoDto updateBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
-        log.error("updateBookById", requestBookWithBookInfoDto);
+
         // 도서 ID로 도서 업데이트 로직 구현
         Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         BookInfo bookInfo = book.getBookInfo();

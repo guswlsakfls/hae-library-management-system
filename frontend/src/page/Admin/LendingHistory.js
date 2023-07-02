@@ -1,12 +1,19 @@
 import Dropdown from '../../component/common/Dropdown';
 import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
+import { useState, useEffect } from 'react';
+import { getLendingListApi } from '../../api/BookApi';
+import { useSearchParams } from 'react-router-dom/dist';
 
 const TableRow = ({
   email,
-  name,
   bookTitle,
+  bookCallSign,
+  lendingLibrarianEmail,
+  lendingCondition,
   lendingDate,
+  returningLibraryEmail,
+  returningCondition,
   returningDate,
   extension,
   status,
@@ -18,8 +25,8 @@ const TableRow = ({
     <td className="py-4 whitespace-nowrap">
       <div className="px-1 flex items-center">
         <div className="ml-4">
-          <div className="text-sm font-medium text-gray-900">{name}</div>
-          <div className="text-sm text-gray-500">{bookTitle}</div>
+          <div className="text-sm font-medium text-gray-900">{bookTitle}</div>
+          <div className="text-sm text-gray-500">{bookCallSign}</div>
         </div>
       </div>
     </td>
@@ -27,8 +34,10 @@ const TableRow = ({
       <div className="flex items-center">
         <div className="ml-4">
           <div className="text-sm font-medium text-gray-900">{lendingDate}</div>
-          <div className="text-sm font-medium text-gray-500">{name}</div>
-          <div className="text-sm text-gray-500">{bookTitle}</div>
+          <div className="text-sm font-medium text-gray-500">
+            {lendingLibrarianEmail}
+          </div>
+          <div className="text-sm text-gray-500">{lendingCondition}</div>
         </div>
       </div>
     </td>
@@ -38,8 +47,10 @@ const TableRow = ({
           <div className="text-sm font-medium text-gray-900">
             {returningDate}
           </div>
-          <div className="text-sm font-medium text-gray-500">{name}</div>
-          <div className="text-sm text-gray-500">{bookTitle}</div>
+          <div className="text-sm font-medium text-gray-500">
+            {returningLibraryEmail}
+          </div>
+          <div className="text-sm text-gray-500">{returningCondition}</div>
         </div>
       </div>
     </td>
@@ -52,74 +63,39 @@ const TableRow = ({
   </tr>
 );
 
-const loans = [
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'Jane Cooper',
-    bookTitle: 'Regional Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '1회',
-    status: '대출중',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  {
-    email: 'guswlsakfls@gmail.com',
-    name: 'John Doe',
-    bookTitle: 'Paradigm Technician',
-    lendingDate: '2012-20-21',
-    returningDate: '2012-20-23',
-    extension: '2회',
-    status: '대출완료',
-  },
-  // 기타 대출 정보...
-];
-
 export default function LendingHistory() {
+  const [lendingList, setLendingList] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('search') || '';
+  const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
+  const [total, setTotal] = useState(0);
+
+  const handlePageChange = page => {
+    setPage(page - 1);
+    setSearchParams({ search, page: page, size });
+  };
+
+  useEffect(() => {
+    getLendingListApi(search, page, size)
+      .then(res => {
+        setLendingList(res.data.lendingList);
+        setTotal(res.data.totalElements);
+        setPage(res.data.currentPage);
+        setSize(res.data.size);
+        console.log(res);
+      })
+      .catch(err => {
+        if (err.response.status === 401 || err.response.status === 403) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+          return;
+        }
+        console.log(err.response);
+        alert(err.response.data.message);
+      });
+  }, [search, page, size]);
+
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
       <div className="flex justify-center items-center my-10 mx-48">
@@ -182,16 +158,22 @@ export default function LendingHistory() {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {loans.map((loan, index) => (
+          {lendingList.map((item, index) => (
             <TableRow
               key={index}
-              email={loan.email}
-              name={loan.name}
-              bookTitle={loan.bookTitle}
-              lendingDate={loan.lendingDate}
-              returningDate={loan.returningDate}
-              extension={loan.extension}
-              status={loan.status}
+              email={item.userEmail}
+              bookTitle={item.bookTitle}
+              bookCallSign={item.bookCallSign}
+              lendingLibrarianEmail={item.lendingLibrarianEmail}
+              lendingCondition={item.lendingCondition}
+              lendingDate={item.createdAt}
+              returningLibraryEmail={item.returningLibrarianEmail}
+              returningCondition={item.returningCondition}
+              returningDate={item.returningAt}
+              extension={item.renew ? '1회' : '-'}
+              status={
+                item.returningLibrarianEmail != null ? '반납완료' : '대출중'
+              }
             />
           ))}
         </tbody>
@@ -199,7 +181,17 @@ export default function LendingHistory() {
           <tr>
             <td colSpan={6}>
               <div className="flex justify-center py-3">
-                <Pagination />
+                <div className="mt-3">
+                  <Pagination
+                    activePage={page + 1}
+                    itemsCountPerPage={size}
+                    totalItemsCount={(total / size) * 10}
+                    pageRangeDisplayed={5}
+                    prevPageText={'‹'}
+                    nextPageText={'›'}
+                    handlePageChange={handlePageChange}
+                  ></Pagination>
+                </div>
               </div>
             </td>
           </tr>

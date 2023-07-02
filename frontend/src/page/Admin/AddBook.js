@@ -1,7 +1,7 @@
 import DefaultButton from '../../component/common/DefaultButton';
 import InputBar from '../../component/common/InputBar';
 import { useEffect, useState } from 'react';
-import { getAddBookByIsbn, postAddBook } from '../../api/BookApi';
+import { addBookByIsbnApi, postAddBook } from '../../api/BookApi';
 import PostInputBar from '../../component/common/PostInputBar';
 import SelectBar from '../../component/common/SelectBar';
 
@@ -43,7 +43,7 @@ export default function AddBook() {
   // ISBN을 가지고 도서 정보를 요청하는 함수
   const handleSearch = async isbn => {
     try {
-      const res = await getAddBookByIsbn(isbn);
+      const res = await addBookByIsbnApi(isbn);
       setTitle(res.data.title);
       setImage(res.data.image);
       setAuthor(res.data.author);
@@ -73,6 +73,15 @@ export default function AddBook() {
       console.log(res.data);
     } catch (err) {
       alert(err.response.data.message);
+      console.log(err.response.data);
+      let errors = err.response.data.errors;
+      if (!errors) {
+        return;
+      }
+      let errorMessages = errors
+        .map((error, index) => `${index + 1}. ${error.message}`)
+        .join('\n\n');
+      alert(errorMessages);
     }
   };
 
@@ -97,7 +106,12 @@ export default function AddBook() {
         alert(err.response.data.message);
 
         let errors = err.response.data.errors;
-        let errorMessages = errors.map(error => error.message).join('\n');
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
         alert(errorMessages);
       });
   };

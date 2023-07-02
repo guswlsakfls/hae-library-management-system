@@ -8,10 +8,14 @@ function classNames(...classes) {
 
 export default function Navbar() {
   // 초기 상태는 '도서목록'
-  const [current, setCurrent] = useState('/search');
+  const [current, setCurrent] = useState('/');
 
   const navigation = [
-    { name: '관리자페이지', href: '/admin', current: current === '/admin' },
+    {
+      name: '관리자페이지',
+      href: '/admin',
+      current: current.includes('/admin'),
+    },
     { name: '안내사항', href: '/info', current: current === '/info' },
     { name: '도서목록', href: '/booklist', current: current === '/booklist' },
     { name: '로그인', href: '/login', current: current === '/login' },

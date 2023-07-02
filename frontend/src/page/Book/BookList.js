@@ -3,7 +3,7 @@ import SearchBar from '../../component/common/SearchBar';
 import Footer from '../../component/Footer';
 import Pagination from '../../component/common/Pagination';
 import { useState, useEffect } from 'react';
-import { getBookList } from '../../api/BookApi';
+import { getBookListApi } from '../../api/BookApi';
 import { useSearchParams } from 'react-router-dom/dist';
 
 export default function BookList() {
@@ -20,7 +20,7 @@ export default function BookList() {
   };
 
   useEffect(() => {
-    getBookList(search, page, size)
+    getBookListApi(search, page, size)
       .then(res => {
         setBookInfoList(res.data.bookInfoList);
         setTotal(res.data.totalElements);
@@ -29,8 +29,13 @@ export default function BookList() {
         console.log(res);
       })
       .catch(err => {
+        if (err.response.status === 401 || err.response.status === 403) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+          return;
+        }
+        console.log(err.response);
         alert(err.response.data.message);
-        window.location.href = '/error';
       });
   }, [search, page, size]);
 
@@ -51,7 +56,10 @@ export default function BookList() {
       </div>
       <div className="flex justify-between items-center my-10 mx-72">
         <h1 className="text-2xl font-bold">도서 검색</h1>
-        <SearchBar text="제목 또는 저자를 입력해 주세요."></SearchBar>
+        <SearchBar
+          text="제목 또는 저자를 입력해 주세요."
+          url="booklist"
+        ></SearchBar>
         <div className="flex">
           <div className="mr-2">
             <Dropdown option1="전체"></Dropdown>

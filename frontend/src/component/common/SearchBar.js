@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import queryString from 'query-string';
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchBar(props) {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const parsed = queryString.parse(window.location.search);
@@ -11,9 +13,14 @@ export default function SearchBar(props) {
     }
   }, []);
 
+  // const handleSubmit = event => {
+  //   event.preventDefault();
+  //   window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+  // };
+
   const handleSubmit = event => {
     event.preventDefault();
-    window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
+    navigate(`/${props.url}?search=${searchTerm}`);
   };
 
   return (
@@ -24,8 +31,8 @@ export default function SearchBar(props) {
         </div>
         <input
           type="text"
-          name="price"
-          id="price"
+          name="book"
+          id="book"
           className="block w-96 h-10 rounded-md border-0 py-2 pl-8 pr-2 text-base text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
           placeholder={props.text}
           value={searchTerm}

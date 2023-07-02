@@ -1,4 +1,4 @@
-INSERT INTO member 
-(member_name, email, password, role, activated) 
+INSERT IGNORE INTO member
+(email, password, role, activated)
 VALUES 
-('admin', 'admin@gmail.com', '$2a$10$OxVD9hQTat7zb7mE080YF.BbuShAoJ6qYysLT0kUvd/lyK5LGGZMu', 'ROLE_ADMIN', true);
+('admin@gmail.com', '$2a$10$0/MqSDYi5gA7HitE1ioK.OmMceX4un2Fv3awXEvqn613QIjz8ob7q', 'ADMIN', true);

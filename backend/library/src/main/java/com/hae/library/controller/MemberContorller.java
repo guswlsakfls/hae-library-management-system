@@ -3,15 +3,19 @@ package com.hae.library.controller;
 import com.hae.library.config.Security.RoleInterface;
 import com.hae.library.dto.Member.*;
 import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.global.Exception.RestApiException;
+import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.service.AuthService;
 import com.hae.library.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/api")
@@ -20,8 +24,9 @@ public class MemberContorller {
     AuthService authService;
 
     @PostMapping(value = "/member/signup")
-    public ResponseResultDto<Object> signUp(@RequestBody RequestMemberDto requestMemberDto) {
-        ResponseMemberDto responseMemberDto = authService.signup(requestMemberDto);
+    public ResponseResultDto<Object> signUp(@RequestBody @Valid RequestSignupDto requestSignupDto) {
+        log.info("회원가입 요청 : {}", requestSignupDto);
+        ResponseMemberDto responseMemberDto = memberService.signup(requestSignupDto);
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원가입에 성공하였습니다")
@@ -29,7 +34,7 @@ public class MemberContorller {
                 .build();
     }
 
-    @RoleInterface.AdminAuthorize
+//    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/member/all")
     public ResponseResultDto<Object> getAllMember() {
         List<ResponseMemberDto> responseMemberDtoList = memberService.getAllMember();
@@ -60,7 +65,7 @@ public class MemberContorller {
                 .build();
     }
 
-    @RoleInterface.AdminAuthorize
+//    @RoleInterface.AdminAuthorize
     @PutMapping(value = "/member/modify")
     public ResponseResultDto<Object> modifyMemberInfo(@RequestBody RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         ResponseMemberDto responseMemberDto =
@@ -68,16 +73,6 @@ public class MemberContorller {
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 정보 수정에 성공하였습니다")
-                .data(responseMemberDto)
-                .build();
-    }
-
-    @PutMapping(value = "/member/changeName")
-    public ResponseResultDto<Object> changeMemberName(@RequestBody String newName) {
-        ResponseMemberDto responseMemberDto = memberService.changeMemberName(newName);
-        return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("회원 이름 변경에 성공하였습니다")
                 .data(responseMemberDto)
                 .build();
     }

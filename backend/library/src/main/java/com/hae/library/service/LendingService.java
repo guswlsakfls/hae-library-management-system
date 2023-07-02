@@ -1,6 +1,7 @@
 package com.hae.library.service;
 
 import com.hae.library.domain.Book;
+import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
 import com.hae.library.dto.Lending.RequestLendingDto;
@@ -17,6 +18,11 @@ import com.hae.library.repository.MemberRepository;
 import com.hae.library.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,24 +41,34 @@ public class LendingService {
 
     @Transactional
     public ResponseLendingDto lendingBook(RequestLendingDto requestLendingDto) {
+        log.info("requestLendingDto: {}", requestLendingDto.toString());
         // 도서가 있는지 조회
         Book book =
                 bookRepo.findById(requestLendingDto.getBookId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
 
-        // 대출된 도서인지 확인
-        Boolean existslending =
-                lendingRepo.existsByBookId(book.getId());
-        if (existslending) {
+        // 대출 된 도서이면 에러 메시지를 반환합니다.
+        if (book.getLending() != null) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
         }
+
+//        // 대출된 도서인지 확인
+//        Boolean existslending =
+//                lendingRepo.existsByBookId(book.getId());
+//        if (existslending) {
+//            throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
+//        }
 
         // 대출받는 유저가 회원인지 확인
         Member user =
                 memberRepo.findById(requestLendingDto.getUserId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
+        // TODO: Security로 회원 이메일 받아야 한다.
         // 대출자 회원인지 확인(현재 로그인한 회원, token으로 확인)
+        log.warn("SecurityUtil: {}", SecurityUtil.getCurrentMemberId());
+//        Member lendingLibrarian =
+//                        memberRepo.findByEmail(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         Member lendingLibrarian =
-                memberRepo.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                memberRepo.findById(requestLendingDto.getUserId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         log.error("{}, {}, {} {}", requestLendingDto.getLendingCondition(),
                 requestLendingDto.getBookId(),
@@ -77,22 +93,24 @@ public class LendingService {
 
     @Transactional
     public ResponseLendingDto returningBook(RequestReturningDto requestReturningDto) {
-        // 도서대출 중인지 조회 없으면 예외처리
+//        // 도서대출 중인지 조회 없으면 예외처리
+//        Lending lending =
+//                lendingRepo.findById(requestReturningDto.getLendingId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
         Lending lending =
-                lendingRepo.findById(requestReturningDto.getLendingId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
+                lendingRepo.findByBookId(requestReturningDto.getBookId()).orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
 
         // 대출된 도서인지 확인
         if (lending.getReturningLibrarian() != null) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_RETURNED);
         }
         // TODO: 대출된 도서가 저장 되어 있으니까 도서, 대출사서, 대출 컨디션은 있다고 생각을 하는것이 맞을까?
-
         // 도서반납자 회원인지 확인
         Member user =
                 memberRepo.findById(lending.getUser().getId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 반납사서가 회원인지 확인
-        Member returningLibrarian = memberRepo.findById(requestReturningDto.getReturningLibrarianId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        // TODO: 액세스 토큰으로 가지고 올 수 있는지 확인 필요.
+//        // 반납사서가 회원인지 확인
+//        Member returningLibrarian = memberRepo.findById(requestReturningDto.getReturningLibrarianId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 반납일이 지났는지 확인
         LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -110,7 +128,9 @@ public class LendingService {
         }
 
         // 반납 로직 구현
-        lending.updateReturning(returningLibrarian, requestReturningDto.getReturningCondition(),
+//        lending.updateReturning(returningLibrarian, requestReturningDto.getReturningCondition(),
+//                now);
+        lending.updateReturning(user, requestReturningDto.getReturningCondition(),
                 now);
 
         Lending updateLending = lendingRepo.save(lending);
@@ -118,13 +138,22 @@ public class LendingService {
         return ResponseLendingDto.from(updateLending);
     }
     @Transactional
-    public List<ResponseLendingDto> getAllLendingHistory() {
+    public Page<ResponseLendingDto> getAllLendingHistory(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+
+        // TODO: 모든 정보를 가지고 와서 검색을 하는 것이 맞을까?
+        // Specification을 이용해 동적 쿼리 생성
+//        Specification<Lending> spec = (root, query, cb) -> {
+//            if (search == null || search.trim().isEmpty()) {
+//                return cb.conjunction(); // 모든 결과 반환
+//            }
+//            // 검색어가 포함된 경우 해당 결과 반환
+//            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+//        };
+
         // 전체 대출 기록 조회 로직 구현
-        List<Lending> lendingList = lendingRepo.findAll();
-        List<ResponseLendingDto> responseLendingDtoList = new ArrayList<>();
-        for (Lending lending : lendingList) {
-            responseLendingDtoList.add(ResponseLendingDto.from(lending));
-        }
+        Page<Lending> lendingList = lendingRepo.findAll(pageable);
+        Page<ResponseLendingDto> responseLendingDtoList = lendingList.map(ResponseLendingDto::from);
 
         return responseLendingDtoList;
     }
@@ -133,7 +162,7 @@ public class LendingService {
     public List<ResponseMemberLendingDto> getMemberLendingHistory() {
         // 개별 대출 기록 조회 없으면 예외처리
         Member user =
-                memberRepo.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                memberRepo.findByEmail(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         List<Lending> lendingList = lendingRepo.findAllByUser(user);
         List<ResponseMemberLendingDto> responseMemberLendingDtoList = new ArrayList<>();

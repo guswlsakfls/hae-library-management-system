@@ -1,30 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Footer from '../../component/Footer';
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
+import { memberLoginApi } from '../../api/MemberApi';
+
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = () => {
+    memberLoginApi(email, password)
+      .then(res => {
+        console.log(res);
+        alert(res.message);
+        localStorage.setItem('accessToken', res.data.accessToken);
+        window.location.href = '/';
+      })
+      .catch(err => {
+        if (err.response.status && err.response.status === 404) {
+          alert('아이디와 비밀번호가 일치하지 않습니다.');
+        } else {
+          let errors = err.response.data.errors;
+          if (!errors) {
+            return;
+          }
+          let errorMessages = errors
+            .map((error, index) => `${index + 1}. ${error.message}`)
+            .join('\n\n');
+          alert(errorMessages);
+        }
+      });
+  };
+
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
@@ -38,7 +45,7 @@ export default function Login() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <div className="space-y-6">
             <div>
               <label
                 htmlFor="email"
@@ -51,9 +58,10 @@ export default function Login() {
                   id="email"
                   name="email"
                   type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder="이메일을 입력해주세요."
+                  valuse={email}
+                  onChange={event => setEmail(event.target.value)}
+                  className="block w-full rounded-md border-0 px-1.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -72,9 +80,10 @@ export default function Login() {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
-                  required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder="패스워드를 입력해 주세요."
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                  className="block w-full rounded-md border-0 px-1.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>
@@ -83,11 +92,12 @@ export default function Login() {
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                onClick={handleLogin}
               >
                 로그인
               </button>
             </div>
-          </form>
+          </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
             회원이 아니신가요?{' '}

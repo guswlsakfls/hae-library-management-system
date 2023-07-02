@@ -9,11 +9,16 @@ import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.service.LendingService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/api")
@@ -39,17 +44,29 @@ public class LendingController {
                 .build();
     }
 
-    @GetMapping(value = "/lending/all/history")
-    public ResponseResultDto<Object> getAllLendingHistory() {
-        List<ResponseLendingDto> responseLendingDtoList = lendingService.getAllLendingHistory();
+    @GetMapping(value = "/lending/all")
+    public ResponseResultDto<Object> getAllLendingHistory(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size
+    ) {
+        log.error("search: {}, page: {}, size: {}", search, page, size);
+        Page<ResponseLendingDto> responseLendingDtoList =
+                lendingService.getAllLendingHistory(search, page, size);
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("lendingList", responseLendingDtoList.getContent());
+        responseData.put("totalElements", responseLendingDtoList.getTotalElements());
+        responseData.put("currentPage", responseLendingDtoList.getNumber());
+        responseData.put("size", responseLendingDtoList.getSize());
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 대여 기록 조회에 성공하였습니다")
-                .data(responseLendingDtoList)
+                .data(responseData)
                 .build();
     }
 
-    @GetMapping(value = "/lending/me/history")
+    @GetMapping(value = "/lending/me")
     public ResponseResultDto<Object> getMemberLendingHistory() {
         List<ResponseMemberLendingDto> responseMemberLendingDtoList =
                 lendingService.getMemberLendingHistory();

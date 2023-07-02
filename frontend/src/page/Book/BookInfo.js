@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Footer from '../../component/Footer';
-import { getBookInfoById } from '../../api/BookApi';
+import { getBookInfoByIdApi } from '../../api/BookApi';
 
 const statusText = {
   FINE: '양호',
@@ -14,14 +14,28 @@ export default function BookInfo() {
   const bookId = window.location.pathname.split('/')[2];
 
   useEffect(() => {
-    getBookInfoById(bookId)
+    getBookInfoByIdApi(bookId)
       .then(res => {
         setBookInfo(res.data);
         console.log(res.data);
       })
       .catch(err => {
+        console.log(err.response);
+        if (err.response.status === 401 || err.response.status === 403) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/login';
+          return;
+        }
         alert(err.response.data.message);
-        window.location.href = '/error';
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+        // window.location.href = '/error';
       });
   }, []);
 
