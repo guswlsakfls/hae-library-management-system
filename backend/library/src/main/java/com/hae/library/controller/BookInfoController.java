@@ -6,11 +6,13 @@ import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.service.BookInfoService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/api")
@@ -67,8 +70,9 @@ public class BookInfoController {
 
     // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
 //    @RoleInterface.AdminAuthorize
-    @GetMapping(value = {"/bookinfo/isbn/" ,"/bookinfo/isbn/{isbn}"})
-    public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable(required = false) String isbn) {
+    @GetMapping(value = "/bookinfo/isbn")
+    public ResponseResultDto<Object> getBookInfoByIsbn(@RequestParam @NotBlank(message =
+            "ISBN값을 입력해 주세요.") String isbn) {
         log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
 

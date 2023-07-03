@@ -73,7 +73,11 @@ const getBookInfoByIdApi = async id => {
 };
 
 const addBookByIsbnApi = async isbn => {
-  const res = await axios.get(serverIp + '/bookinfo/isbn/' + isbn, {
+  const res = await axios.get(serverIp + '/bookinfo/isbn', {
+    params: {
+      isbn: isbn,
+    },
+
     // headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
