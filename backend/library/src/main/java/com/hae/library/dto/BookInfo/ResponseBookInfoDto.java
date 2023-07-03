@@ -16,8 +16,8 @@ public class ResponseBookInfoDto {
     private String publishedAt;
 
     public static ResponseBookInfoDto from(BookInfo bookInfo) {
+        // bookInfo가 null인 경우 예외 처리 또는 기본값 설정 등을 수행
         if (bookInfo == null) {
-            // bookInfo가 null인 경우 예외 처리 또는 기본값 설정 등을 수행
             throw new IllegalArgumentException("bookInfo cannot be null");
         }
 

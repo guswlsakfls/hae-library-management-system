@@ -34,7 +34,7 @@ export default function AddBook() {
   const [author, setAuthor] = useState('');
   const [publisher, setPublisher] = useState('');
   const [publishedAt, setPublishedAt] = useState('');
-  const [isbn, setIsbn] = useState('');
+  const [isbn, setIsbn] = useState(null);
   const [category, setCategory] = useState('');
   const [callSign, setCallSign] = useState('');
   const [donator, setDonator] = useState('');

@@ -38,17 +38,32 @@ public class SpringSecurityConfig {
         this.customAuthFailureHandler = customAuthFailureHandler;
     }
 
-    private static final String[] PERMIT_URL_ARRAY = {
-            /* 회원 */
-            "/api/member/signup",
-            "/api/member/login",
+    // 회원, 비회원, 관리자 모두 사용 가능합니다.
+    private static final String[] ALL_URL_ARRAY = {
+            /* 로그인, 회원가입 */
+            "/api/signup",
+            "/api/login",
             "/api/auth",
 
             /* 도서 */
-            "/api/bookinfo/all",
             "/api/bookinfo/**",
-            "/api/**",
+
+            /* 기타 등등 */
+            "/error",
+//            "/api/**"
+
     };
+
+    // 회원, 관리자만 사용 가능 합니다.
+    private static final String[] MEMBER_URL_ARRAY = {
+            "/api/member/**",
+    };
+
+    // 관리자만 사용 가능 합니다.
+    private static final String[] ADMIN_URL_ARRAY = {
+            "/api/admin/**",
+    };
+
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -68,8 +83,9 @@ public class SpringSecurityConfig {
                 )
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/**").permitAll()
-                        .requestMatchers(PERMIT_URL_ARRAY).permitAll()
+                        .requestMatchers(ALL_URL_ARRAY).permitAll()
+                        .requestMatchers(MEMBER_URL_ARRAY).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(ADMIN_URL_ARRAY).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 //                .formLogin(formLogin -> formLogin

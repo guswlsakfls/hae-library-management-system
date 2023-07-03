@@ -59,6 +59,10 @@ public class Lending extends BaseTimeEntity{
         this.renew = renew;
     }
 
+    /**
+     * ID를 업데이트합니다.
+     * @param id 새로운 ID
+     */
     public void updateIdTest(Long id) {
         this.id = id;
     }
@@ -67,12 +71,19 @@ public class Lending extends BaseTimeEntity{
         this.renew = renew;
     }
 
-    // TODO: 유저가 연장 신청
+    /**
+     * 대출을 연장합니다.
+     */
     public void renewLending() {
         this.returningEndAt = this.returningEndAt.plusDays(7);
         this.updateRenew(true);
     }
 
+    /**
+     * 대출 조건의 길이를 확인합니다.
+     * @param condition 대출 조건
+     * @throws IllegalArgumentException 대출 조건 길이가 유효하지 않을 경우 예외를 던집니다.
+     */
     public void checkConditionLength(String condition) {
         final int MIN_LENDING_CONDITION_LENGTH = 4;
         final int MAX_LENDING_CONDITION_LENGTH = 300;
@@ -82,6 +93,12 @@ public class Lending extends BaseTimeEntity{
         }
     }
 
+    /**
+     * 반납 정보를 업데이트합니다.
+     * @param returninglibrarian 반납한 사서
+     * @param returningCondition 반납 조건
+     * @param returningEndAt 반납 일시
+     */
     public void updateReturning(Member returninglibrarian, String returningCondition, LocalDateTime returningEndAt) {
         this.returningLibrarian = returninglibrarian;
         this.returningCondition = returningCondition;
@@ -89,6 +106,11 @@ public class Lending extends BaseTimeEntity{
     }
 
     // 관계 매핑
+
+    /**
+     * 대출에 도서를 추가합니다.
+     * @param book 추가할 도서
+     */
     public void addBook(Book book) {
         this.book = book;
 
@@ -98,6 +120,10 @@ public class Lending extends BaseTimeEntity{
         }
     }
 
+    /**
+     * 대출에 사용자를 추가합니다.
+     * @param user 추가할 사용자
+     */
     public void addUser(Member user) {
         this.user = user;
 
@@ -107,6 +133,10 @@ public class Lending extends BaseTimeEntity{
         }
     }
 
+    /**
+     * 대출의 사용자 정보를 업데이트합니다.
+     * @param member 업데이트할 사용자 정보
+     */
     public void updateMember(Member member) {
         this.user = member;
     }

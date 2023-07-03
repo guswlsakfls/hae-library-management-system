@@ -37,7 +37,7 @@ export default function Mypage() {
         </h2>
       </div>
 
-      <div class="left-0 z-50 h-16 bg-white border-b mt-10 mx-96">
+      <div class="left-0 z-50 h-16 bg-white border-b mt-10 lg:mx-96">
         {/* ... */}
         <div class="grid h-full max-w-lg grid-cols-2 mx-auto font-medium justify-center">
           <button

@@ -23,33 +23,32 @@ import java.util.stream.Collectors;
 @Slf4j
 @Configuration
 public class TokenProvider {
-//    private static final String AUTHORITIES_KEY = "auth";
+    // 권한 키
     private static final String AUTHORITIES_KEY = "ADMIN";
+    // 토큰 타입
     private static final String BEARER_TYPE = "bearer";
+    // 키
     private final Key key;
+    // 액세스 토큰 만료 시간 (7일)
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000000 * 60 * 60 * 24 * 7L;
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000000 * 60 * 60 * 24 * 7L; // 7일
-
-
-
+    // 생성자 - secret key를 이용해서 HMAC SHA 키를 생성
     public TokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        log.info("HMAC SHA 키가 생성되었습니다.");
     }
 
-
-    // 토큰 생성
+    // JWT 토큰 생성
     public TokenDto createToken(Authentication authentication) {
-
+        // 사용자 권한을 콤마로 분리한 문자열로 만듦
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-
         Date tokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-
-        log.error(String.valueOf(tokenExpiresIn));
+        log.info("토큰 만료 시간: {}", tokenExpiresIn);
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
@@ -58,6 +57,8 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
+        log.info("JWT 토큰이 생성되었습니다.");
+
         return TokenDto.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
@@ -65,9 +66,9 @@ public class TokenProvider {
                 .build();
     }
 
+    // JWT 토큰으로 인증 정보를 가져옴
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
-
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
@@ -82,22 +83,24 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, accessToken, authorities);
     }
 
+    // JWT 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.");
         }
         return false;
     }
 
+    // JWT 토큰에서 Claims를 추출
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();

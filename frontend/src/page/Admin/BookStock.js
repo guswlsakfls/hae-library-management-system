@@ -23,9 +23,9 @@ export default function BookStock() {
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
 
-  function toggleModal() {
+  const toggleModal = () => {
     setIsOpen(!isOpen);
-  }
+  };
   // 수정 버튼 클릭 시 호출되는 함수
   const handleEditClick = book => {
     setEditBook(book);

@@ -1,5 +1,6 @@
 import DefaultButton from '../../component/common/DefaultButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getMyInfoApi } from '../../api/MemberApi';
 
 const user = {
   email: 'guswlsakfls@gmail.com',
@@ -9,38 +10,59 @@ const user = {
 
 export default function MyInfo() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
+  const [myInfo, setMyInfo] = useState({});
 
   function modifyToggleModal() {
     modifySetIsOpen(!modifyIsOpen);
   }
 
+  useEffect(() => {
+    getMyInfoApi()
+      .then(res => {
+        console.log(res);
+        setMyInfo(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+        alert('내 정보를 불러오는데 실패했습니다.');
+      });
+  }, []);
+
   return (
     <>
-      <div className="flex justify-center items-center my-10 mx-96 border-2">
+      <div className="flex justify-center items-center my-10 sm:mx-32 lg:mx-96 border-2">
         <div className="m-6 border-b border-gray-100">
           <dl className="divide-y divide-gray-100">
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 이메일
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.email}
+              <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
+                {myInfo.email}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 대출권수
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.lendingCount}
+              <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
+                {myInfo.lendingList === null ? 0 : myInfo.lendingCount}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
                 연체현황
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.penaltyDate}
+              <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
+                {myInfo.penaltyEndDate &&
+                !isNaN(Date.parse(myInfo.penaltyEndDate))
+                  ? new Date(
+                      new Date(myInfo.penaltyEndDate).getTime() +
+                        24 * 60 * 60 * 1000
+                    )
+                      .toISOString()
+                      .split('T')[0]
+                  : '-'}
               </dd>
             </div>
           </dl>
