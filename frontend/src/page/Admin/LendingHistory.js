@@ -103,7 +103,10 @@ export default function LendingHistory() {
       </div>
       <div className="flex justify-between items-center my-10 mx-48">
         <h1 className="text-2xl font-bold">대출/반납 검색</h1>
-        <SearchBar></SearchBar>
+        <SearchBar
+          text="제목 또는 청구기호로 검색해 주세요."
+          url="admin/lending-history"
+        ></SearchBar>
         <div className="flex">
           <div className="mr-2">
             <Dropdown option1="대출일 순"></Dropdown>

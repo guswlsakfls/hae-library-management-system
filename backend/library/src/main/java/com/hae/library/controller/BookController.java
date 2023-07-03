@@ -35,7 +35,7 @@ public class BookController {
 
 
     // 새 책을 생성합니다
-    @PostMapping(value = "/book/create")
+    @PostMapping(value = "/admin/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("책 생성 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
         ResponseBookWithBookInfoDto responseBookWithBookInfoDto = bookService.createBook(requestBookWithBookInfoDto);
@@ -49,7 +49,7 @@ public class BookController {
     }
 
     // 모든 책을 검색하거나, 검색어에 해당하는 책을 검색합니다
-    @GetMapping(value = "/book/all")
+    @GetMapping(value = "/admin/book/all")
     public ResponseResultDto getAllBook(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
@@ -76,7 +76,7 @@ public class BookController {
 
 
     // 지정된 ID를 가진 책을 검색합니다
-    @GetMapping(value = "/book/{bookId}/info")
+    @GetMapping(value = "/member/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") @Positive Long bookId) {
         log.info("ID로 책 조회 요청: [GET] /book/{bookId}/info - 책 ID {}", bookId);
         ResponseBookWithBookInfoDto  bookWithBookInfoDto = bookService.getBookById(bookId);
@@ -90,7 +90,7 @@ public class BookController {
     }
 
     // 청구기호로 책을 검색합니다
-    @GetMapping(value = "/book/callsign")
+    @GetMapping(value = "/admin/book/callsign")
     public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
             "청구기호를 입력해 주세요.") String callSign) {
         log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", callSign);
@@ -105,7 +105,7 @@ public class BookController {
     }
 
     // 책 정보를 업데이트 합니다
-    @PutMapping(value = "/book/update")
+    @PutMapping(value = "/admin/book/update")
     public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("책 정보 업데이트 요청: [PUT] /book/update - {}", requestBookWithBookInfoDto.toString());
         ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBook(requestBookWithBookInfoDto);
@@ -119,7 +119,7 @@ public class BookController {
     }
 
     // 지정된 ID를 가진 책을 삭제합니다
-    @DeleteMapping(value = "/book/{bookId}/delete")
+    @DeleteMapping(value = "/admin/book/{bookId}/delete")
     public ResponseResultDto<Object> deleteBookById(@PathVariable("bookId") Long bookId) {
         log.info("책 삭제 요청: [DELETE] /book/{bookId}/delete - 책 ID {}", bookId);
         bookService.deleteBookById(bookId);

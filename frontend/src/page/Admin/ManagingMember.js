@@ -139,7 +139,11 @@ export default function ManagingMember() {
 
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {member.penaltyEndDate
-          ? new Date(member.penaltyEndDate).toISOString().split('T')[0]
+          ? new Date(
+              new Date(member.penaltyEndDate).getTime() + 24 * 60 * 60 * 1000
+            )
+              .toISOString()
+              .split('T')[0]
           : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
@@ -172,7 +176,10 @@ export default function ManagingMember() {
         </div>
         <div className="flex justify-between items-center my-10 mx-48">
           <h1 className="text-2xl font-bold">회원 목록</h1>
-          <SearchBar text="청구기호를 입력해 주세요."></SearchBar>
+          <SearchBar
+            text="이메일로 검색해 주세요."
+            url="admin/member"
+          ></SearchBar>
           <div className="flex">
             <div className="mr-2">
               <Dropdown option1="대출일 순"></Dropdown>

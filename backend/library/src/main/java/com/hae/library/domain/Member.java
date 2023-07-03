@@ -37,7 +37,7 @@ public class Member extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Role role = Role.ROLE_USER;
 
     @Column(name = "activated")
     private boolean activated = true;

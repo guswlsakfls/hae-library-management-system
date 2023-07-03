@@ -15,18 +15,24 @@ const postAddBook = async (
   donator,
   status
 ) => {
-  const res = await axios.post(serverIp + '/book/create', {
-    title: title,
-    image: image,
-    author: author,
-    publisher: publisher,
-    publishedAt: publishedAt,
-    isbn: isbn,
-    category: category,
-    callSign: callSign,
-    donator: donator,
-    status: status,
-  });
+  const res = await axios.post(
+    serverIp + '/admin/book/create',
+    {
+      title: title,
+      image: image,
+      author: author,
+      publisher: publisher,
+      publishedAt: publishedAt,
+      isbn: isbn,
+      category: category,
+      callSign: callSign,
+      donator: donator,
+      status: status,
+    },
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
   return res.data;
 };
 
@@ -46,23 +52,24 @@ const getBookListApi = async (search, page, size) => {
 
 const getLendingListApi = async (search, page, size) => {
   console.log(page);
-  const res = await axios.get(serverIp + '/lending/all', {
+  const res = await axios.get(serverIp + '/admin/lending/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
     },
+    headers: { authorization: `Bearer ${accessToken}` },
   });
 
   return res.data; // 최신화 위해 역순으로 정렬.
 };
 
 const getBookByCallSignApi = async callSign => {
-  const res = await axios.get(serverIp + '/book/callsign', {
+  const res = await axios.get(serverIp + '/admin/book/callsign', {
     params: {
       callsign: callSign,
     },
-    // headers: { authorization: `Bearer ${accessToken}` },
+    headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
@@ -73,67 +80,70 @@ const getBookInfoByIdApi = async id => {
 };
 
 const addBookByIsbnApi = async isbn => {
-  const res = await axios.get(serverIp + '/bookinfo/isbn', {
+  const res = await axios.get(serverIp + '/admin/bookinfo/isbn', {
     params: {
       isbn: isbn,
     },
-
-    // headers: { authorization: `Bearer ${accessToken}` },
+    headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
 
 const lendingBookApi = async (bookId, userId, lendingCondition) => {
   const res = await axios.post(
-    serverIp + '/lending/create',
+    serverIp + '/admin/lending/create',
     {
       bookId: bookId,
       userId: userId,
       lendingCondition: lendingCondition,
-    }
-    // { headers: { authorization: `Bearer ${accessToken}` } }
+    },
+    { headers: { authorization: `Bearer ${accessToken}` } }
   );
   return res.data;
 };
 
-const returningBookApi = async (bookId, userId, returningCondition) => {
+const returningBookApi = async (bookId, returningCondition) => {
   const res = await axios.put(
-    serverIp + '/lending/returning',
+    serverIp + '/admin/lending/returning',
     {
       bookId: bookId,
-      // userId: userId,
       returningCondition: returningCondition,
-    }
-    // { headers: { authorization: `Bearer ${accessToken}` } }
+    },
+    { headers: { authorization: `Bearer ${accessToken}` } }
   );
   return res.data;
 };
 
 const getBookStockListApi = async (search, page, size) => {
-  const res = await axios.get(serverIp + '/book/all', {
+  const res = await axios.get(serverIp + '/admin/book/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
     },
+    headers: { authorization: `Bearer ${accessToken}` },
   });
 
   return res.data; // 최신화 위해 역순으로 정렬.
 };
 
 const updateBookStockApi = async editBook => {
-  const res = await axios.put(serverIp + '/book/update', {
-    id: editBook.bookInfo.id,
-    title: editBook.bookInfo.title,
-    isbn: editBook.bookInfo.isbn,
-    author: editBook.bookInfo.author,
-    image: editBook.bookInfo.image,
-    callSign: editBook.callSign,
-    donator: editBook.donator,
-    status: editBook.status,
-    publisher: editBook.bookInfo.publisher,
-    publishedAt: editBook.bookInfo.publishedAt,
-  });
+  const res = await axios.put(
+    serverIp + '/admin/book/update',
+    {
+      id: editBook.bookInfo.id,
+      title: editBook.bookInfo.title,
+      isbn: editBook.bookInfo.isbn,
+      author: editBook.bookInfo.author,
+      image: editBook.bookInfo.image,
+      callSign: editBook.callSign,
+      donator: editBook.donator,
+      status: editBook.status,
+      publisher: editBook.bookInfo.publisher,
+      publishedAt: editBook.bookInfo.publishedAt,
+    },
+    { headers: { authorization: `Bearer ${accessToken}` } }
+  );
   return res.data;
 };
 

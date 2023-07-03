@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class RequestChangeMemberInfoDto {
-    @NotBlank(message = "id는 필수 입력 값입니다.")
+    @NotNull(message = "id는 필수 입력 값입니다.")
     private Long id;
 
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",

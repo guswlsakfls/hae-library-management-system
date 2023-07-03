@@ -167,7 +167,7 @@ public class LendingService {
     @Transactional
     public List<ResponseMemberLendingDto> getMemberLendingHistory() {
         // 로그인한 회원의 대출 기록 조회합니다. (jwt 토큰에서 회원 ID를 가져옵니다.)
-        Member user = memberRepo.findByEmail(SecurityUtil.getCurrentMemberId())
+        Member user = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 회원의 대출 기록을 조회합니다.

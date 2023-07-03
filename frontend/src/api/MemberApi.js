@@ -4,27 +4,28 @@ const serverIp = 'http://localhost:8080/api';
 const accessToken = localStorage.getItem('accessToken');
 
 const getMemberListApi = async (search, page, size) => {
-  const res = await axios.get(serverIp + '/member/all', {
+  const res = await axios.get(serverIp + '/admin/memberinfo/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
     },
+    headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
 
 const getUserByEmailApi = async email => {
   const res = await axios.post(
-    serverIp + '/memberInfo',
-    { email: email }
-    // { headers: { authorization: `Bearer ${accessToken}` } }
+    serverIp + '/admin/memberInfo',
+    { email: email },
+    { headers: { authorization: `Bearer ${accessToken}` } }
   );
   return res.data;
 };
 
 const memberSignupApi = async (email, password, checkPassword) => {
-  const res = await axios.post(serverIp + '/member/signup', {
+  const res = await axios.post(serverIp + '/signup', {
     email: email,
     password: password,
     checkPassword: checkPassword,
@@ -41,12 +42,27 @@ const memberLoginApi = async (email, password) => {
 };
 
 const updateMemberApi = async editMember => {
-  const res = await axios.put(serverIp + `/member/update`, {
-    id: editMember.id,
-    email: editMember.email,
-    role: editMember.role,
-    penaltyEndDate: editMember.penaltyEndDate,
-    activated: editMember.activated,
+  console.log(editMember);
+
+  const res = await axios.put(
+    serverIp + `/admin/member/update`,
+    {
+      id: editMember.id,
+      email: editMember.email,
+      role: editMember.role,
+      penaltyEndDate: editMember.penaltyEndDate,
+      activated: editMember.activated,
+    },
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return res.data;
+};
+
+const getMyInfoApi = async () => {
+  const res = await axios.get(serverIp + '/member/memberinfo/me', {
+    headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
@@ -57,4 +73,5 @@ export {
   memberLoginApi,
   getMemberListApi,
   updateMemberApi,
+  getMyInfoApi,
 };

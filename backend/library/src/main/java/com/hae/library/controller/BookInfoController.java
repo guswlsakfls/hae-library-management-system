@@ -70,7 +70,7 @@ public class BookInfoController {
 
     // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
 //    @RoleInterface.AdminAuthorize
-    @GetMapping(value = "/bookinfo/isbn")
+    @GetMapping(value = "/admin/bookinfo/isbn")
     public ResponseResultDto<Object> getBookInfoByIsbn(@RequestParam @NotBlank(message =
             "ISBN값을 입력해 주세요.") String isbn) {
         log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
@@ -85,7 +85,7 @@ public class BookInfoController {
     }
 
     // 특정 책 정보를 삭제하는 요청을 처리합니다.
-    @DeleteMapping(value = "/bookinfo/{bookInfoId}/delete")
+    @DeleteMapping(value = "/admin/bookinfo/{bookInfoId}/delete")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
         log.info("책 삭제: [DELETE] /bookinfo/{}/delete - ID로 책 정보 삭제", bookInfoId);
         bookInfoService.deleteBookInfoById(bookInfoId);

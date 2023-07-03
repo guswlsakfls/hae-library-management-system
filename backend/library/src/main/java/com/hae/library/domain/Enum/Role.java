@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 
 // USER: 일반 사용자, ADMIN: 관리자
 public enum Role {
-    USER, ADMIN
+    ROLE_USER, ROLE_ADMIN
 }

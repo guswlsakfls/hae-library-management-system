@@ -52,7 +52,7 @@ public class MemberService {
         Member member = Member.builder()
                 .email(requestSignupDto.getEmail())
                 .password(passwordEncoder.encode(requestSignupDto.getPassword()))
-                .role(Role.valueOf("USER"))
+                .role(Role.valueOf("ROLE_USER"))
                 .build();
 
         return ResponseMemberDto.from(memberRepository.save(member));
@@ -104,7 +104,8 @@ public class MemberService {
      * @return 현재 로그인한 사용자의 정보 DTO
      */
     public ResponseMemberDto getMyInfoBySecurity() {
-        return memberRepository.findByEmail(SecurityUtil.getCurrentMemberId())
+        // jwt토큰에서 받아온 사용자의 이메일을 기준으로 회원 정보를 조회합니다.
+        return memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .map(ResponseMemberDto::from)
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
@@ -166,7 +167,7 @@ public class MemberService {
     public ResponseMemberDto changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
         // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
-                memberRepository.findByEmail(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 요청으로 받은 이전 비밀번호와 회원의 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
         if (!passwordEncoder.matches(requestChangePasswordDto.getExPassword(), member.getPassword())) {
@@ -182,13 +183,12 @@ public class MemberService {
     /**
      * 회원 탈퇴 처리를 합니다. 회원의 activated 상태를 false로 변경합니다.
      *
-     * @param memberId 회원 ID
      * @return 변경된 회원 정보 DTO
      */
     @Transactional
-    public ResponseMemberDto memberWithdrawal(Long memberId) {
+    public ResponseMemberDto memberWithdrawal() {
         Member member =
-                memberRepository.findById(memberId).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         member.updateActivated(false);
         return ResponseMemberDto.from(memberRepository.save(member));
     }
