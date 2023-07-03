@@ -145,7 +145,7 @@ public class MemberService {
     @Transactional
     public ResponseMemberDto modifyMemberInfo(RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         // 변경하려는 이메일이 이미 존재하는 경우, 예외를 발생시킵니다.
-        if (memberRepository.existsByEmail(requestChangeMemberInfoDto.getEmail())) {
+        if (memberRepository.existsByEmailAndIdIsNot(requestChangeMemberInfoDto.getEmail(), requestChangeMemberInfoDto.getId())) {
             throw new RestApiException(MemberErrorCode.MEMBER_DUPLICATE_EMAIL);
         }
 
