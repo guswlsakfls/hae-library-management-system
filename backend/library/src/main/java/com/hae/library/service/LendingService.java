@@ -143,8 +143,12 @@ public class LendingService {
             if (search == null || search.trim().isEmpty()) {
                 return cb.conjunction(); // 모든 결과 반환
             }
-            // 검색어가 포함된 경우 해당 결과 반환
-            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+            // 검색어(도서 제목, 이메일)가 포함된 경우 해당 결과 반환합니다.
+            return cb.or(cb.like(cb.lower(root.get("book").get("bookInfo").get("title")),
+                            "%" + search.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("user").get("email ")), "%" + search.toLowerCase() +
+                            "%")
+            );
         };
 
         // 전체 대출 기록 조회
