@@ -5,6 +5,7 @@ import lombok.Setter;
 
 // TODO: 필요없는 변수들 제거
 // 국립중앙 도서관 API에서 제공하는 도서 정보를 담는 DTO 입니다.
+//@Setter
 @Getter
 public class BookApiResultDto {
     private String titleInfo;

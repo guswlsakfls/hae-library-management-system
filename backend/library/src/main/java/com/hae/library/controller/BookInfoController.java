@@ -53,7 +53,7 @@ public class BookInfoController {
 
     // 책 정보를 조회하는 요청을 처리합니다.
     @GetMapping(value = "/bookinfo/{bookInfoId}")
-    public ResponseResultDto<Object> getBookInfoById(@PathVariable Long bookInfoId) {
+    public ResponseResultDto<Object> getBookInfoById(@PathVariable(required = false) Long bookInfoId) {
         log.info("책 정보 조회: [GET] /bookinfo/{} - ID로 책 정보 조회", bookInfoId);
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoById(bookInfoId);
 
@@ -67,8 +67,8 @@ public class BookInfoController {
 
     // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
 //    @RoleInterface.AdminAuthorize
-    @GetMapping(value = "/bookinfo/isbn/{isbn}")
-    public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable String isbn) {
+    @GetMapping(value = {"/bookinfo/isbn/" ,"/bookinfo/isbn/{isbn}"})
+    public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable(required = false) String isbn) {
         log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
 

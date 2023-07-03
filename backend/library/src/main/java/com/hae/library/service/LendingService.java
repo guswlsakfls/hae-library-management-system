@@ -67,7 +67,6 @@ public class LendingService {
         // 대출일을 2주뒤 00:00:00으로 설정합니다.
         LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusWeeks(2);
 
-
         Lending newLending = Lending.builder()
                 .user(user)
                 .lendingLibrarian(lendingLibrarian)

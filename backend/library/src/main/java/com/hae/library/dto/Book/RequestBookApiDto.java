@@ -10,7 +10,7 @@ import java.util.List;
 // 국립중앙도서관 API에서 받아온 데이터를 담는 DTO 입니다.
 @Getter
 @NoArgsConstructor
-@ToString(exclude = "result") // 큰 데이터를 다루는 result 필드 제외
+@ToString
 public class RequestBookApiDto {
     private int total;
     private String kwd;

@@ -120,6 +120,11 @@ public class BookInfoService {
      */
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoByIsbn(String isbn) {
+        // isbn이 null이거나 공백이라면
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new RestApiException(BookErrorCode.NOTHING_REQUEST_INPUT);
+        }
+
         // DB에서 isbn으로 책 정보를 가져옵니다.
         Optional<BookInfo> bookInfoOptional = bookInfoRepo.findByIsbn(isbn);
         BookInfo bookInfo;
@@ -127,7 +132,9 @@ public class BookInfoService {
         if (bookInfoOptional.isEmpty()) {
             // 국립중앙도서관 API로 책 정보를 가져옵니다.
             RequestBookApiDto requestBookApiDto = searchByIsbn(isbn);
-            if (requestBookApiDto == null) { // api 못받으면 에러처리
+            log.error("requestBookApiDto: {}", requestBookApiDto.toString());
+            if (requestBookApiDto.getResult() == null) { // api 못받으면 에러처리(result가 null이면, 값이 들어오는
+                // 필드들이 있다.)
                 throw new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO);
             }
             // 가져온 책 정보를 bookInfo에 저장한다
