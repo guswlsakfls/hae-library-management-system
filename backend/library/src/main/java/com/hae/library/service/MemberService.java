@@ -31,16 +31,24 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 회원가입을 처리합니다.
+     *
+     * @param requestSignupDto 회원 가입 정보 DTO
+     * @return 회원 정보 DTO
+     */
     public ResponseMemberDto signup(RequestSignupDto requestSignupDto) {
-        // 비밀번호 재확인이 일치하지 않는다면, MEMBER_PASSWORD_NOT_MATCH 오류를 발생시킨다.
+        // 입력받은 패스워드와 패스워드 재확인이 일치하지 않으면 예외를 발생시킵니다.
         if (!requestSignupDto.isPasswordMatching()) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
 
+        // 이메일이 이미 존재하면 예외를 발생시킵니다.
         if (memberRepository.findByEmail(requestSignupDto.getEmail()).orElse(null) != null) {
             throw new RestApiException(MemberErrorCode.MEMBER_ALREADY_EXIST);
         }
 
+        // Member 객체를 빌드하고 저장합니다. 비밀번호는 암호화하여 저장합니다.
         Member member = Member.builder()
                 .email(requestSignupDto.getEmail())
                 .password(passwordEncoder.encode(requestSignupDto.getPassword()))
@@ -50,7 +58,14 @@ public class MemberService {
         return ResponseMemberDto.from(memberRepository.save(member));
     }
 
-    // 검색어와 페이지 정보를 받아 회원 목록을 반환하는 메서드 입니다.
+    /**
+     * 모든 회원 목록을 검색어 그리고 페이징하여 조회합니다.
+     *
+     * @param search 검색어
+     * @param page   페이지 번호
+     * @param size   페이지 크기
+     * @return 회원 정보 페이지
+     */
     public Page<ResponseMemberDto> getAllMember(String search, int page, int size) {
         // 페이지 정보를 설정합니다. 페이지는 0부터 시작하며, 정렬은 'createdAt' 컬럼을 기준으로 오름차순으로 합니다.
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
@@ -83,53 +98,93 @@ public class MemberService {
     }
 
 
+    /**
+     * 현재 로그인한 사용자의 정보를 조회합니다.
+     *
+     * @return 현재 로그인한 사용자의 정보 DTO
+     */
     public ResponseMemberDto getMyInfoBySecurity() {
         return memberRepository.findByEmail(SecurityUtil.getCurrentMemberId())
                 .map(ResponseMemberDto::from)
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
+    /**
+     * 이메일을 기준으로 회원 정보를 조회합니다.
+     *
+     * @param requestEmailDto 이메일 정보 DTO
+     * @return 회원 정보 DTO
+     */
     public ResponseMemberDto getMemberByEmail(RequestEmailDto requestEmailDto) {
-        // 이메일로 사용자를 찾는다.
+        // 이메일로 사용자를 찾습니다.
         Optional<Member> member = memberRepository.findByEmail(requestEmailDto.getEmail());
 
-        // 만약 사용자를 찾지 못했다면, MEMBER_NOT_FOUND 오류를 발생시킨다.
+        // 만약 사용자를 찾지 못했다면, 예외를 발생시킵니다.
         if (member.isEmpty()) {
             throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
 
-        // 사용자를 찾았다면, 사용자 정보를 DTO 객체로 변환한다.
         ResponseMemberDto responseMemberDto = ResponseMemberDto.from(member.get());
 
-        // 해당 사용자가 대출한 책 목록을 가져와 DTO로 변환한다. 그리고 이를 사용자 DTO에 설정한다.
+        // 해당 사용자가 대출한 책 목록을 가져와 DTO로 변환합니다. 그리고 이를 사용자 DTO에 설정합니다.
         responseMemberDto.updateLendingList(member.get().getLendingList().stream()
                 .map(lending -> ResponseLendingDto.from(lending))
                 .collect(Collectors.toList()));
 
-        // 최종적으로 사용자 정보를 담은 DTO를 반환한다.
+
         return responseMemberDto;
     }
 
 
+    /**
+     * 특정 회원의 정보를 수정합니다.
+     *
+     * @param requestChangeMemberInfoDto 변경할 회원 정보 DTO
+     * @return 변경된 회원 정보 DTO
+     */
     @Transactional
     public ResponseMemberDto modifyMemberInfo(RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
+        // 변경하려는 이메일이 이미 존재하는 경우, 예외를 발생시킵니다.
+        if (memberRepository.existsByEmail(requestChangeMemberInfoDto.getEmail())) {
+            throw new RestApiException(MemberErrorCode.MEMBER_DUPLICATE_EMAIL);
+        }
+
+        // 요청받은 ID로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findById(requestChangeMemberInfoDto.getId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         member.updateMemberInfo(requestChangeMemberInfoDto);
         return ResponseMemberDto.from(memberRepository.save(member));
     }
 
+    /**
+     * 회원의 비밀번호를 변경합니다.
+     *
+     * @param requestChangePasswordDto 비밀번호 변경 정보 DTO
+     * @return 변경된 회원 정보 DTO
+     */
     @Transactional
     public ResponseMemberDto changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
+        // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // 요청으로 받은 이전 비밀번호와 회원의 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
         if (!passwordEncoder.matches(requestChangePasswordDto.getExPassword(), member.getPassword())) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
+
+        // 회원의 비밀번호를 새 비밀번호로 업데이트하고 이를 암호화합니다.
         member.updatePassword(passwordEncoder.encode((requestChangePasswordDto.getNewPassword())));
+
         return ResponseMemberDto.from(memberRepository.save(member));
     }
 
+    /**
+     * 회원 탈퇴 처리를 합니다. 회원의 activated 상태를 false로 변경합니다.
+     *
+     * @param memberId 회원 ID
+     * @return 변경된 회원 정보 DTO
+     */
     @Transactional
     public ResponseMemberDto memberWithdrawal(Long memberId) {
         Member member =

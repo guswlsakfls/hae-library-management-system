@@ -26,10 +26,13 @@ public class MemberContorller {
     MemberService memberService;
     AuthService authService;
 
+    // 회원가입 요청을 합니다
     @PostMapping(value = "/member/signup")
     public ResponseResultDto<Object> signUp(@RequestBody @Valid RequestSignupDto requestSignupDto) {
-        log.info("회원가입 요청 : {}", requestSignupDto);
+        log.info("회원가입 요청: [POST] /member/signup - {}", requestSignupDto.toString());
         ResponseMemberDto responseMemberDto = memberService.signup(requestSignupDto);
+
+        log.info("회원가입에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원가입에 성공하였습니다")
@@ -37,6 +40,7 @@ public class MemberContorller {
                 .build();
     }
 
+    // 회원 정보 전체를 조회합니다.
 //    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/member/all")
     public ResponseResultDto<Object> getAllMember(
@@ -44,6 +48,7 @@ public class MemberContorller {
             @RequestParam(required = false) int page,
             @RequestParam(required = false) int size
     ) {
+        log.info("모든 회원 정보 조회: [GET] /member/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
         // 검색 키워드와 페이진이션 정보를 인자로 주어 회원 정보를 가져옵니다.
         Page<ResponseMemberDto> responseMemberDtoList = memberService.getAllMember(search, page,
                 size);
@@ -53,6 +58,8 @@ public class MemberContorller {
         responseData.put("totalElements", responseMemberDtoList.getTotalElements());
         responseData.put("currentPage", responseMemberDtoList.getNumber());
         responseData.put("size", responseMemberDtoList.getSize());
+
+        log.info("회원 전체 조회에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 전체 조회에 성공하였습니다")
@@ -60,9 +67,13 @@ public class MemberContorller {
                 .build();
     }
 
+    // 내 프로필 정보를 조회합니다.
     @GetMapping(value = "/memberInfo/me")
     public ResponseResultDto<Object> getMemberMe() {
+        log.info("내 정보 조회: [GET] /memberInfo/me");
         ResponseMemberDto responseMemberDto = memberService.getMyInfoBySecurity();
+
+        log.info("내 정보 조회에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 정보 조회에 성공하였습니다")
@@ -70,9 +81,13 @@ public class MemberContorller {
                 .build();
     }
 
+    // 회원 정보를 조회합니다.
     @PostMapping(value = "/memberInfo")
     public ResponseResultDto<Object> getMemberByEmail(@RequestBody @Valid RequestEmailDto requestEmailDto) {
+        log.info("회원 정보 조회: [POST] /memberInfo - {}", requestEmailDto.toString());
         ResponseMemberDto responseMemberDto = memberService.getMemberByEmail(requestEmailDto);
+
+        log.info("회원 정보 조회에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 정보 조회에 성공하였습니다")
@@ -80,11 +95,15 @@ public class MemberContorller {
                 .build();
     }
 
+    // 회원 정보를 수정합니다.
 //    @RoleInterface.AdminAuthorize
     @PutMapping(value = "/member/update")
-    public ResponseResultDto<Object> modifyMemberInfo(@RequestBody RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
+    public ResponseResultDto<Object> modifyMemberInfo(@RequestBody @Valid RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
+        log.info("회원 정보 수정: [PUT] /member/update - {}", requestChangeMemberInfoDto.toString());
         ResponseMemberDto responseMemberDto =
                 memberService.modifyMemberInfo(requestChangeMemberInfoDto);
+
+        log.info("회원 정보 수정에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 정보 수정에 성공하였습니다")
@@ -92,10 +111,14 @@ public class MemberContorller {
                 .build();
     }
 
+    // 회원 비밀번호를 변경합니다.
     @PutMapping(value = "/member/changePassword")
     public ResponseResultDto<Object> updateMemberPassword(@RequestBody RequestChangePasswordDto requestChangePasswordDto) {
+        log.info("회원 비밀번호 변경: [PUT] /member/changePassword - {}", requestChangePasswordDto.toString());
         ResponseMemberDto responseMemberDto =
                 memberService.changeMemberPassword(requestChangePasswordDto);
+
+        log.info("회원 비밀번호 변경에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 비밀번호 변경에 성공하였습니다")
@@ -107,7 +130,10 @@ public class MemberContorller {
     // TODO: 회원 탈퇴시 boolean으로 처리(1: 회원, 0: 탈퇴)
     @PutMapping(value = "/member/withdrawal")
     public ResponseResultDto<Object> memberWithdrawal(@RequestBody Long memberId) {
+        log.info("회원 탈퇴: [PUT] /member/withdrawal - {}", memberId);
         memberService.memberWithdrawal(memberId);
+
+        log.info("회원 탈퇴에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 탈퇴에 성공하였습니다")

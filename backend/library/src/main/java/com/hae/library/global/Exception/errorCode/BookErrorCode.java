@@ -8,10 +8,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum BookErrorCode implements ErrorCode {
-    // 책, 책 정보
+    // 도서
     BAD_REQUEST_BOOK(HttpStatus.BAD_REQUEST, "존재하지 않는 책입니다."),
     BAD_REQUEST_BOOKINFO(HttpStatus.BAD_REQUEST, "존재하지 않는 책 정보입니다."),
     DUPLICATE_BOOK(HttpStatus.BAD_REQUEST, "이미 존재하는 책입니다."),
+    DUPLICATE_CALLSIGN(HttpStatus.BAD_REQUEST, "이미 존재하는 청구기호입니다."),
 
     // 대출
     NOT_LENDING_BY_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 대출 정보입니다."),

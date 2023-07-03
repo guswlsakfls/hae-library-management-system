@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
-@Setter
 @ToString
 @NoArgsConstructor
 public class RequestBookWithBookInfoDto {
@@ -42,10 +41,10 @@ public class RequestBookWithBookInfoDto {
     @NotBlank(message = "출판일을 입력해주세요.")
     private String publishedAt;
 
-//    @NotBlank(message = "도서 상태를 입력해주세요.")
+    @NotBlank(message = "도서 상태를 입력해주세요.")
     private String status;
 
-//    @Size(max = 20, message = "기증자는 20자를 넘을 수 없습니다.")
+    @Size(max = 100, message = "기증자는 100자를 넘을 수 없습니다.")
     private String donator;
 
     @Builder

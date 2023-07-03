@@ -31,12 +31,11 @@ public class BookInfoController {
             @RequestParam(required = false) int page,
             @RequestParam(required = false) int size
     ) {
-        log.info("API called: /bookinfo/all with parameters - search: {}, page: {}, size: {}", search, page, size);
+        log.info("모든 책 정보 조회: [GET] /bookinfo/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
         // 검색 키워드와 페이지네이션 정보를 인자로 주어 책 정보를 가져옵니다.
         Page<ResponseBookInfoDto> responseBookInfoDtoList =
                 bookInfoService.getAllBookInfo(search, page, size);
 
-        log.error("responseBookInfoDtoList: {}", responseBookInfoDtoList.toString());
         // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("bookInfoList", responseBookInfoDtoList.getContent());
@@ -44,23 +43,25 @@ public class BookInfoController {
         responseData.put("currentPage", responseBookInfoDtoList.getNumber());
         responseData.put("size", responseBookInfoDtoList.getSize());
 
+        log.info("모든 책 정보 조회에 성공하였습니다");
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정
-                .message("모든 책 정보 조회에 성공하였습니다")  // 메시지 설정
-                .data(responseData)  // 책 정보 목록을 데이터로 설정
+                .statusCode(HttpStatus.OK.value())
+                .message("모든 책 정보 조회에 성공하였습니다")
+                .data(responseData)
                 .build();
     }
 
-    // 하나의 책 정보를 조회하는 요청을 처리합니다.
+    // 책 정보를 조회하는 요청을 처리합니다.
     @GetMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> getBookInfoById(@PathVariable Long bookInfoId) {
-        // 특정 책 정보를 보유도서와 함께 가져옵니다.
+        log.info("책 정보 조회: [GET] /bookinfo/{} - ID로 책 정보 조회", bookInfoId);
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoById(bookInfoId);
-        // HTTP 상태 코드, 메시지, 데이터를 포함하는 응답 DTO를 반환합니다.
+
+        log.info("ID로 책 정보 조회에 성공하였습니다 {}", bookInfoId);
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정
-                .message("책 한 개 정보 조회에 성공하였습니다")  // 메시지 설정
-                .data(responseBookInfoDto)  // 특정 책 정보를 데이터로 설정
+                .statusCode(HttpStatus.OK.value())
+                .message("책 한 개 정보 조회에 성공하였습니다")
+                .data(responseBookInfoDto)
                 .build();
     }
 
@@ -68,26 +69,28 @@ public class BookInfoController {
 //    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/bookinfo/isbn/{isbn}")
     public ResponseResultDto<Object> getBookInfoByIsbn(@PathVariable String isbn) {
-        // 특정 책 정보를 보유도서와 함께 가져옵니다.
+        log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
         ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
-        // HTTP 상태 코드, 메시지, 데이터를 포함하는 응답 DTO를 반환합니다.
+
+        log.info("ISBN으로 책 정보 조회에 성공하였습니다 {}", isbn);
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정
-                .message("하나의 책 정보 조회에 성공하였습니다")  // 메시지 설정
-                .data(responseBookInfoDto)  // 특정 책 정보를 데이터로 설정
+                .statusCode(HttpStatus.OK.value())
+                .message("하나의 책 정보 조회에 성공하였습니다")
+                .data(responseBookInfoDto)
                 .build();
     }
 
     // 특정 책 정보를 삭제하는 요청을 처리합니다.
     @DeleteMapping(value = "/bookinfo/{bookInfoId}/delete")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
-        // 특정 책 정보를 삭제하고
+        log.info("책 삭제: [DELETE] /bookinfo/{}/delete - ID로 책 정보 삭제", bookInfoId);
         bookInfoService.deleteBookInfoById(bookInfoId);
-        // HTTP 상태 코드와 메시지를 포함하는 응답 DTO를 반환합니다. 데이터는 없습니다.
+
+        log.info("ID로 책 정보 삭제에 성공하였습니다 {}", bookInfoId);
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())  // HTTP 상태 코드 200을 설정
-                .message("책 정보 삭제에 성공하였습니다")  // 메시지 설정
-                .data(null)  // 데이터는 없음
+                .statusCode(HttpStatus.OK.value())
+                .message("책 정보 삭제에 성공하였습니다")
+                .data(null)
                 .build();
     }
 }

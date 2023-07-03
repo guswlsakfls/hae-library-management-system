@@ -36,6 +36,8 @@ public class ResponseBookWithBookInfoDto {
 
     public static ResponseBookWithBookInfoDto from(Book book) {
         boolean isLending = false;
+
+        // 대출 중이라면 isLending을 true로 설정합니다.
         if (book.getLending() != null) {
             isLending = true;
         }

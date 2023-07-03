@@ -13,6 +13,7 @@ import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,16 +34,23 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class BookInfoService {
+
     private final BookInfoRepository bookInfoRepo;
-    public BookInfoService(BookInfoRepository bookInfoRepo) {
+
+    // TODO: @Value로 주입받아서 @RequiredArgsConstructor 에러가 나는 현상?
+    BookInfoService(BookInfoRepository bookInfoRepo) {
         this.bookInfoRepo = bookInfoRepo;
     }
 
     @Value("${nationalIsbnApiKey}")
     private String nationalIsbnApiKey;
 
-
-    // bookService.createBook에 쓰인다
+    /**
+     * 새로운 책 정보를 저장합니다.
+     *
+     * @param requestBookDto 새로운 책 정보 요청 DTO
+     * @return 저장된 책 정보 응답 DTO
+     */
     @Transactional
     public ResponseBookInfoDto createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
         BookInfo bookInfo = BookInfo.builder()
@@ -54,62 +62,90 @@ public class BookInfoService {
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
 
+        // 생성한 BookInfo 객체를 DB에 저장하고, 저장된 객체를 다시 가져옵니다.
         BookInfo newBookInfo = bookInfoRepo.save(bookInfo);
         return ResponseBookInfoDto.from(newBookInfo);
     }
 
+    /**
+     * 검색어에 따라 모든 책 정보를 페이징하여 가져옵니다.
+     *
+     * @param search 검색어
+     * @param page   페이지 번호
+     * @param size   페이지 크기
+     * @return 책 정보 페이지 응답 DTO
+     */
     @Transactional
     public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size) {
+        // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
-        // Specification을 이용해 동적 쿼리 생성합니다.
+        // Specification을 이용해 동적 쿼리를 생성합니다.
         Specification<BookInfo> spec = (root, query, cb) -> {
             if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction(); // 모든 결과 반환
+                return cb.conjunction(); // 모든 결과를 반환합니다.
             }
-            // 검색어가 포함된 경우 해당 결과 반환합니다.
+            // title 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
             return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
         };
 
+        // 책 정보를 페이징하여 가져온 후, 가져온 책 정보를 Response DTO로 변환합니다.
         Page<BookInfo> bookInfoList = bookInfoRepo.findAll(spec, pageable);
-
-        log.error("bookInfoList: {}", bookInfoList.toList());
         Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
         return responseBookInfoDtoList;
     }
 
 
+    /**
+     * ID로 책 정보를 가져옵니다.
+     *
+     * @param bookInfoId 책 정보 ID
+     * @return 책 정보와 관련된 책 응답 DTO
+     */
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoById(Long bookInfoId) {
-        log.info("bookInfoId: {}", bookInfoId);// 또는 log 등을 사용하여 로그로 출력
+        log.info("bookInfoId: {}", bookInfoId);
         BookInfo bookInfo =
                 bookInfoRepo.findById(bookInfoId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
         List<Book> bookList = bookInfo.getBookList();
-        log.info("bookList: {}", bookList.toString());// 또는 log 등을 사용하여 로그로 출력
+        log.info("bookList: {}", bookList.toString());
         return ResponseBookInfoWithBookDto.from(bookInfo);
     }
 
+    /**
+     * ISBN으로 책 정보를 가져옵니다.
+     *
+     * @param isbn ISBN
+     * @return 책 정보와 관련된 책 응답 DTO
+     */
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoByIsbn(String isbn) {
-        // 만약 책 정보가 없다면 국립중앙도서관 API로 책 정보를 가져온다
+        // DB에서 isbn으로 책 정보를 가져옵니다.
         Optional<BookInfo> bookInfoOptional = bookInfoRepo.findByIsbn(isbn);
         BookInfo bookInfo;
+        // 만약 책 정보가 없다면
         if (bookInfoOptional.isEmpty()) {
-            // 국립중앙도서관 API로 책 정보를 가져온다
+            // 국립중앙도서관 API로 책 정보를 가져옵니다.
             RequestBookApiDto requestBookApiDto = searchByIsbn(isbn);
             if (requestBookApiDto == null) { // api 못받으면 에러처리
                 throw new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO);
             }
             // 가져온 책 정보를 bookInfo에 저장한다
             return requestBookApiDto.toResponseBookInfoWithBookDto();
-        } else { // 책 정보가 있다면 그대로 가져온다
+        // 책 정보가 있다면 그대로 가져옵니다.
+        } else {
             bookInfo = bookInfoOptional.get();
         }
         return ResponseBookInfoWithBookDto.from(bookInfo);
     }
 
+    /**
+     * ISBN으로 국립중앙도서관 API에서 책 정보를 검색합니다.
+     *
+     * @param isbn ISBN
+     * @return 도서 검색 결과 DTO
+     */
     public RequestBookApiDto searchByIsbn(String isbn) {
-        //컨트롤러에서 isbn을 받아온다 - 받아온 isbn 호출
         log.info("BookService - isbn : {}",isbn);
 
         // 헤더 설정
@@ -135,34 +171,15 @@ public class BookInfoService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-//        log.warn("responseEntity : {}",response.getBody());
 
-        //Dto 인스턴스화
-//        RequestBookApiDto bookApi = response.getBody();
-
-//        log.warn("bookApi : {}",bookApi.toString());
-
-
-
-//        if (bookApi != null) {
-//            // DTO setting
-//            bookApi.builder()
-//                    .bookName(bookApi.getBookName())
-//                    .bookPrice(bookApi.getBookPrice())
-//                    .seriesNo(bookApi.getSeriesNo())
-//                    .category(bookApi.getCategory())
-//                    .writer(bookApi.getWriter())
-//                    .publisher(bookApi.getPublisher())
-//                    .bookDescription(bookApi.getBookDescription())
-//                    .bookImageURL(bookApi.getBookImageURL())
-//                    .bookPublishDate(bookApi.getBookPublishDate())
-//                    .build();
-//        }
-
-        //데이터 담은 객체 리턴
         return requestBookApiDto;
     }
 
+    /**
+     * ID로 책 정보를 삭제합니다.
+     *
+     * @param id 책 정보 ID
+     */
     @Transactional
     public void deleteBookInfoById(Long id) {
         BookInfo bookInfo = bookInfoRepo.findById(id).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
