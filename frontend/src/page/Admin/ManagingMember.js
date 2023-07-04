@@ -8,17 +8,6 @@ import { getMemberListApi, updateMemberApi } from '../../api/MemberApi';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 
-const users = [
-  {
-    email: 'guswlsakfls@gmali.com',
-    role: '관리자',
-    penalty: '2021-10-10',
-    lendingCount: 1,
-    createAt: '2021-10-10',
-    updateAt: '2021-10-10',
-  },
-];
-
 export default function ManagingMember() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
 
@@ -36,7 +25,6 @@ export default function ManagingMember() {
     penaltyEndDate: '',
     activated: '',
   });
-  const [startDate, setStartDate] = useState(new Date());
 
   const modifyToggleModal = () => {
     modifySetIsOpen(!modifyIsOpen);
@@ -134,7 +122,7 @@ export default function ManagingMember() {
         {member.email}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {member.role === 'ADMIN' ? '관리자' : '일반회원'}
+        {member.role === 'ROLE_ADMIN' ? '관리자' : '일반회원'}
       </td>
 
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
@@ -316,8 +304,8 @@ export default function ManagingMember() {
                     value={editMember.role}
                     onChange={handleInputChange}
                   >
-                    <option value="USER">일반 사용자</option>
-                    <option value="ADMIN">관리자</option>
+                    <option value="ROLE_USER">일반 사용자</option>
+                    <option value="ROLE_ADMIN">관리자</option>
                   </select>
 
                   <label

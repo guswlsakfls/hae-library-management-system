@@ -2,19 +2,20 @@ import DefaultButton from '../../component/common/DefaultButton';
 import { useEffect, useState } from 'react';
 import { getMyInfoApi } from '../../api/MemberApi';
 
-const user = {
-  email: 'guswlsakfls@gmail.com',
-  lendingCount: 2,
-  penaltyDate: '2021-10-10',
-};
-
 export default function MyInfo() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
   const [myInfo, setMyInfo] = useState({});
 
-  function modifyToggleModal() {
+  const modifyToggleModal = () => {
     modifySetIsOpen(!modifyIsOpen);
-  }
+  };
+
+  const logOut = () => {
+    if (window.confirm('로그아웃 하시겠습니까?')) {
+      localStorage.removeItem('accessToken');
+      window.location.href = '/';
+    }
+  };
 
   useEffect(() => {
     getMyInfoApi()
@@ -24,7 +25,8 @@ export default function MyInfo() {
       })
       .catch(err => {
         console.log(err);
-        alert('내 정보를 불러오는데 실패했습니다.');
+        alert('로그인이 필요합니다.');
+        window.location.href = '/login';
       });
   }, []);
 
@@ -71,6 +73,9 @@ export default function MyInfo() {
       <div className="flex justify-center items-center my-10 mx-48">
         <DefaultButton size="large" onClick={modifyToggleModal}>
           비밀번호 변경
+        </DefaultButton>
+        <DefaultButton size="large" onClick={logOut}>
+          로그 아웃
         </DefaultButton>
         <DefaultButton size="large">탈퇴하기</DefaultButton>
       </div>

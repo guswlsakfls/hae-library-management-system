@@ -10,6 +10,9 @@ export default function Navbar() {
   // 초기 상태는 '도서목록'
   const [current, setCurrent] = useState('/');
 
+  // 로그인 상태 체크 (localStorage에 accessToken이 저장되어 있는지 확인)
+  const isLogin = localStorage.getItem('accessToken') !== null;
+
   const navigation = [
     {
       name: '관리자페이지',
@@ -18,7 +21,12 @@ export default function Navbar() {
     },
     { name: '안내사항', href: '/info', current: current === '/info' },
     { name: '도서목록', href: '/booklist', current: current === '/booklist' },
-    { name: '로그인', href: '/login', current: current === '/login' },
+    // 로그인 상태에 따라 다르게 표시
+    {
+      name: isLogin ? '마이페이지' : '로그인',
+      href: isLogin ? '/mypage' : '/login',
+      current: current === (isLogin ? '/mypage' : '/login'),
+    },
   ];
 
   useEffect(() => {

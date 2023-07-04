@@ -79,18 +79,30 @@ public class LendingController {
                 .build();
     }
 
+    // TODO: 프론트 2번 렌더링 되는 문제 -> 페이징이 되지 않았다.
     // 책 대여 기록을 조회합니다.
-    @GetMapping(value = "/member/lending/me")
-    public ResponseResultDto<Object> getMemberLendingHistory() {
+    @GetMapping(value = "/member/lending-history/me")
+    public ResponseResultDto<Object> getMemberLendingHistory(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) int size
+    ) {
         log.info("책 대여 기록 조회: [GET] /lending/me");
-        List<ResponseMemberLendingDto> responseMemberLendingDtoList =
-                lendingService.getMemberLendingHistory();
+        Page<ResponseMemberLendingDto> responseMemberLendingDtoList =
+                lendingService.getMemberLendingHistory(search, page, size);
+
+        // 회원이 빌린 대출/반납 기록 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("myLendingHistory", responseMemberLendingDtoList.getContent());
+        responseData.put("totalElements", responseMemberLendingDtoList.getTotalElements());
+        responseData.put("currentPage", responseMemberLendingDtoList.getNumber());
+        responseData.put("size", responseMemberLendingDtoList.getSize());
 
         log.info("책 대여 기록 조회에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 대여 기록 조회에 성공하였습니다")
-                .data(responseMemberLendingDtoList)
+                .data(responseData)
                 .build();
     }
 

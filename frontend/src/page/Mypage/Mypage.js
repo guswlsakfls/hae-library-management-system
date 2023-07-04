@@ -1,73 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Footer from '../../component/Footer';
 import MyInfo from './MyInfo';
 import MyLendingHistory from './MyLendingHistory';
-
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Mypage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [tab, setTab] = useState('userinfo');
+
+  // TODO: 새로고침시 tab이 초기화되는 문제(내정보 불러오고, 대출기록 불러온다)
+  // useEffect(() => {
+  //   const currentPath = location.pathname.split('/').pop();
+  //   setTab(currentPath);
+  // }, [location]);
+
+  const handleTabClick = newTab => {
+    setTab(newTab);
+    navigate(`/mypage/${newTab}`);
+  };
 
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
       <div className="sm:mx-auto sm:w-full border-b-2">
         <h2 className="mt-10 pb-10 text-center text-4xl font-bold leading-9 tracking-tight text-gray-900">
           마이페이지
         </h2>
       </div>
 
-      <div class="left-0 z-50 h-16 bg-white border-b mt-10 lg:mx-96">
-        {/* ... */}
-        <div class="grid h-full max-w-lg grid-cols-2 mx-auto font-medium justify-center">
+      <div className="left-0 z-50 h-16 bg-white border-b mt-10 lg:mx-96">
+        <div className="grid h-full max-w-lg grid-cols-2 mx-auto font-medium justify-center">
           <button
-            onClick={() => setTab('userinfo')}
+            onClick={() => handleTabClick('userinfo')}
             type="button"
-            class={`inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group ${
+            className={`inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group ${
               tab === 'userinfo' ? 'text-blue-600' : 'text-gray-500'
             }`}
           >
-            {/* SVG 코드 */}
-            <span class="text-2xl  group-hover:text-blue-600 dark:group-hover:text-blue-500">
+            <span className="text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-500">
               내 정보
             </span>
           </button>
           <button
-            onClick={() => setTab('lendingrecord')}
+            onClick={() => handleTabClick('my-lending-history')}
             type="button"
-            class={`inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group ${
-              tab === 'lendingrecord' ? 'text-blue-600' : 'text-gray-500'
+            className={`inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group ${
+              tab === 'my-lending-history' ? 'text-blue-600' : 'text-gray-500'
             }`}
           >
-            {/* SVG 코드 */}
-            <span class="text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-500">
+            <span className="text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-500">
               대출 기록
             </span>
           </button>
         </div>
       </div>
       <div>{tab === 'userinfo' ? <MyInfo /> : <MyLendingHistory />}</div>
-
       <Footer />
     </>
   );

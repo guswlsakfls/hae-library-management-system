@@ -2,12 +2,16 @@ package com.hae.library.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "category")
+@Getter
+@Table(name = "CATEGORY")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
@@ -17,8 +21,17 @@ public class Category {
     private Long id;
 
     @OneToMany(mappedBy = "category")
-    private ArrayList<BookInfo> bookInfoList = new ArrayList<BookInfo>();
+    private List<BookInfo> bookInfoList = new ArrayList<BookInfo>();
 
     @Column(name = "category_name")
     private String categoryName;
+
+    @Builder
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public void updateCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

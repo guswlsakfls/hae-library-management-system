@@ -22,7 +22,7 @@ public class BookInfo extends BaseTimeEntity{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CATEGORY")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.REMOVE)
