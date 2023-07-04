@@ -17,7 +17,7 @@ const getMemberListApi = async (search, page, size) => {
 
 const getUserByEmailApi = async email => {
   const res = await axios.post(
-    serverIp + '/admin/memberInfo',
+    serverIp + '/admin/memberinfo',
     { email: email },
     { headers: { authorization: `Bearer ${accessToken}` } }
   );

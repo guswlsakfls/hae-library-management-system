@@ -12,7 +12,7 @@ const statusText = {
   LOST: '분실',
 };
 
-export default function BookStock() {
+export default function ManagingBook() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';

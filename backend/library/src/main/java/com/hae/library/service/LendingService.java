@@ -16,6 +16,7 @@ import com.hae.library.repository.BookRepository;
 import com.hae.library.repository.LendingRepository;
 import com.hae.library.repository.MemberRepository;
 import com.hae.library.util.SecurityUtil;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,11 +59,11 @@ public class LendingService {
 
         // 대출받는 유저가 회원인지 확인하고 가져옵니다.
         Member user = memberRepo.findById(requestLendingDto.getUserId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.USER_NOT_FOUND));
 
         // 대출자 회원인지 확인하고 가져옵니다.
         Member lendingLibrarian = memberRepo.findById(requestLendingDto.getUserId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
 
         // 대출일을 2주뒤 00:00:00으로 설정합니다.
         LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusWeeks(2);
@@ -165,22 +166,36 @@ public class LendingService {
      * @return 회원의 대출 기록 리스트
      */
     @Transactional
-    public List<ResponseMemberLendingDto> getMemberLendingHistory() {
-        // 로그인한 회원의 대출 기록 조회합니다. (jwt 토큰에서 회원 ID를 가져옵니다.)
+    public Page<ResponseMemberLendingDto> getMemberLendingHistory(String search, int page, int size) {
+        // 페이징 정보를 설정합니다.
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+
+        // 로그인한 회원을 조회합니다. (jwt 토큰에서 회원 ID를 가져옵니다.)
         Member user = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 회원의 대출 기록을 조회합니다.
-        List<Lending> lendingList = lendingRepo.findAllByUser(user);
+        // Specification을 이용해 동적 쿼리를 생성합니다.
+        Specification<Lending> spec = (root, query, cb) -> {
+            Predicate p = cb.equal(root.get("user"), user);
+
+            if (search != null && !search.trim().isEmpty()) {
+                // 검색어가 포함된 경우 해당 결과를 추가합니다.
+                p = cb.and(p, cb.like(cb.lower(root.get("book").get("bookInfo").get("title")),
+                        "%" + search.toLowerCase() + "%"));
+            }
+
+            return p;
+        };
+
+        // 로그인한 회원의 대출 기록을 조회합니다.
+        Page<Lending> lendingList = lendingRepo.findAll(spec, pageable);
 
         // 대출 기록들을 DTO로 변환합니다.
-        List<ResponseMemberLendingDto> responseMemberLendingDtoList = new ArrayList<>();
-        for (Lending lending : lendingList) {
-            responseMemberLendingDtoList.add(ResponseMemberLendingDto.from(lending));
-        }
+        Page<ResponseMemberLendingDto> responseMemberLendingDtoList = lendingList.map(ResponseMemberLendingDto::from);
 
         return responseMemberLendingDtoList;
     }
+
 
     /**
      * 대출 연장을 처리합니다.

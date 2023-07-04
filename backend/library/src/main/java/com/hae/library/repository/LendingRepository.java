@@ -3,6 +3,9 @@ package com.hae.library.repository;
 import com.hae.library.domain.Book;
 import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -17,5 +20,7 @@ public interface LendingRepository extends JpaRepository<Lending, Long>,
     List<Lending> findAllByLendingLibrarianId(Long lendingLibrarianId);
     List<Lending> findAllByReturningLibrarianId(Long returningLibrarianId);
 
-    List<Lending> findAllByUser(Member user);
+    Page<Lending> findAllByUser(Specification<Lending> spec, Pageable pageable);
+
+
 }

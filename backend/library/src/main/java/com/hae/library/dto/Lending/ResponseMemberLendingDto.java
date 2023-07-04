@@ -21,8 +21,8 @@ public class ResponseMemberLendingDto {
         dto.bookTitle = lending.getBook().getBookInfo().getTitle();
         dto.bookCallSign = lending.getBook().getCallSign();
         dto.userEmail = lending.getUser().getEmail();
-        dto.returningEndAt = lending.getReturningEndAt().toString();
-        dto.createdAt = lending.getCreatedAt().toString();
+        dto.returningEndAt = lending.getReturningEndAt().toLocalDate().toString();
+        dto.createdAt = lending.getCreatedAt().toLocalDate().toString();
         dto.renew = lending.isRenew();
         return dto;
     }

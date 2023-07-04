@@ -6,13 +6,13 @@ import Login from './Login/Login';
 import Signup from './Login/Signup';
 import BookList from './Book/BookList';
 import BookInfo from './Book/BookInfo';
-import Info from './Home/Info';
 import NotFound from '../component/NotFound';
 import LendingPage from './LendingPage';
 import LendingHistoryPage from './LendingHistoryPage';
 import AddBookPage from './AddBookPage';
-import BookStockPage from './BookStockPage';
+import ManagingBookPage from './ManagingBookPage';
 import ManageingMemeberPage from './ManagingMemeberPage';
+import ManagingCategoryPage from './ManagingCategoryPage';
 import DefaultModal from '../component/DefaultModal';
 import Mypage from './/Mypage/Mypage';
 
@@ -23,29 +23,22 @@ const Router = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route element={<LimitedRoute isLogoutOnly />}> */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/booklist" element={<BookList />} />
-          <Route path="/info" element={<Info />} />
           <Route path="/book/:id" element={<BookInfo />} />
-          {/* <Route element={<LimitedRoute isLoginOnly />}> */}
-          <Route path="/mypage" element={<Mypage />} />
-          {/* </Route> */}
-          {/* <Route element={<LimitedRoute isAdminOnly />}> */}
+          <Route path="/mypage/*" element={<Mypage />} />
           <Route path="/admin/*">
             <Route path="" element={<LendingPage />} />
             <Route path="lending" element={<LendingPage />} />{' '}
             <Route path="addbook" element={<AddBookPage />} />{' '}
             <Route path="lending-history" element={<LendingHistoryPage />} />
-            <Route path="book-stock" element={<BookStockPage />} />
+            <Route path="book-stock" element={<ManagingBookPage />} />
+            <Route path="category" element={<ManagingCategoryPage />} />
             <Route path="member" element={<ManageingMemeberPage />} />
             <Route path="modal" element={<DefaultModal />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
-          {/* <Route path="/reservation" element={<ReservedLoan />} /> */}
-          {/* <Route path="/book" element={<BookManagement />} /> */}
-          {/* <Route path="/review" element={<ReviewManagement />} /> */}
-          {/* <Route path="/stock" element={<BookStock />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

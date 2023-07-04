@@ -76,7 +76,7 @@ export default function Lending() {
   };
 
   const handleLendingBook = () => {
-    lendingBookApi(user.id, book.id, lendingCondition)
+    lendingBookApi(book.id, user.id, lendingCondition)
       .then(res => {
         alert(res.message);
         setUser({});
@@ -97,7 +97,7 @@ export default function Lending() {
       });
   };
   const handleReturningBook = () => {
-    returningBookApi(user.id, book.id, lendingCondition)
+    returningBookApi(book.id, lendingCondition)
       .then(res => {
         alert(res.message);
         setUser({});

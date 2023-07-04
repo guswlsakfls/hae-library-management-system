@@ -1,0 +1,26 @@
+package com.hae.library.dto.Category.Request;
+
+import com.hae.library.domain.Category;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+
+@Getter
+@Valid
+public class RequestUpdateCategoryDto {
+    @NotNull(message = "카테고리 id는 필수입니다")
+    private Long categoryId;
+
+    @NotBlank(message = "수정 될 카테고리 이름은 필수입니다")
+    @Size(max = 20, message = "카테고리 이름은 20자를 넘을 수 없습니다")
+    private String updatedCategoryName;
+
+    // toEntity 생성
+    public Category toEntity() {
+        return Category.builder()
+                .categoryName(updatedCategoryName)
+                .build();
+    }
+}

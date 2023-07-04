@@ -1,11 +1,11 @@
 import SideBar from '../component/SideBar';
-import BookStock from './Admin/BookStock';
+import BookStock from './Admin/ManagingBook';
 
-const BookStockPage = () => (
+const ManagingBookPage = () => (
   <div className="flex">
     <SideBar />
     <BookStock />
   </div>
 );
 
-export default BookStockPage;
+export default ManagingBookPage;
