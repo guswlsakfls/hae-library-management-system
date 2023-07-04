@@ -4,25 +4,13 @@ import { useEffect, useState } from 'react';
 import { addBookByIsbnApi, postAddBook } from '../../api/BookApi';
 import PostInputBar from '../../component/common/PostInputBar';
 import SelectBar from '../../component/common/SelectBar';
+import { getCategoryListApi } from '../../api/CategoryApi';
 
 const statusText = {
   FINE: '양호',
   BREAK: '손상',
   LOST: '분실',
 };
-
-const categoryList = [
-  '카테고리 선택',
-  '총류',
-  '철학',
-  '종교',
-  '자연과학',
-  '기술과학',
-  '예술',
-  '언어',
-  '문학',
-  '역사',
-];
 
 const bookStatus = ['카테고리 선택', 'FINE', 'BREAK'];
 
@@ -39,6 +27,7 @@ export default function AddBook() {
   const [callSign, setCallSign] = useState('');
   const [donator, setDonator] = useState('');
   const [status, setStatus] = useState('');
+  const [categoryList, setCategoryList] = useState([]);
 
   // ISBN을 가지고 도서 정보를 요청하는 함수
   const handleSearch = async isbn => {
@@ -115,6 +104,18 @@ export default function AddBook() {
         alert(errorMessages);
       });
   };
+
+  useEffect(() => {
+    getCategoryListApi()
+      .then(res => {
+        console.log(res);
+        setCategoryList(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+        alert('카테고리 목록을 불러오는데 실패했습니다.');
+      });
+  }, []);
 
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
@@ -231,7 +232,7 @@ export default function AddBook() {
             <SelectBar
               value={category}
               onChange={e => setCategory(e.target.value)}
-              items={categoryList}
+              items={categoryList.map(cat => cat.categoryName)}
             ></SelectBar>
           </div>
           <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

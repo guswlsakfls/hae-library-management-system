@@ -9,20 +9,13 @@ export default function SelectBar(props) {
         >
           {props.items &&
             props.items.map((item, index) => (
-              <option key={index} value={item}>
-                {item}
+              <option
+                key={index}
+                value={typeof item === 'object' ? item.categoryName : item}
+              >
+                {typeof item === 'object' ? item.categoryName : item}
               </option>
             ))}
-          {/* <option value="">카테고리 선택</option>
-          <option value="총류">총류</option>
-          <option value="철학">철학</option>
-          <option value="종교">종교</option>
-          <option value="자연과학">자연과학</option>
-          <option value="기술과학">기술과학</option>
-          <option value="예술">예술</option>
-          <option value="언어">언어</option>
-          <option value="문학">문학</option>
-          <option value="역사">역사</option> */}
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg
