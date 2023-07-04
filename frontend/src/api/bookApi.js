@@ -15,6 +15,7 @@ const postAddBook = async (
   donator,
   status
 ) => {
+  console.log('category:', category);
   const res = await axios.post(
     serverIp + '/admin/book/create',
     {
@@ -24,7 +25,7 @@ const postAddBook = async (
       publisher: publisher,
       publishedAt: publishedAt,
       isbn: isbn,
-      category: category,
+      categoryName: category,
       callSign: callSign,
       donator: donator,
       status: status,

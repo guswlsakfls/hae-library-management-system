@@ -2,6 +2,7 @@ package com.hae.library.service;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
@@ -11,6 +12,7 @@ import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
+import com.hae.library.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ public class BookService {
     private final BookRepository bookRepo;
     private final BookInfoRepository bookInfoRepo;
     private final BookInfoService bookInfoService;
+    private final CategoryRepository categoryRepo;
 
     // 새로운 책을 생성하는 메서드입니다.
     @Transactional
@@ -47,14 +50,14 @@ public class BookService {
         ResponseBookWithBookInfoDto responseBookWithBookInfoDto;
         // BookInfo가 존재하는 경우와 존재하지 않는 경우 다르게 처리합니다.
         if (bookInfoOptional.isPresent()) {
-            // BookInfo가 존재하는 경우
+            // BookInfo가 존재하는 경우 기존 BookInfo를 사용합니다.
             BookInfo bookInfo = bookInfoOptional.get();
+
             responseBookWithBookInfoDto =
                     saveBookWithBookInfo(requestBookWithBookInfoDto,
                             bookInfo);
         } else {
-            // BookInfo가 존재하지 않는 경우
-            // 새로운 BookInfo를 생성합니다.
+            // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.
             ResponseBookInfoDto responseBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
             BookInfo bookInfo = BookInfo.builder()
                     .id(responseBookInfo.getId())
@@ -83,6 +86,7 @@ public class BookService {
         // 생성한 책 객체에 BookInfo를 추가합니다.
         book.addBookInfo(bookInfo);
         // 책 객체를 데이터베이스에 저장합니다.
+
         Book updateBook = bookRepo.save(book);
         return ResponseBookWithBookInfoDto.from(updateBook);
     }

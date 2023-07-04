@@ -19,7 +19,7 @@ public class ResponseBookInfoWithBookDto {
     private String publisher;
     private String publishedAt;
     private String category;
-    private String callSign;
+    private String callSign; // 국립중앙도서관 api에서 제공하는 청구기호
     private List<ResponseBookDto> bookList;
 
     public static ResponseBookInfoWithBookDto from(BookInfo bookInfo) {
@@ -37,6 +37,7 @@ public class ResponseBookInfoWithBookDto {
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
                 .bookList(responseBookList)
+                .category(bookInfo.getCategory().getCategoryName())
                 .build();
     }
 }

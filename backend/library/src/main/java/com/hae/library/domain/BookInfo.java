@@ -91,6 +91,18 @@ public class BookInfo extends BaseTimeEntity{
     }
 
     /**
+     * 카테고리와 책 정보 간의 관계를 설정합니다.
+     * @param category 카테고리
+     */
+    public void addCategory(Category category) {
+        this.category = category;
+
+        if(!category.getBookInfoList().contains(this)) {
+            category.getBookInfoList().add(this);
+        }
+    }
+
+    /**
      * 도서 제목을 업데이트합니다.
      * @param title 새로운 도서 제목
      */

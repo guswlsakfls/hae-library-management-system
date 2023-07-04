@@ -1,4 +1,5 @@
 export default function SelectBar(props) {
+  console.log(props.items);
   return (
     <div className="flex justify-center">
       <div className="relative w-40">

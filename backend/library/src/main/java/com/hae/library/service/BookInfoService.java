@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookApiDto;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
@@ -12,6 +13,7 @@ import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +38,14 @@ import java.util.stream.Collectors;
 public class BookInfoService {
 
     private final BookInfoRepository bookInfoRepo;
+    private final CategoryRepository categoryRepo;
 
     // TODO: @Value로 주입받아서 @RequiredArgsConstructor 에러가 나는 현상?
-    BookInfoService(BookInfoRepository bookInfoRepo) {
+    BookInfoService(BookInfoRepository bookInfoRepo, CategoryRepository categoryRepo) {
         this.bookInfoRepo = bookInfoRepo;
+        this.categoryRepo = categoryRepo;
     }
+
 
     @Value("${nationalIsbnApiKey}")
     private String nationalIsbnApiKey;
@@ -61,6 +66,15 @@ public class BookInfoService {
                 .publisher(requestBookDto.getPublisher())
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
+
+        // 카테고리를 조회하고 책 객체에 추가합니다.
+        Optional<Category> categoryOptional =
+                categoryRepo.findByCategoryName(requestBookDto.getCategoryName());
+        if (!categoryOptional.isPresent()) {
+            throw new RestApiException(BookErrorCode.CATEGORY_NOT_FOUND);
+        }
+        Category category = categoryOptional.get();
+        bookInfo.addCategory(category);
 
         // 생성한 BookInfo 객체를 DB에 저장하고, 저장된 객체를 다시 가져옵니다.
         BookInfo newBookInfo = bookInfoRepo.save(bookInfo);

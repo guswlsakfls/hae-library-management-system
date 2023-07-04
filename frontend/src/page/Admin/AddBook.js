@@ -12,7 +12,7 @@ const statusText = {
   LOST: '분실',
 };
 
-const bookStatus = ['카테고리 선택', 'FINE', 'BREAK'];
+const bookStatus = ['FINE', 'BREAK'];
 
 export default function AddBook() {
   const [bookList, setBookList] = useState([]);
@@ -26,45 +26,54 @@ export default function AddBook() {
   const [category, setCategory] = useState('');
   const [callSign, setCallSign] = useState('');
   const [donator, setDonator] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('FINE');
   const [categoryList, setCategoryList] = useState([]);
 
   // ISBN을 가지고 도서 정보를 요청하는 함수
   const handleSearch = async isbn => {
     try {
-      const res = await addBookByIsbnApi(isbn);
-      setTitle(res.data.title);
-      setImage(res.data.image);
-      setAuthor(res.data.author);
-      setPublisher(res.data.publisher);
-      setPublishedAt(res.data.publishedAt);
-      setIsbn(res.data.isbn);
-      setCategory(res.data.category);
-      setCallSign(() => {
-        if (res.data.callSign === null) {
-          if (res.data.bookList.length > 0) {
-            const callSignWithoutLastChar = res.data.bookList[0].callSign.slice(
-              0,
-              -1
-            );
-            return callSignWithoutLastChar;
-          } else {
-            return ''; // or any default value
+      await addBookByIsbnApi(isbn).then(res => {
+        console.log(res.data);
+
+        setTitle(res.data.title);
+        setImage(res.data.image);
+        setAuthor(res.data.author);
+        setPublisher(res.data.publisher);
+        setPublishedAt(res.data.publishedAt);
+        setIsbn(res.data.isbn);
+        setCategory(res.data.category);
+        setCallSign(() => {
+          if (res.data.callSign === null) {
+            if (res.data.bookList.length > 0) {
+              const callSignWithoutLastChar =
+                res.data.bookList[0].callSign.slice(0, -1);
+              return callSignWithoutLastChar;
+            } else {
+              return ''; // or any default value
+            }
           }
-        }
-        return res.data.callSign + '.c';
+          return res.data.callSign + '.c';
+        });
+        setDonator(res.data.donator ? res.data.donator : '');
+        setBookList(res.data.bookList);
+        setStatus('FINE');
       });
-
-      setDonator(res.data.donator ? res.data.donator : '');
-      setBookList(res.data.bookList);
-      setStatus(res.data.status);
-
-      console.log(res.data);
     } catch (err) {
       alert(err.response.data.message);
       console.log(err.response.data);
       let errors = err.response.data.errors;
       if (!errors) {
+        setTitle('');
+        setImage('');
+        setAuthor('');
+        setPublisher('');
+        setPublishedAt('');
+        setIsbn('');
+        setCategory('');
+        setCallSign('');
+        setDonator('');
+        setBookList([]);
+        setStatus('FINE');
         return;
       }
       let errorMessages = errors
@@ -93,6 +102,17 @@ export default function AddBook() {
       })
       .catch(err => {
         alert(err.response.data.message);
+        setTitle('');
+        setImage('');
+        setAuthor('');
+        setPublisher('');
+        setPublishedAt('');
+        setIsbn('');
+        setCategory('');
+        setCallSign('');
+        setDonator('');
+        setBookList([]);
+        setStatus('');
 
         let errors = err.response.data.errors;
         if (!errors) {
@@ -104,6 +124,9 @@ export default function AddBook() {
         alert(errorMessages);
       });
   };
+
+  console.log(category);
+  console.log(status);
 
   useEffect(() => {
     getCategoryListApi()

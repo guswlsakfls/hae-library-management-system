@@ -3,6 +3,7 @@ package com.hae.library.dto.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Enum.BookStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -40,6 +41,9 @@ public class RequestBookWithBookInfoDto {
 //    @Size(max = 10, message = "출판일은 10자를 넘을 수 없습니다.")
     @NotBlank(message = "출판일을 입력해주세요.")
     private String publishedAt;
+
+    @NotBlank(message = "도서 카테고리를 입력해주세요.")
+    private String categoryName;
 
     @NotBlank(message = "도서 상태를 입력해주세요.")
     private String status;
