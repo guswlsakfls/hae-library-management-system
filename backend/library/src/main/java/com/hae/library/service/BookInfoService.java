@@ -16,6 +16,7 @@ import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @Service
@@ -57,7 +57,7 @@ public class BookInfoService {
      * @return 저장된 책 정보 응답 DTO
      */
     @Transactional
-    public ResponseBookInfoDto createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
+    public BookInfo createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
         BookInfo bookInfo = BookInfo.builder()
                 .title(requestBookDto.getTitle())
                 .author(requestBookDto.getAuthor())
@@ -67,6 +67,8 @@ public class BookInfoService {
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
 
+        log.error("request!!!: {}", requestBookDto);
+        log.error("requestCategoryName: {}", requestBookDto.getCategoryName());
         // 카테고리를 조회하고 책 객체에 추가합니다.
         Optional<Category> categoryOptional =
                 categoryRepo.findByCategoryName(requestBookDto.getCategoryName());
@@ -74,11 +76,11 @@ public class BookInfoService {
             throw new RestApiException(BookErrorCode.CATEGORY_NOT_FOUND);
         }
         Category category = categoryOptional.get();
+        log.error("category: {}", category.getCategoryName());
         bookInfo.addCategory(category);
-
+        log.error("bookInfo: {}", bookInfo.getCategory().getCategoryName());
         // 생성한 BookInfo 객체를 DB에 저장하고, 저장된 객체를 다시 가져옵니다.
-        BookInfo newBookInfo = bookInfoRepo.save(bookInfo);
-        return ResponseBookInfoDto.from(newBookInfo);
+        return bookInfoRepo.save(bookInfo);
     }
 
     /**

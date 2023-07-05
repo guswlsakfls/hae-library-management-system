@@ -5,6 +5,7 @@ import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
 import { useSearchParams } from 'react-router-dom/dist';
 import { getBookStockListApi, updateBookStockApi } from '../../api/BookApi';
+import { getCategoryListApi } from '../../api/CategoryApi';
 
 const statusText = {
   FINE: '양호',
@@ -22,12 +23,23 @@ export default function ManagingBook() {
   const [total, setTotal] = useState(0);
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
+  const [categoryList, setCategoryList] = useState([]);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
   };
   // 수정 버튼 클릭 시 호출되는 함수
   const handleEditClick = book => {
+    // 카테고리 조회 합니다.
+    getCategoryListApi()
+      .then(res => {
+        console.log(res);
+        setCategoryList(res.data);
+      })
+      .catch(err => {
+        console.log(err.response);
+        alert(err.response.data.message);
+      });
     setEditBook(book);
     toggleModal();
     console.log(book);
@@ -48,7 +60,7 @@ export default function ManagingBook() {
           'title',
           'author',
           'publisher',
-          'category',
+          'categoryName',
           'isbn',
           'image',
           'publishedAt',
@@ -314,15 +326,20 @@ export default function ManagingBook() {
                   >
                     카테고리
                   </label>
-                  <input
-                    type="text"
-                    name="category"
+                  <select
                     id="category"
-                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-96 text-gray-500"
-                    placeholder="카테고리를 입력하세요."
-                    value={editBook.bookInfo.category}
+                    name="category"
+                    className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md text-gray-500"
+                    value={editBook.bookInfo.categoryName}
                     onChange={handleInputChange}
-                  />
+                  >
+                    {categoryList.map((category, index) => (
+                      <option key={index} value={category.categoryName}>
+                        {category.categoryName}
+                      </option>
+                    ))}
+                  </select>
+
                   <label
                     htmlFor="isbn"
                     className="block text-sm font-medium text-gray-700 mt-3"
@@ -367,8 +384,8 @@ export default function ManagingBook() {
                     value={editBook.status}
                     onChange={handleInputChange}
                   >
-                    <option value="BOOK_FINE">보통</option>
-                    <option value="BOOK_BREAK">파손</option>
+                    <option value="FINE">보통</option>
+                    <option value="BREAK">파손</option>
                   </select>
 
                   <label

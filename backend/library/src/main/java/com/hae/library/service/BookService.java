@@ -10,6 +10,7 @@ import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.RestApiException;
+import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
 import com.hae.library.repository.CategoryRepository;
@@ -37,7 +38,7 @@ public class BookService {
     // 새로운 책을 생성하는 메서드입니다.
     @Transactional
     public ResponseBookWithBookInfoDto createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
-        log.error("requestBookDto: {}", requestBookWithBookInfoDto);
+        log.error("requestBookDto???: {}", requestBookWithBookInfoDto);
 
         // 청구기호가 중복되는지 확인합니다. 중복되는 경우 예외 처리합니다.
         if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
@@ -58,19 +59,10 @@ public class BookService {
                             bookInfo);
         } else {
             // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.
-            ResponseBookInfoDto responseBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
-            BookInfo bookInfo = BookInfo.builder()
-                    .id(responseBookInfo.getId())
-                    .title(responseBookInfo.getTitle())
-                    .author(responseBookInfo.getAuthor())
-                    .isbn(responseBookInfo.getIsbn())
-                    .image(responseBookInfo.getImage())
-                    .publisher(responseBookInfo.getPublisher())
-                    .publishedAt(responseBookInfo.getPublishedAt())
-                    .build();
+            BookInfo newBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
             responseBookWithBookInfoDto =
-                    saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
+                    saveBookWithBookInfo(requestBookWithBookInfoDto, newBookInfo);
         }
         return responseBookWithBookInfoDto;
     }
@@ -139,14 +131,21 @@ public class BookService {
         Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         BookInfo bookInfo = book.getBookInfo();
 
-        // TODO: 청구기호 저장하기전에 중복되는지 확인
+        // 청구기호 저장하기전에 중복되는지 확인합니다.
         if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
             throw new RestApiException(BookErrorCode.DUPLICATE_CALLSIGN);
         }
 
+        // 카테고리를 조회하고 카테고리가 존재하지 않는다면 예외를 발생시킵니다.
+        Category category =
+                categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName()).orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
+
+
         // 도서 정보를 업데이트하고, 업데이트된 도서 정보를 데이터베이스에 저장합니다.
         bookInfo.updateBookInfo(requestBookWithBookInfoDto.getTitle(), requestBookWithBookInfoDto.getIsbn(), requestBookWithBookInfoDto.getAuthor(),
-                requestBookWithBookInfoDto.getPublisher(), requestBookWithBookInfoDto.getPublishedAt(), requestBookWithBookInfoDto.getImage());
+                requestBookWithBookInfoDto.getPublisher(),
+                requestBookWithBookInfoDto.getPublishedAt(),
+                requestBookWithBookInfoDto.getImage(), category);
         bookInfoRepo.save(bookInfo);
 
         // 청구기호와 도서의 상태 그리고 기증자 정보를 업데이트하고, 업데이트된 도서를 데이터베이스에 저장합니다.

@@ -1,10 +1,7 @@
 package com.hae.library.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,13 +78,14 @@ public class BookInfo extends BaseTimeEntity{
      * @param image       새로운 도서 이미지
      */
     public void updateBookInfo(String title, String isbn, String author, String publisher,
-                               String publishedAt, String image) {
+                               String publishedAt, String image, Category category) {
         this.title = title;
         this.isbn = isbn;
         this.author = author;
         this.publisher = publisher;
         this.publishedAt = publishedAt;
         this.image = image;
+        this.category = category;
     }
 
     /**
