@@ -14,11 +14,11 @@ export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 2);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
   const [category, setCategory] = useState('전체');
-  const [sort, setSort] = useState('이름순');
+  const [sort, setSort] = useState('최신도서');
   const [categoryList, setCategoryList] = useState([]);
 
   const handlePageChange = page => {
@@ -103,44 +103,50 @@ export default function BookList() {
       </div>
       {/* 리스트 */}
       <div className="flex flex-wrap justify-start lg:px-12 mx-32 border-t-2 border-b-2">
-        {bookInfoList.map(book => (
-          <div key={book.id} className="lg:w-1/2 w-full px-2">
-            <li className="flex py-6 px-8">
-              <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                <img
-                  src={book.image}
-                  alt={book.title}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-
-              <div className="ml-4 flex flex-1 flex-col">
-                <div>
-                  <div className="flex justify-between text-base font-medium text-gray-900">
-                    <h3>{book.title}</h3>
-                    <p className="ml-4">{book.category}</p>
-                  </div>
-                  <p className="mt-1 text-sm text-gray-500">{book.author}</p>
+        {bookInfoList.length !== 0 ? (
+          bookInfoList.map(book => (
+            <div key={book.id} className="lg:w-1/2 w-full px-2">
+              <li className="flex py-6 px-8">
+                <div className="h-32 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                  <img
+                    src={book.image}
+                    alt={book.title}
+                    className="h-full w-full object-cover object-center"
+                  />
                 </div>
-                <div className="flex flex-1 items-end justify-between text-sm">
-                  <p className="text-gray-500">{book.publisher}</p>
 
-                  <div className="flex">
-                    <button
-                      type="button"
-                      className="font-medium text-gray-400 hover:text-indigo-500"
-                      onClick={() => {
-                        window.location.href = `/book/${book.id}`;
-                      }}
-                    >
-                      자세히 보기 >
-                    </button>
+                <div className="ml-4 flex flex-1 flex-col">
+                  <div>
+                    <div className="flex justify-between text-base font-medium text-gray-900">
+                      <h3>{book.title}</h3>
+                      <p className="ml-4">{book.category}</p>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">{book.author}</p>
+                  </div>
+                  <div className="flex flex-1 items-end justify-between text-sm">
+                    <p className="text-gray-500">{book.publisher}</p>
+
+                    <div className="flex">
+                      <button
+                        type="button"
+                        className="font-medium text-gray-400 hover:text-indigo-500"
+                        onClick={() => {
+                          window.location.href = `/book/${book.id}`;
+                        }}
+                      >
+                        자세히 보기 >
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
+              </li>
+            </div>
+          ))
+        ) : (
+          <div className="flex justify-center items-center w-full h-32 text-4xl my-5">
+            검색한 도서가 없습니다. 다시 검색해 주세요
           </div>
-        ))}
+        )}
       </div>
 
       <div className="mt-3">

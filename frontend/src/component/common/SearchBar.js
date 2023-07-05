@@ -20,7 +20,7 @@ export default function SearchBar(props) {
 
   const handleSubmit = event => {
     event.preventDefault();
-    navigate(`/${props.url}?search=${searchTerm}`);
+    navigate(`/${props.url}?search=${searchTerm}&category=전체&sort=최신도서`);
   };
 
   return (
