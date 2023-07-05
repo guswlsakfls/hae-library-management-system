@@ -38,13 +38,15 @@ const postAddBook = async (
 };
 
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
-const getBookListApi = async (search, page, size) => {
+const getBookListApi = async (search, page, size, category, sort) => {
   console.log(page);
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
+      category: category,
+      sort: sort,
     },
   });
 

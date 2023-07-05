@@ -1,10 +1,14 @@
-import Dropdown from '../../component/common/Dropdown';
 import SearchBar from '../../component/common/SearchBar';
 import Footer from '../../component/Footer';
 import Pagination from '../../component/common/Pagination';
 import { useState, useEffect } from 'react';
 import { getBookListApi } from '../../api/BookApi';
 import { useSearchParams } from 'react-router-dom/dist';
+import SelectBar from '../../component/common/SelectBar';
+import { getCategoryListApi } from '../../api/CategoryApi';
+
+// 이름순, 날짜순 정렬
+const sortList = ['최신도서', '오래된도서'];
 
 export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,14 +17,29 @@ export default function BookList() {
   const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
+  const [category, setCategory] = useState('전체');
+  const [sort, setSort] = useState('이름순');
+  const [categoryList, setCategoryList] = useState([]);
 
   const handlePageChange = page => {
     setPage(page - 1);
-    setSearchParams({ search, page: page, size });
+    setSearchParams({ search, page: page, size, category, sort });
   };
 
   useEffect(() => {
-    getBookListApi(search, page, size)
+    // 카테고리 목록을 불러오는 함수
+    getCategoryListApi()
+      .then(res => {
+        console.log('selecti: ', res);
+        setCategoryList([{ value: 0, categoryName: '전체' }, ...res.data]);
+      })
+      .catch(err => {
+        console.log(err);
+        alert('카테고리 목록을 불러오는데 실패했습니다.');
+      });
+
+    // 도서 목록을 불러오는 함수
+    getBookListApi(search, page, size, category, sort)
       .then(res => {
         setBookInfoList(res.data.bookInfoList);
         setTotal(res.data.totalElements);
@@ -30,43 +49,55 @@ export default function BookList() {
       })
       .catch(err => {
         console.log(err);
-        // if (err.response.status === 401 || err.response.status === 403) {
-        //   alert('로그인이 필요합니다.');
-        //   window.location.href = '/login';
-        //   return;
-        // }
         console.log(err.response);
-        // alert(err.response.data.message);
+        alert(err.response.data.message);
       });
-  }, [search, page, size]);
+  }, [search, page, size, category, sort]);
 
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
       <div className="sm:mx-auto sm:w-full border-b-2">
         <h2 className="mt-10 pb-10 text-center text-4xl font-bold leading-9 tracking-tight text-gray-900">
           도서목록
         </h2>
       </div>
-      <div className="flex justify-between items-center my-10 mx-72">
-        <h1 className="text-2xl font-bold">도서 검색</h1>
+      <div className="flex flex-wrap items-center my-10 mx-72">
+        <h1 className="sm:text-sm lg:text-2xl font-bold mx-4">도서 검색</h1>
         <SearchBar
           text="제목 또는 저자를 입력해 주세요."
           url="booklist"
         ></SearchBar>
-        <div className="flex">
-          <div className="mr-2">
-            <Dropdown option1="전체"></Dropdown>
-          </div>
-          <div className="mr-2">
-            <Dropdown option1="이름순"></Dropdown>
+        <div className="flex mx-4 mt-2">
+          <SelectBar
+            value={category}
+            onChange={e => {
+              setCategory(e.target.value);
+              setSearchParams({
+                search,
+                page,
+                size,
+                category: e.target.value,
+                sort,
+              });
+            }}
+            items={categoryList}
+          ></SelectBar>
+          <div className="mx-2">
+            <SelectBar
+              width="135"
+              value={sort}
+              onChange={e => {
+                setSort(e.target.value);
+                setSearchParams({
+                  search,
+                  page,
+                  size,
+                  category,
+                  sort: e.target.value,
+                });
+              }}
+              items={sortList}
+            ></SelectBar>
           </div>
         </div>
       </div>
