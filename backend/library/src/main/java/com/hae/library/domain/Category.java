@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Table(name = "CATEGORY")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category {
+public class Category extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

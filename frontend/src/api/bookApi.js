@@ -103,11 +103,11 @@ const lendingBookApi = async (bookId, userId, lendingCondition) => {
   return res.data;
 };
 
-const returningBookApi = async (bookId, returningCondition) => {
+const returningBookApi = async (lendingId, returningCondition) => {
   const res = await axios.put(
     serverIp + '/admin/lending/returning',
     {
-      bookId: bookId,
+      lendingId: lendingId,
       returningCondition: returningCondition,
     },
     { headers: { authorization: `Bearer ${accessToken}` } }
@@ -160,6 +160,16 @@ const getMeLendingHistoryListApi = async (search, page, size) => {
   return res.data;
 };
 
+const getLendgingInfoApi = async callSign => {
+  const res = await axios.get(serverIp + '/admin/lending/callsign', {
+    params: {
+      callSign: callSign,
+    },
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getBookListApi,
   getBookInfoByIdApi,
@@ -172,4 +182,5 @@ export {
   getBookStockListApi,
   updateBookStockApi,
   getMeLendingHistoryListApi,
+  getLendgingInfoApi,
 };

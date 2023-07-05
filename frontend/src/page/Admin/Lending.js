@@ -5,17 +5,19 @@ import {
   getBookByCallSignApi,
   lendingBookApi,
   returningBookApi,
+  getLendgingInfoApi,
 } from '../../api/BookApi';
 import DefaultSearchBar from '../../component/common/DefaultSearchBar';
 
 export default function Lending() {
   const [searchEmail, serSearchEmail] = useState('');
   const [searchCallSign, setSearchCallSign] = useState('');
-  const [lendingCondition, setLendingCondition] = useState('');
+  const [condition, setCondition] = useState('');
   const [user, setUser] = useState({});
   const [book, setBook] = useState({});
   const [returningAt, setReturningAt] = useState('');
   const [transactionType, setTransactionType] = useState('lending'); // 'lending' 혹은 'returning'
+  const [lendingInfo, setLendingInfo] = useState({});
 
   const handleGetUser = () => {
     getUserByEmailApi(searchEmail)
@@ -75,8 +77,31 @@ export default function Lending() {
       });
   };
 
+  const handleGetLendingInfo = () => {
+    getLendgingInfoApi(searchCallSign)
+      .then(res => {
+        setLendingInfo(res.data);
+        console.log(res);
+      })
+      .catch(err => {
+        setBook({});
+        setUser({});
+        setReturningAt('');
+        alert(err.response.data.message);
+        console.log(err.response.data);
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
   const handleLendingBook = () => {
-    lendingBookApi(book.id, user.id, lendingCondition)
+    lendingBookApi(book.id, user.id, condition)
       .then(res => {
         alert(res.message);
         setUser({});
@@ -85,6 +110,7 @@ export default function Lending() {
       })
       .catch(err => {
         alert(err.response.data.message);
+        window.location.reload();
         console.log(err.response.data);
         let errors = err.response.data.errors;
         if (!errors) {
@@ -97,26 +123,51 @@ export default function Lending() {
       });
   };
   const handleReturningBook = () => {
-    returningBookApi(book.id, lendingCondition)
-      .then(res => {
-        alert(res.message);
-        setUser({});
-        setBook({});
-        setReturningAt('');
-      })
-      .catch(err => {
-        alert(err.response.data.message);
-        console.log(err.response.data);
-        let errors = err.response.data.errors;
-        if (!errors) {
-          return;
-        }
-        let errorMessages = errors
-          .map((error, index) => `${index + 1}. ${error.message}`)
-          .join('\n\n');
-        alert(errorMessages);
-      });
+    // 현재 날짜와 반납 예정일을 Date 객체로 변환합니다.
+    const now = new Date();
+    const dueDate = new Date(lendingInfo.returningEndAt);
+    const diffDays = 0;
+
+    // 두 날짜를 비교하여 연체 일수를 계산합니다.
+    if (now > dueDate) {
+      const diffTime = now - dueDate;
+      diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // 연체 일수를 alert 창에 보여줍니다.
+    if (
+      window.confirm(
+        `반납 예정일로부터 ${diffDays}일이 지났습니다. 반납하시겠습니까?`
+      )
+    ) {
+      returningBookApi(lendingInfo.lendingId, condition)
+        .then(res => {
+          alert(res.message);
+          window.location.reload();
+        })
+        .catch(err => {
+          alert(err.response.data.message);
+          console.log(err.response.data);
+          let errors = err.response.data.errors;
+          if (!errors) {
+            return;
+          }
+          let errorMessages = errors
+            .map((error, index) => `${index + 1}. ${error.message}`)
+            .join('\n\n');
+          alert(errorMessages);
+        });
+    }
   };
+
+  useEffect(() => {
+    serSearchEmail('');
+    setSearchCallSign('');
+    setCondition('');
+    setUser({});
+    setBook({});
+    setReturningAt('');
+  }, [transactionType]);
 
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
@@ -132,15 +183,19 @@ export default function Lending() {
           <option value="returning">반납</option>
         </select>
       </div>
-      <div className="flex justify-center items-center my-10 mx-48">
-        <h1 className="text-2xl font-bold mr-6">유저 검색</h1>
-        <DefaultSearchBar
-          text="이메일을 입력해 주세요."
-          value={searchEmail}
-          setValue={serSearchEmail}
-          handler={handleGetUser}
-        ></DefaultSearchBar>
-      </div>
+      {transactionType === 'lending' ? (
+        <div className="flex justify-center items-center my-10 mx-48">
+          <h1 className="text-2xl font-bold mr-6">유저 검색</h1>
+          <DefaultSearchBar
+            text="이메일을 입력해 주세요."
+            value={searchEmail}
+            setValue={serSearchEmail}
+            handler={handleGetUser}
+          ></DefaultSearchBar>
+        </div>
+      ) : (
+        ''
+      )}
 
       <div className="flex justify-center items-center my-10 sm:mx-32 xl:mx-80 border-2 border-gray-900">
         <div className="m-6 border-b border-gray-100">
@@ -150,7 +205,13 @@ export default function Lending() {
                 이메일 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.email ? user.email : '-'}
+                {transactionType == 'lending'
+                  ? user.email
+                    ? user.email
+                    : '-'
+                  : lendingInfo.userEmail
+                  ? lendingInfo.userEmail
+                  : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -158,7 +219,13 @@ export default function Lending() {
                 대출 수 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.lendingList ? user.lendingList.length : '-'}
+                {transactionType == 'lending'
+                  ? user.lendingList
+                    ? user.lendingList.length
+                    : '-'
+                  : lendingInfo.lendingCount
+                  ? lendingInfo.lendingCount
+                  : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -166,7 +233,13 @@ export default function Lending() {
                 연체현황 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user.penaltyDate ? user.penaltyDate : '-'}
+                {transactionType == 'lending'
+                  ? user.penaltyDate
+                    ? user.penaltyDate
+                    : '-'
+                  : lendingInfo.userPenaltyDate
+                  ? lendingInfo.userPenaltyDate
+                  : '-'}
               </dd>
             </div>
           </dl>
@@ -178,7 +251,9 @@ export default function Lending() {
           text="청구기호를 입력해 주세요."
           value={searchCallSign}
           setValue={setSearchCallSign}
-          handler={handleGetBook}
+          handler={
+            transactionType === 'lending' ? handleGetBook : handleGetLendingInfo
+          }
         ></DefaultSearchBar>
       </div>
       <div className="flex justify-center items-center my-10 sm:mx-32 xl:mx-80 border-2 border-gray-900">
@@ -189,8 +264,12 @@ export default function Lending() {
                 제목 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {book.bookInfo && book.bookInfo.title
-                  ? book.bookInfo.title
+                {transactionType == 'lending'
+                  ? book.bookInfo && book.bookInfo.title
+                    ? book.bookInfo.title
+                    : '-'
+                  : lendingInfo.bookTitle
+                  ? lendingInfo.bookTitle
                   : '-'}
               </dd>
             </div>
@@ -199,7 +278,13 @@ export default function Lending() {
                 청구기호 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {book.callSign ? book.callSign : '-'}
+                {transactionType === 'lending'
+                  ? book.callSign
+                    ? book.callSign
+                    : '-'
+                  : lendingInfo.bookCallSign
+                  ? lendingInfo.bookCallSign
+                  : '-'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -207,7 +292,13 @@ export default function Lending() {
                 반납 예정일 :
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {returningAt ? returningAt : '-'}
+                {transactionType === 'lending'
+                  ? returningAt
+                    ? returningAt
+                    : '-'
+                  : lendingInfo.returningEndAt
+                  ? lendingInfo.returningEndAt
+                  : '-'}
               </dd>
             </div>
           </dl>
@@ -220,8 +311,8 @@ export default function Lending() {
           rows="3"
           className="pl-1 border-t shadow-md focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm rounded-md"
           placeholder=" 특이사항을 적어주세요. (4~100자 이내)"
-          value={lendingCondition}
-          onChange={event => setLendingCondition(event.target.value)}
+          value={condition}
+          onChange={event => setCondition(event.target.value)}
         ></textarea>
       </div>
       {transactionType === 'lending' && (
