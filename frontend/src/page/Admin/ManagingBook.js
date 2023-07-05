@@ -327,8 +327,8 @@ export default function ManagingBook() {
                     카테고리
                   </label>
                   <select
-                    id="category"
-                    name="category"
+                    id="categoryName"
+                    name="categoryName"
                     className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md text-gray-500"
                     value={editBook.bookInfo.categoryName}
                     onChange={handleInputChange}

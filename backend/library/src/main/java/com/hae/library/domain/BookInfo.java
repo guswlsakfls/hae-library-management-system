@@ -15,7 +15,7 @@ public class BookInfo extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BOOK_INFO_ID")
+    @Column(name = "book_info_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,13 +41,13 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "isbn", nullable = false, unique = true)
     private String isbn;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false, length = 300)
     private String title;
 
-    @Column(name = "author", nullable = false, length = 50)
+    @Column(name = "author", nullable = false, length = 300)
     private String author;
 
-    @Column(name = "publisher", length = 50)
+    @Column(name = "publisher", length = 100)
     private String publisher;
 
     @Column(name = "image")

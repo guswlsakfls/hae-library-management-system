@@ -14,7 +14,7 @@ public class ResponseBookInfoDto {
     private String author;
     private String isbn;
     private String image;
-    private ResponseCategoryDto categoryDto; // 그냥 category로 하면 스택오버플로우 난다.
+    private String categoryName; // 그냥 category로 하면 스택오버플로우 난다.
     private String publisher;
     private String publishedAt;
 
@@ -30,7 +30,7 @@ public class ResponseBookInfoDto {
                 .author(bookInfo.getAuthor())
                 .isbn(bookInfo.getIsbn())
                 .image(bookInfo.getImage())
-                .categoryDto(ResponseCategoryDto.from(bookInfo.getCategory()))
+                .categoryName(ResponseCategoryDto.from(bookInfo.getCategory()).getCategoryName())
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
                 .build();

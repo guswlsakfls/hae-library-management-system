@@ -20,18 +20,18 @@ public class RequestBookWithBookInfoDto {
     @Pattern(regexp = ".*\\.c\\d+$", message = "올바른 청구기호 형식이 아닙니다. .c 다음에 숫자를 입력해주세요.")
     private String callSign;
 
-    @Pattern(regexp = "^[0-9]{9,13}$", message = "ISBN은 13자의 숫자로 이루어져야 합니다.")
+    @Pattern(regexp = "^[0-9]{9,13}$", message = "ISBN은 9~13자의 숫자로 이루어져야 합니다.")
     private String isbn;
 
-    @Size(max = 200, message = "도서 제목은 200자를 넘을 수 없습니다.")
+    @Size(max = 300, message = "도서 제목은 300자를 넘을 수 없습니다.")
     @NotBlank(message = "도서 제목을 입력해주세요.")
     private String title;
 
-    @Size(max = 20, message = "저자는 20자를 넘을 수 없습니다.")
+    @Size(max = 300, message = "저자는 300자를 넘을 수 없습니다.")
     @NotBlank(message = "저자를 입력해주세요.")
     private String author;
 
-    @Size(max = 20, message = "출판사는 20자를 넘을 수 없습니다.")
+    @Size(max = 50, message = "출판사는 50자를 넘을 수 없습니다.")
     @NotBlank(message = "출판사를 입력해주세요.")
     private String publisher;
 

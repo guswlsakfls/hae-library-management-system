@@ -132,7 +132,8 @@ public class BookService {
         BookInfo bookInfo = book.getBookInfo();
 
         // 청구기호 저장하기전에 중복되는지 확인합니다.
-        if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
+        if (bookRepo.existsByCallSignAndIdIsNot(requestBookWithBookInfoDto.getCallSign(),
+                book.getId())) {
             throw new RestApiException(BookErrorCode.DUPLICATE_CALLSIGN);
         }
 

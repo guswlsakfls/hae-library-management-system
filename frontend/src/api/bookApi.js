@@ -129,10 +129,11 @@ const getBookStockListApi = async (search, page, size) => {
 };
 
 const updateBookStockApi = async editBook => {
+  console.log(editBook);
   const res = await axios.put(
     serverIp + '/admin/book/update',
     {
-      id: editBook.bookInfo.id,
+      id: editBook.id,
       title: editBook.bookInfo.title,
       isbn: editBook.bookInfo.isbn,
       author: editBook.bookInfo.author,
@@ -140,6 +141,7 @@ const updateBookStockApi = async editBook => {
       callSign: editBook.callSign,
       donator: editBook.donator,
       status: editBook.status,
+      categoryName: editBook.bookInfo.categoryName,
       publisher: editBook.bookInfo.publisher,
       publishedAt: editBook.bookInfo.publishedAt,
     },

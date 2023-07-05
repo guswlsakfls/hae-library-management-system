@@ -24,4 +24,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     Page<Book> findAll(@Param("search") String search, Pageable pageable);
 
     Optional<Book> findByCallSign(String callSign);
+
+    boolean existsByCallSignAndIdIsNot(String callSign, Long id);
 }
