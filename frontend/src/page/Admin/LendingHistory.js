@@ -175,7 +175,7 @@ export default function LendingHistory() {
               returningDate={item.returningAt}
               extension={item.renew ? '1회' : '-'}
               status={
-                item.returningLibrarianEmail != null ? '반납완료' : '대출중'
+                item.returningLibrarianEmail != null ? '반납완료' : '대출 중'
               }
             />
           ))}

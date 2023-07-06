@@ -143,7 +143,8 @@ public class BookService {
 
 
         // 도서 정보를 업데이트하고, 업데이트된 도서 정보를 데이터베이스에 저장합니다.
-        bookInfo.updateBookInfo(requestBookWithBookInfoDto.getTitle(), requestBookWithBookInfoDto.getIsbn(), requestBookWithBookInfoDto.getAuthor(),
+        bookInfo.updateBookInfo(requestBookWithBookInfoDto.getTitle(),
+                requestBookWithBookInfoDto.getIsbn(), requestBookWithBookInfoDto.getAuthor(),
                 requestBookWithBookInfoDto.getPublisher(),
                 requestBookWithBookInfoDto.getPublishedAt(),
                 requestBookWithBookInfoDto.getImage(), category);

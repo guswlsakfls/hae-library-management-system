@@ -78,7 +78,6 @@ public class LendingService {
                 .user(user)
                 .lendingLibrarian(lendingLibrarian)
                 .lendingCondition(requestLendingDto.getLendingCondition())
-                .returningEndAt(now)
                 .build();
 
         // 대출 정보를 저장합니다.

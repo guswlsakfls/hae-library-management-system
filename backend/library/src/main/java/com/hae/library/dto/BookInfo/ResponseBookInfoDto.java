@@ -15,6 +15,7 @@ public class ResponseBookInfoDto {
     private String isbn;
     private String image;
     private String categoryName; // 그냥 category로 하면 스택오버플로우 난다.
+    private int stockQuantity;
     private String publisher;
     private String publishedAt;
 
@@ -31,6 +32,7 @@ public class ResponseBookInfoDto {
                 .isbn(bookInfo.getIsbn())
                 .image(bookInfo.getImage())
                 .categoryName(ResponseCategoryDto.from(bookInfo.getCategory()).getCategoryName())
+                .stockQuantity(bookInfo.getStockQuantity())
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
                 .build();

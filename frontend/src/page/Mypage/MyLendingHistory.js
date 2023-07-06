@@ -60,7 +60,7 @@ export default function MyLendingHistory() {
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">
               {/* TODO: 반납 예정일과 반납 날짜는 다르게 해야 할 듯 */}
-              {lending.returningEndAt}
+              {lending.returningEndAt ? lending.returningEndAt : '-'}
             </div>
           </div>
         </div>

@@ -117,13 +117,8 @@ const returningBookApi = async (lendingId, returningCondition) => {
   return res.data;
 };
 
-const getBookStockListApi = async (search, page, size) => {
-  const res = await axios.get(serverIp + '/admin/book/all', {
-    params: {
-      search: search,
-      page: page === null ? 0 : page,
-      size: size === null ? 10 : size,
-    },
+const getBookStockListApi = async id => {
+  const res = await axios.get(serverIp + `/bookinfo/` + id, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
 
@@ -136,16 +131,16 @@ const updateBookStockApi = async editBook => {
     serverIp + '/admin/book/update',
     {
       id: editBook.id,
-      title: editBook.bookInfo.title,
-      isbn: editBook.bookInfo.isbn,
-      author: editBook.bookInfo.author,
-      image: editBook.bookInfo.image,
+      title: editBook.title,
+      isbn: editBook.isbn,
+      author: editBook.author,
+      image: editBook.image,
       callSign: editBook.callSign,
       donator: editBook.donator,
       status: editBook.status,
-      categoryName: editBook.bookInfo.categoryName,
-      publisher: editBook.bookInfo.publisher,
-      publishedAt: editBook.bookInfo.publishedAt,
+      categoryName: editBook.category,
+      publisher: editBook.publisher,
+      publishedAt: editBook.publishedAt,
     },
     { headers: { authorization: `Bearer ${accessToken}` } }
   );

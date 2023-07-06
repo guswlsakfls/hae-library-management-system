@@ -6,6 +6,8 @@ import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ResponseBookDto {
     private Long id;
@@ -13,15 +15,19 @@ public class ResponseBookDto {
     private BookStatus status;
     private String donator;
     private Boolean isAvailable;
+    private String createdAt;
+    private String updatedAt;
 
     @Builder
     public ResponseBookDto(Long id, String callSign,
-                                       BookStatus status, String donator, Boolean isAvailable) {
+                                       BookStatus status, String donator, Boolean isAvailable, String createdAt, String updatedAt) {
         this.id = id;
         this.callSign = callSign;
         this.status = status;
         this.donator = donator;
         this.isAvailable = isAvailable;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static ResponseBookDto from(Book book) {
@@ -31,6 +37,8 @@ public class ResponseBookDto {
                 .status(book.getStatus())
                 .donator(book.getDonator())
                 .isAvailable(book.isLendingStatus())
+                .createdAt(book.getCreatedAt().toLocalDate().toString())
+                .updatedAt(book.getUpdatedAt().toLocalDate().toString())
                 .build();
     }
 }

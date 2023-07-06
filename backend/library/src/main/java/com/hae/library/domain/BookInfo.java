@@ -114,6 +114,15 @@ public class BookInfo extends BaseTimeEntity{
     public void updateId(Long nonExistingId) {
         this.id = nonExistingId;
     }
+
+    /**
+     * 도서 재고 수량을 얻습니다.
+     * @param bookInfo 도서 정보
+     * @return 도서 재고 수량
+     */
+    public int getStockQuantity() {
+        return this.bookList.size();
+    }
 }
 
 

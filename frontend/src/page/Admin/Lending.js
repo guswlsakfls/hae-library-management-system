@@ -104,9 +104,7 @@ export default function Lending() {
     lendingBookApi(book.id, user.id, condition)
       .then(res => {
         alert(res.message);
-        setUser({});
-        setBook({});
-        setReturningAt('');
+        window.location.reload();
       })
       .catch(err => {
         alert(err.response.data.message);
@@ -220,7 +218,7 @@ export default function Lending() {
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                 {transactionType == 'lending'
-                  ? user.lendingCount !== 0
+                  ? user.lendingCount
                     ? user.lendingCount
                     : '-'
                   : lendingInfo.lendingCount

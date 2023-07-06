@@ -125,8 +125,10 @@ public class BookInfoService {
             List<Predicate> predicates = new ArrayList<>();
 
             if (search != null && !search.trim().isEmpty()) {
-                // title 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
-                predicates.add(cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%"));
+                // title 필드 또는 isbn 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
+                Predicate titleLike = cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+                Predicate isbnLike = cb.like(cb.lower(root.get("isbn")), "%" + search.toLowerCase() + "%");
+                predicates.add(cb.or(titleLike, isbnLike));
             }
 
             if (categoryName != null && !categoryName.trim().isEmpty() && !categoryName.equals("전체")) {
