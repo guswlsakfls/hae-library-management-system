@@ -8,6 +8,7 @@ import {
   getBookListApi,
   getBookStockListApi,
   updateBookStockApi,
+  deleteBookApi,
 } from '../../api/BookApi';
 import { getCategoryListApi } from '../../api/CategoryApi';
 import SelectBar from '../../component/common/SelectBar';
@@ -139,9 +140,26 @@ export default function ManagingBook() {
       });
   };
 
-  // const handleSearch = searchKey = {
-  //   setSearchParams({ search: searchKey, page: 0, size });
-  // };
+  // 도서 삭제 신청
+  const handleDeleteClick = id => {
+    console.log(id);
+    if (
+      window.confirm(
+        '[!주의!] 대출 관련 기록도 삭제됩니다. 정말 삭제하시겠습니까?'
+      )
+    ) {
+      deleteBookApi(id)
+        .then(res => {
+          console.log(res);
+          alert(res.message);
+          window.location.reload();
+        })
+        .catch(err => {
+          console.log(err.response);
+          alert(err.response.data.message);
+        });
+    }
+  };
 
   useEffect(() => {
     getBookListApi(search, page, size, category, sort)
@@ -189,7 +207,11 @@ export default function ManagingBook() {
         {book.stockQuantity + ' 권'}
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton size="small" onClick={() => handleReadClick(book.id)}>
+        <DefaultButton
+          color={'blue'}
+          size="small"
+          onClick={() => handleReadClick(book.id)}
+        >
           조회
         </DefaultButton>
       </td>
@@ -364,7 +386,7 @@ export default function ManagingBook() {
                         {book.callSign}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-                        {book.isAvailable ? '대출가능' : '대출 중'}
+                        {book.isAvailable ? '대출 중' : '대출 가능'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
                         {book.status === 'FINE' ? '양호' : '파손'}
@@ -377,6 +399,16 @@ export default function ManagingBook() {
                       </td>
                       <td className="py-4 whitespace-nowrap text-sm text-black-500">
                         <DefaultButton
+                          color={'red'}
+                          size="small"
+                          onClick={() => handleDeleteClick(book.id)}
+                        >
+                          삭제
+                        </DefaultButton>
+                      </td>
+                      <td className="py-4 whitespace-nowrap text-sm text-black-500">
+                        <DefaultButton
+                          color={'blue'}
                           size="small"
                           onClick={() =>
                             handleEditClick(bookStockList, book.id)
@@ -390,9 +422,7 @@ export default function ManagingBook() {
               </tbody>
             </table>
             <div className="mt-4 flex justify-end">
-              <DefaultButton onClick={toggleModal} color={'red'}>
-                닫기
-              </DefaultButton>
+              <DefaultButton onClick={toggleModal}>닫기</DefaultButton>
             </div>
           </div>
           {isEdit ? (

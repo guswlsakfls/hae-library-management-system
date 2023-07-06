@@ -22,6 +22,7 @@ public enum MemberErrorCode implements ErrorCode {
 
     // 대출
     USER_NOT_LENDING_AVAILABLE(HttpStatus.BAD_REQUEST, "3권까지 대출 가능합니다"),
+    USER_OVERDUE(HttpStatus.BAD_REQUEST, "연체일이 지난 후에 대출이 가능합니다"),
     ;
 
     private final HttpStatus httpStatus;

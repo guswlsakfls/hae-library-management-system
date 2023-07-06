@@ -128,4 +128,19 @@ public class Member extends BaseTimeEntity {
     public void decreaseLendingCount() {
         this.lendingCount--;
     }
+
+    /**
+     * 회원의 연체 여부를 반환합니다.
+     * @return 연체 여부
+     */
+    public boolean isPenalty() {
+        return this.penaltyEndDate != null && this.penaltyEndDate.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * 연체일을 초기화 해줍니다.
+     */
+    public void resetPenaltyEndDate() {
+        this.penaltyEndDate = null;
+    }
 }

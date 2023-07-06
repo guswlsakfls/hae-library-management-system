@@ -59,9 +59,17 @@ public class LendingService {
         // 대출받는 유저가 회원인지 확인하고 가져옵니다.
         Member user = memberRepo.findById(requestLendingDto.getUserId())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.USER_NOT_FOUND));
-        // 대출 받는 유저의 대출 가능 여부를 확인합니다.
+        // 대출 받는 유저의 대출 권수를 확인하고, 대출 가능 여부를 확인합니다.
         if (user.getLendingCount() > 3) {
             throw new RestApiException(MemberErrorCode.USER_NOT_LENDING_AVAILABLE);
+        }
+        // 대출 받는 유저의 연체현황을 확인하고, 대출 가능 여부를 확인합니다.
+        if (user.isPenalty()) {
+            throw new RestApiException(MemberErrorCode.USER_OVERDUE);
+        }
+        // 연체일이 지난상태에서 대출받으면 연체일을 초기화 해줍니다.
+        if (user.getPenaltyEndDate() != null) {
+            user.resetPenaltyEndDate();
         }
         // 대출 받는 유저의 대출 횟수를 증가시킵니다.
         user.increaseLendingCount();
@@ -119,14 +127,17 @@ public class LendingService {
         // 반납일이 지났는지 확인하고 연체일을 부과합니다.
         // 당일 00:00:00을 가져옵니다.
         LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        if (lending.getReturningEndAt().isAfter(now)) {
+        // 대출일 2주 뒤에 날짜로 반납일을 정해줍니다.
+        LocalDateTime returningEndAt = lending.getCreatedAt().plusDays(14);
+        // 반납일이 지났는지 확인합니다.
+        if (returningEndAt.isBefore(now)) {
             // 연체일을 계산합니다.
-            long daysOverdue = ChronoUnit.DAYS.between(lending.getReturningEndAt(), now);
+            long daysOverdue = ChronoUnit.DAYS.between(returningEndAt, now);
             LocalDateTime newPenaltyEndDate = user.getPenaltyEndDate();
-            // 연체일이 0일 이상이면 연체일을 부과합니다.
-            if (newPenaltyEndDate == null) { // 연체일이 없으면 연체일을 부과합니다.
+            // 연체일이 없거나, 이미지난 연체일이 있으면 현재 시간부터 연체일을 부과합니다.
+            if (newPenaltyEndDate == null || newPenaltyEndDate.isBefore(now)) {
                 newPenaltyEndDate = now.plusDays(daysOverdue);
-            } else { // 연체일이 있으면 연체일을 더합니다.
+            } else { // 연체일이 있으면 현재 연체일에 부과합니다.
                 newPenaltyEndDate = newPenaltyEndDate.plusDays(daysOverdue);
             }
             // 연체일을 부과하고 저장합니다.
@@ -154,7 +165,7 @@ public class LendingService {
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
 
         // 책의 대출 정보를 조회합니다.
-        Lending lending = lendingRepo.findByBookId(book.getId())
+        Lending lending = lendingRepo.findByBookIdAndReturningLibrarianIsNull(book.getId())
                 .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
 
         return ResponseLendingInfoForReturningDto.from(lending);

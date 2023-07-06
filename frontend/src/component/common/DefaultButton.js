@@ -32,7 +32,7 @@ export default function DefaultButton({
       buttonColorClass = 'bg-green-500 hover:bg-green-700';
       break;
     default:
-      buttonColorClass = 'bg-blue-500 hover:bg-blue-700';
+      buttonColorClass = 'bg-gray-500 hover:bg-gray-700';
       break;
   }
 

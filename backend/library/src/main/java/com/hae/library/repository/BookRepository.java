@@ -1,6 +1,7 @@
 package com.hae.library.repository;
 
 import com.hae.library.domain.Book;
+import com.hae.library.domain.BookInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
-//    @Override // TODO: JpaSpecificationExecutor 추가해서 에러난다 나중에 확인
+    // 청구기호로 책이 존재하는지 확인하는 메서드입니다.
     @EntityGraph(attributePaths = {"bookInfo"})
     boolean existsByCallSign(String callSign);
 
@@ -23,7 +24,12 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     @EntityGraph(attributePaths = {"lending"})
     Page<Book> findAll(@Param("search") String search, Pageable pageable);
 
+    // 청구기호로 책을 찾는 메서드입니다.
     Optional<Book> findByCallSign(String callSign);
 
+    // 자신을 제외한 동일한 청구기호를 가진 책이 있는지 확인하는 메서드입니다.
     boolean existsByCallSignAndIdIsNot(String callSign, Long id);
+
+    // 몇 권의 도서가 있는지 확인하는 메서드입니다.
+    int countByBookInfo(BookInfo bookInfo);
 }

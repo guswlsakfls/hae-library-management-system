@@ -21,7 +21,7 @@ public class Book extends BaseTimeEntity {
     @JoinColumn(name = "BOOK_INFO_ID")
     private BookInfo bookInfo;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Lending> lendingList = new ArrayList<>();
 
     @Column(name = "lending_status", nullable = false)
@@ -104,27 +104,6 @@ public class Book extends BaseTimeEntity {
      */
     public void updateIdTest(Long id) {
         this.id = id;
-    }
-
-    /**
-     * 도서 정보를 업데이트합니다.
-     * @param bookInfo 업데이트할 도서 정보
-     */
-    public void updateBookInfo(BookInfo bookInfo) {
-        this.bookInfo = bookInfo;
-    }
-
-    /**
-     * 대출 정보를 삭제합니다.
-     * @param lending 삭제할 도서 정보
-     */
-    public void removeLending(Lending lending) {
-        this.lendingList.remove(lending);
-        // 무한루프 체크
-        if (lending.getBook() == this) {
-            lending.updateBook(null);
-        }
-
     }
 
     /**

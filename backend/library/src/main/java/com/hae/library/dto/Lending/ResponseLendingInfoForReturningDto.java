@@ -4,6 +4,7 @@ import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ public class ResponseLendingInfoForReturningDto {
     private LocalDateTime userPenaltyEndDate;
     private String bookTitle;
     private String bookCallSign;
+    private LocalDateTime createdAt;
     private String returningEndAt;
 
     public static ResponseLendingInfoForReturningDto from(Lending lending) {
@@ -28,7 +30,10 @@ public class ResponseLendingInfoForReturningDto {
         dto.userPenaltyEndDate = lending.getUser().getPenaltyEndDate();
         dto.bookTitle = lending.getBook().getBookInfo().getTitle();
         dto.bookCallSign = lending.getBook().getCallSign();
-        dto.returningEndAt = lending.getReturningEndAt().toLocalDate().toString();
+        dto.createdAt = lending.getCreatedAt();
+        if (lending.getReturningEndAt() != null) {
+            dto.returningEndAt = lending.getReturningEndAt().toLocalDate().toString();
+        }
         return dto;
     }
 }

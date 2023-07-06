@@ -123,8 +123,9 @@ export default function Lending() {
   const handleReturningBook = () => {
     // 현재 날짜와 반납 예정일을 Date 객체로 변환합니다.
     const now = new Date();
-    const dueDate = new Date(lendingInfo.returningEndAt);
-    const diffDays = 0;
+    const dueDate = new Date(lendingInfo.createdAt);
+    dueDate.setDate(dueDate.getDate() + 14); // createdAt에서 14일을 더합니다.
+    let diffDays = 0;
 
     // 두 날짜를 비교하여 연체 일수를 계산합니다.
     if (now > dueDate) {
@@ -232,11 +233,11 @@ export default function Lending() {
               </dt>
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                 {transactionType == 'lending'
-                  ? user.penaltyDate
-                    ? user.penaltyDate
+                  ? user.penaltyEndDate
+                    ? user.penaltyEndDate.split('T')[0]
                     : '-'
-                  : lendingInfo.userPenaltyDate
-                  ? lendingInfo.userPenaltyDate
+                  : lendingInfo.userPenaltyEndDate
+                  ? lendingInfo.userPenaltyEndDate.split('T')[0]
                   : '-'}
               </dd>
             </div>
@@ -294,8 +295,13 @@ export default function Lending() {
                   ? returningAt
                     ? returningAt
                     : '-'
-                  : lendingInfo.returningEndAt
-                  ? lendingInfo.returningEndAt
+                  : lendingInfo.createdAt
+                  ? new Date(
+                      new Date(lendingInfo.createdAt.split('T')[0]).getTime() +
+                        14 * 24 * 60 * 60 * 1000
+                    )
+                      .toISOString()
+                      .split('T')[0]
                   : '-'}
               </dd>
             </div>
@@ -315,7 +321,7 @@ export default function Lending() {
       </div>
       {transactionType === 'lending' && (
         <div className="flex justify-center items-center my-10 mx-48">
-          <DefaultButton size="large" click={handleLendingBook}>
+          <DefaultButton color="blue" size="large" click={handleLendingBook}>
             대출 신청
           </DefaultButton>
         </div>
@@ -323,7 +329,7 @@ export default function Lending() {
 
       {transactionType === 'returning' && (
         <div className="flex justify-center items-center my-10 mx-48">
-          <DefaultButton size="large" click={handleReturningBook}>
+          <DefaultButton color="blue" size="large" click={handleReturningBook}>
             반납 신청
           </DefaultButton>
         </div>

@@ -169,6 +169,13 @@ const getLendgingInfoApi = async callSign => {
   return res.data;
 };
 
+const deleteBookApi = async id => {
+  const res = await axios.delete(serverIp + `/admin/book/${id}/delete`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getBookListApi,
   getBookInfoByIdApi,
@@ -182,4 +189,5 @@ export {
   updateBookStockApi,
   getMeLendingHistoryListApi,
   getLendgingInfoApi,
+  deleteBookApi,
 };
