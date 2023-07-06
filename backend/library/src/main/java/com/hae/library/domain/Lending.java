@@ -18,7 +18,7 @@ public class Lending extends BaseTimeEntity{
     @Column(name = "LENDING_ID")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOK")
     private Book book;
 
@@ -115,8 +115,8 @@ public class Lending extends BaseTimeEntity{
         this.book = book;
 
         // 무한루프 체크
-        if (book.getLending() != this) {
-            book.addLending(this);
+        if (!book.getLendingList().contains(this)) {
+            book.getLendingList().add(this);
         }
     }
 
@@ -139,5 +139,13 @@ public class Lending extends BaseTimeEntity{
      */
     public void updateMember(Member member) {
         this.user = member;
+    }
+
+    /**
+     * 대출의 도서 정보를 업데이트합니다.
+     * @param book 업데이트할 도서 정보
+     */
+    public void updateBook(Book book) {
+        this.book = book;
     }
 }

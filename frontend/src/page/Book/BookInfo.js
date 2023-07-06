@@ -120,12 +120,13 @@ export default function BookInfo() {
                         </h4>
                         <h4
                           className={`text-sm font-medium mr-5 ${
-                            book.isAvailable === '대출 가능'
+                            book.isAvailable === false
                               ? 'text-blue-500'
                               : 'text-red-500'
                           }`}
                         >
-                          {book.isAvailable} {/* 대출상태 */}
+                          {book.isAvailable ? '대출 가능' : '대출 중'}{' '}
+                          {/* 대출상태 */}
                         </h4>
                         <h4
                           className={`text-sm font-medium mr-5 ${

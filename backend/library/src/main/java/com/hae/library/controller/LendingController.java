@@ -42,13 +42,12 @@ public class LendingController {
     @PutMapping(value = "/admin/lending/returning")
     public ResponseResultDto<Object> ReturningBook(@RequestBody @Valid RequestReturningDto requestReturningDto) {
         log.info("책 반납 요청: [PUT] /lending/returning - {}", requestReturningDto.toString());
-        ResponseLendingDto responseLendingDto = lendingService.returningBook(requestReturningDto);
+        lendingService.returningBook(requestReturningDto);
 
         log.info("책 반납에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 반납에 성공하였습니다")
-                .data(responseLendingDto)
                 .build();
     }
 

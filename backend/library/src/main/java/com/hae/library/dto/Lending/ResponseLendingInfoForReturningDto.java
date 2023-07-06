@@ -24,7 +24,7 @@ public class ResponseLendingInfoForReturningDto {
         ResponseLendingInfoForReturningDto dto = new ResponseLendingInfoForReturningDto();
         dto.lendingId = lending.getId();
         dto.userEmail = lending.getUser().getEmail();
-        dto.lendingCount = lending.getUser().getLendingList().size();
+        dto.lendingCount = lending.getUser().getLendingCount();
         dto.userPenaltyEndDate = lending.getUser().getPenaltyEndDate();
         dto.bookTitle = lending.getBook().getBookInfo().getTitle();
         dto.bookCallSign = lending.getBook().getCallSign();

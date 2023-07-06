@@ -48,15 +48,24 @@ public class LendingService {
         // 도서가 있는지 조회합니다.
         Book book = bookRepo.findById(requestLendingDto.getBookId())
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
-
-        // 대출된 도서인지 확인합니다.
-        if (book.getLending() != null) {
+        // 도서가 대출 가능한지 확인합니다.
+        if (book.isLendingStatus()) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
         }
+        // 도서를 대출 처리합니다.
+        book.updateLending();
+        bookRepo.save(book);
 
         // 대출받는 유저가 회원인지 확인하고 가져옵니다.
         Member user = memberRepo.findById(requestLendingDto.getUserId())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.USER_NOT_FOUND));
+        // 대출 받는 유저의 대출 가능 여부를 확인합니다.
+        if (user.getLendingCount() > 3) {
+            throw new RestApiException(MemberErrorCode.USER_NOT_LENDING_AVAILABLE);
+        }
+        // 대출 받는 유저의 대출 횟수를 증가시킵니다.
+        user.increaseLendingCount();
+        memberRepo.save(user);
 
         // 대출자 회원인지 확인하고 가져옵니다.
         Member lendingLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
@@ -83,27 +92,34 @@ public class LendingService {
      * 책 반납을 처리합니다.
      *
      * @param requestReturningDto 반납 요청 DTO
-     * @return 반납된 대출 정보 DTO
      */
     @Transactional
-    public ResponseLendingDto returningBook(RequestReturningDto requestReturningDto) {
-        // 대출 도서인지 확인합니다.
+    public void returningBook(RequestReturningDto requestReturningDto) {
+        // 대출 도서인지 확인하고 대출 정보를 가져옵니다.
         Lending lending = lendingRepo.findById(requestReturningDto.getLendingId())
                 .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
+        // 반납 도서를 가져옵니다.
+        Book book = lending.getBook();
+        // 반납자 회원인지 확인하고 회원 정보를 가져옵니다.
+        Member returningLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
+        // 반납하는 유저 정보를 가져옵니다.
+        Member user = lending.getUser();
 
         // 반납된 도서인지 확인합니다.
-        if (lending.getReturningLibrarian() != null) {
+        if (book.isLendingStatus() == false) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_RETURNED);
         }
+        // 도서를 반납 처리합니다.
+        book.updateReturning();
+        bookRepo.save(book);
 
-        // 도서 반납자가 회원인지 확인하고 회원 정보를 가져옵니다.
-        Member user = memberRepo.findById(lending.getUser().getId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        // 당일 00:00:00을 가져옵니다.
-        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        // 유저의 대출 횟수를 감소시킵니다.
+        user.decreaseLendingCount();
 
         // 반납일이 지났는지 확인하고 연체일을 부과합니다.
+        // 당일 00:00:00을 가져옵니다.
+        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         if (lending.getReturningEndAt().isAfter(now)) {
             // 연체일을 계산합니다.
             long daysOverdue = ChronoUnit.DAYS.between(lending.getReturningEndAt(), now);
@@ -114,20 +130,16 @@ public class LendingService {
             } else { // 연체일이 있으면 연체일을 더합니다.
                 newPenaltyEndDate = newPenaltyEndDate.plusDays(daysOverdue);
             }
-            // 연체일을 저장합니다.
+            // 연체일을 부과하고 저장합니다.
             user.updatePenaltyEndDate(newPenaltyEndDate);
-            memberRepo.save(user);
         }
-
-        // 반납자 회원인지 확인하고 회원 정보를 가져옵니다.
-        Member returningLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
+        memberRepo.save(user);
 
         // 반납 처리정보를 업데이트 합니다.
         lending.updateReturning(returningLibrarian, requestReturningDto.getReturningCondition(), now);
-        Lending updatedLending = lendingRepo.save(lending);
+        lendingRepo.save(lending);
 
-        return ResponseLendingDto.from(updatedLending);
+//        return ResponseLendingDto.from(updatedLending);
     }
 
     /**

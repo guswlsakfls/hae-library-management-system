@@ -25,20 +25,7 @@ public class BookInfo extends BaseTimeEntity{
     @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.REMOVE)
     private List<Book> bookList = new ArrayList<>();
 
-    // TODO: 주석 처리된 부분은 관계 매핑을 위한 코드. 추후에 필요하면 주석 해제
-    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
-    // private List<RequestBook> requestBookList = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
-    // private List<BookMark> bookMarkList = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
-    // private List<Review> reviewList = new ArrayList<>();
-
-    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
-    // private List<Reservation> reservationList = new ArrayList<>();
-
-    @Column(name = "isbn", nullable = false, unique = true)
+    @Column(name = "isbn", nullable = false)
     private String isbn;
 
     @Column(name = "title", nullable = false, length = 300)
@@ -56,6 +43,18 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "published_at")
     private String publishedAt;
 
+    // TODO: 주석 처리된 부분은 관계 매핑을 위한 코드. 추후에 필요하면 주석 해제
+    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
+    // private List<RequestBook> requestBookList = new ArrayList<>();
+
+    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
+    // private List<BookMark> bookMarkList = new ArrayList<>();
+
+    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
+    // private List<Review> reviewList = new ArrayList<>();
+
+    // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
+    // private List<Reservation> reservationList = new ArrayList<>();
     @Builder
     public BookInfo(Long id, String isbn, String title, String author, String publisher,
                     String image, String publishedAt) {
