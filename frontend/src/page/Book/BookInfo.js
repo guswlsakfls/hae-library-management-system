@@ -125,7 +125,7 @@ export default function BookInfo() {
                               : 'text-red-500'
                           }`}
                         >
-                          {book.isAvailable ? '대출 가능' : '대출 중'}{' '}
+                          {book.isAvailable ? '대출 중' : '대출 가능'}{' '}
                           {/* 대출상태 */}
                         </h4>
                         <h4

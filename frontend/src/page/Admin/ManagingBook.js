@@ -236,9 +236,10 @@ export default function ManagingBook() {
               value={category}
               onChange={e => {
                 setCategory(e.target.value);
+                setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
                 setSearchParams({
                   search,
-                  page,
+                  page: 1, // 카테고리 변경 시, 페이지를 1로 설정
                   size,
                   category: e.target.value,
                   sort,
@@ -252,9 +253,10 @@ export default function ManagingBook() {
                 value={sort}
                 onChange={e => {
                   setSort(e.target.value);
+                  setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
                   setSearchParams({
                     search,
-                    page,
+                    page: 1, // 카테고리 변경 시, 페이지를 1로 설정
                     size,
                     category,
                     sort: e.target.value,
