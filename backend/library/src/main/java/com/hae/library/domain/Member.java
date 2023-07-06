@@ -24,9 +24,12 @@ public class Member extends BaseTimeEntity {
     private Long id;
 
     @OneToMany(mappedBy = "user")
-    private List<Lending> LendingList = new ArrayList<Lending>();
+    private List<Lending> lendingList = new ArrayList<Lending>();
 
-    @Column(nullable = false, length = 30, unique = true)
+    @Column(name = "lending_count")
+    private int lendingCount = 0;
+
+    @Column(nullable = false, length = 30)
     private String email;
 
     @Column(nullable = false)
@@ -100,6 +103,44 @@ public class Member extends BaseTimeEntity {
      */
     public void addLending(Lending lending) {
         lending.updateMember(this);
-        this.LendingList.add(lending);
+        this.lendingList.add(lending);
+    }
+
+    /**
+     * 반납한 대출 정보를 삭제합니다.
+     * @param lending 삭제할 대출 정보
+     */
+    public void removeLending(Lending lending) {
+        this.lendingList.remove(lending);
+//        lending.updateMember(null);
+    }
+
+    /**
+     * 대출 횟수를 증가시킵니다.
+     */
+    public void increaseLendingCount() {
+        this.lendingCount++;
+    }
+
+    /**
+     * 대출 횟수를 감소시킵니다.
+     */
+    public void decreaseLendingCount() {
+        this.lendingCount--;
+    }
+
+    /**
+     * 회원의 연체 여부를 반환합니다.
+     * @return 연체 여부
+     */
+    public boolean isPenalty() {
+        return this.penaltyEndDate != null && this.penaltyEndDate.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * 연체일을 초기화 해줍니다.
+     */
+    public void resetPenaltyEndDate() {
+        this.penaltyEndDate = null;
     }
 }

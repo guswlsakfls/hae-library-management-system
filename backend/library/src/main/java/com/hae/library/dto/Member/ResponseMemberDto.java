@@ -23,7 +23,7 @@ public class ResponseMemberDto {
     private String email;
     private Role role;
     private LocalDateTime penaltyEndDate;
-    private List<ResponseLendingDto> lendingList;
+    private int lendingCount;
     private String createdAt;
     private String updatedAt;
     private boolean activated;
@@ -35,13 +35,15 @@ public class ResponseMemberDto {
                 .email(member.getEmail())
                 .role(member.getRole())
                 .penaltyEndDate(member.getPenaltyEndDate())
+                .lendingCount(member.getLendingCount())
                 .activated(member.isActivated())
                 .createdAt(member.getCreatedAt().toLocalDate().toString())
                 .updatedAt(member.getUpdatedAt().toLocalDate().toString())
                 .build();
     }
 
-    public void updateLendingList(List<ResponseLendingDto> lendingList) {
-        this.lendingList = lendingList;
+    // 회원의 대출 횟수를 업데이트 합니다.
+    public void updateLendingCount(int lendingCount) {
+        this.lendingCount = lendingCount;
     }
 }

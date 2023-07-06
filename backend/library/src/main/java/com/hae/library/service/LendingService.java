@@ -4,10 +4,7 @@ import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
-import com.hae.library.dto.Lending.RequestLendingDto;
-import com.hae.library.dto.Lending.RequestReturningDto;
-import com.hae.library.dto.Lending.ResponseLendingDto;
-import com.hae.library.dto.Lending.ResponseMemberLendingDto;
+import com.hae.library.dto.Lending.*;
 import com.hae.library.dto.ResponseResultDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
@@ -51,18 +48,35 @@ public class LendingService {
         // 도서가 있는지 조회합니다.
         Book book = bookRepo.findById(requestLendingDto.getBookId())
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
-
-        // 대출된 도서인지 확인합니다.
-        if (book.getLending() != null) {
+        // 도서가 대출 가능한지 확인합니다.
+        if (book.isLendingStatus()) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
         }
+        // 도서를 대출 처리합니다.
+        book.updateLending();
+        bookRepo.save(book);
 
         // 대출받는 유저가 회원인지 확인하고 가져옵니다.
         Member user = memberRepo.findById(requestLendingDto.getUserId())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.USER_NOT_FOUND));
+        // 대출 받는 유저의 대출 권수를 확인하고, 대출 가능 여부를 확인합니다.
+        if (user.getLendingCount() > 3) {
+            throw new RestApiException(MemberErrorCode.USER_NOT_LENDING_AVAILABLE);
+        }
+        // 대출 받는 유저의 연체현황을 확인하고, 대출 가능 여부를 확인합니다.
+        if (user.isPenalty()) {
+            throw new RestApiException(MemberErrorCode.USER_OVERDUE);
+        }
+        // 연체일이 지난상태에서 대출받으면 연체일을 초기화 해줍니다.
+        if (user.getPenaltyEndDate() != null) {
+            user.resetPenaltyEndDate();
+        }
+        // 대출 받는 유저의 대출 횟수를 증가시킵니다.
+        user.increaseLendingCount();
+        memberRepo.save(user);
 
         // 대출자 회원인지 확인하고 가져옵니다.
-        Member lendingLibrarian = memberRepo.findById(requestLendingDto.getUserId())
+        Member lendingLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
 
         // 대출일을 2주뒤 00:00:00으로 설정합니다.
@@ -72,7 +86,6 @@ public class LendingService {
                 .user(user)
                 .lendingLibrarian(lendingLibrarian)
                 .lendingCondition(requestLendingDto.getLendingCondition())
-                .returningEndAt(now)
                 .build();
 
         // 대출 정보를 저장합니다.
@@ -86,45 +99,76 @@ public class LendingService {
      * 책 반납을 처리합니다.
      *
      * @param requestReturningDto 반납 요청 DTO
-     * @return 반납된 대출 정보 DTO
      */
     @Transactional
-    public ResponseLendingDto returningBook(RequestReturningDto requestReturningDto) {
-        Lending lending = lendingRepo.findByBookId(requestReturningDto.getBookId())
-                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
+    public void returningBook(RequestReturningDto requestReturningDto) {
+        // 대출 도서인지 확인하고 대출 정보를 가져옵니다.
+        Lending lending = lendingRepo.findById(requestReturningDto.getLendingId())
+                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
+        // 반납 도서를 가져옵니다.
+        Book book = lending.getBook();
+        // 반납자 회원인지 확인하고 회원 정보를 가져옵니다.
+        Member returningLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
+        // 반납하는 유저 정보를 가져옵니다.
+        Member user = lending.getUser();
 
-        // 대출된 도서인지 확인합니다.
-        if (lending.getReturningLibrarian() != null) {
+        // 반납된 도서인지 확인합니다.
+        if (book.isLendingStatus() == false) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_RETURNED);
         }
+        // 도서를 반납 처리합니다.
+        book.updateReturning();
+        bookRepo.save(book);
 
-        // 도서 반납자가 회원인지 확인하고 회원 정보를 가져옵니다.
-        Member user = memberRepo.findById(lending.getUser().getId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        // 유저의 대출 횟수를 감소시킵니다.
+        user.decreaseLendingCount();
 
         // 반납일이 지났는지 확인하고 연체일을 부과합니다.
-        if (lending.getReturningEndAt().isAfter(now)) {
+        // 당일 00:00:00을 가져옵니다.
+        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        // 대출일 2주 뒤에 날짜로 반납일을 정해줍니다.
+        LocalDateTime returningEndAt = lending.getCreatedAt().plusDays(14);
+        // 반납일이 지났는지 확인합니다.
+        if (returningEndAt.isBefore(now)) {
             // 연체일을 계산합니다.
-            long daysOverdue = ChronoUnit.DAYS.between(lending.getReturningEndAt(), now);
+            long daysOverdue = ChronoUnit.DAYS.between(returningEndAt, now);
             LocalDateTime newPenaltyEndDate = user.getPenaltyEndDate();
-            // 연체일이 0일 이상이면 연체일을 부과합니다.
-            if (newPenaltyEndDate == null) { // 연체일이 없으면 연체일을 부과합니다.
+            // 연체일이 없거나, 이미지난 연체일이 있으면 현재 시간부터 연체일을 부과합니다.
+            if (newPenaltyEndDate == null || newPenaltyEndDate.isBefore(now)) {
                 newPenaltyEndDate = now.plusDays(daysOverdue);
-            } else { // 연체일이 있으면 연체일을 더합니다.
+            } else { // 연체일이 있으면 현재 연체일에 부과합니다.
                 newPenaltyEndDate = newPenaltyEndDate.plusDays(daysOverdue);
             }
-            // 연체일을 저장합니다.
+            // 연체일을 부과하고 저장합니다.
             user.updatePenaltyEndDate(newPenaltyEndDate);
-            memberRepo.save(user);
         }
+        memberRepo.save(user);
 
         // 반납 처리정보를 업데이트 합니다.
-        lending.updateReturning(user, requestReturningDto.getReturningCondition(), now);
-        Lending updatedLending = lendingRepo.save(lending);
+        lending.updateReturning(returningLibrarian, requestReturningDto.getReturningCondition(), now);
+        lendingRepo.save(lending);
 
-        return ResponseLendingDto.from(updatedLending);
+//        return ResponseLendingDto.from(updatedLending);
+    }
+
+    /**
+     * 책 반납을 위한 대출 정보를 조회합니다.
+     *
+     * @param callsign 책 청구기호
+     * @return 대출 정보 DTO
+     */
+    @Transactional
+    public ResponseLendingInfoForReturningDto getLendingInfoByCallSign(String callsign) {
+        // 책 청구기호로 책을 조회합니다.
+        Book book = bookRepo.findByCallSign(callsign)
+                .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
+
+        // 책의 대출 정보를 조회합니다.
+        Lending lending = lendingRepo.findByBookIdAndReturningLibrarianIsNull(book.getId())
+                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
+
+        return ResponseLendingInfoForReturningDto.from(lending);
     }
 
     /**
@@ -147,7 +191,7 @@ public class LendingService {
             // 검색어(도서 제목, 이메일)가 포함된 경우 해당 결과 반환합니다.
             return cb.or(cb.like(cb.lower(root.get("book").get("bookInfo").get("title")),
                             "%" + search.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("user").get("email ")), "%" + search.toLowerCase() +
+                    cb.like(cb.lower(root.get("user").get("email")), "%" + search.toLowerCase() +
                             "%")
             );
         };
@@ -207,7 +251,7 @@ public class LendingService {
     public ResponseLendingDto updateRenew(Long lendingId) {
         // 대출Id로 대출 정보를 조회합니다.
         Lending lending = lendingRepo.findById(lendingId)
-                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
+                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
 
         // 대출 연장이 가능한지 확인합니다.
         if (lending.isRenew()) {
@@ -231,7 +275,7 @@ public class LendingService {
     public ResponseMemberLendingDto deleteLending(Long lendingId) {
         // 대출Id로 대출 정보를 조회합니다.
         Lending lending = lendingRepo.findById(lendingId)
-                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING_BY_ID));
+                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
 
         // 대출 기록을 삭제합니다.
         lendingRepo.delete(lending);

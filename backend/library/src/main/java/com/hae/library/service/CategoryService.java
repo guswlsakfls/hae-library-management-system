@@ -1,11 +1,13 @@
 package com.hae.library.service;
 
+import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.dto.Category.Request.RequestCreateCategoryDto;
 import com.hae.library.dto.Category.Request.RequestUpdateCategoryDto;
 import com.hae.library.dto.Category.Response.ResponseCategoryDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
+import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CategoryService {
-    private final CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepo;
+    private final BookInfoRepository bookInfoRepo;
 
     /**
      * 카테고리를 생성합니다.
@@ -25,12 +28,12 @@ public class CategoryService {
      */
     public void createCategory(RequestCreateCategoryDto requestCreateCategoryDto) {
         // 카테고리가 중복되면 예외를 발생시킵니다.
-        if (categoryRepository.existsByCategoryName(requestCreateCategoryDto.getCategoryName())) {
+        if (categoryRepo.existsByCategoryName(requestCreateCategoryDto.getCategoryName())) {
             throw new RestApiException(CategoryErrorCode.DUPLICATE_CATEGORY);
         }
 
         // 새로운 카테고리를 저장합니다.
-        categoryRepository.save(requestCreateCategoryDto.toEntity());
+        categoryRepo.save(requestCreateCategoryDto.toEntity());
     }
 
     /**
@@ -40,7 +43,7 @@ public class CategoryService {
      */
     public List<ResponseCategoryDto> getAllCategory() {
         // 모든 카테고리를 조회합니다.
-        return categoryRepository.findAll().stream()
+        return categoryRepo.findAll().stream()
                 .map(ResponseCategoryDto::from)
                 .collect(Collectors.toList());
 
@@ -54,7 +57,7 @@ public class CategoryService {
      */
     public ResponseCategoryDto getCategoryById(Long categoryId) {
         // 카테고리를 조회합니다.
-        return ResponseCategoryDto.from(categoryRepository.findById(categoryId)
+        return ResponseCategoryDto.from(categoryRepo.findById(categoryId)
                 .orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY)));
     }
 
@@ -66,14 +69,14 @@ public class CategoryService {
      */
     public ResponseCategoryDto updateCategory(RequestUpdateCategoryDto categoryDto) {
         // 카테고리를 조회합니다.
-        Category category = categoryRepository.findById(categoryDto.getCategoryId())
+        Category category = categoryRepo.findById(categoryDto.getCategoryId())
                 .orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
 
         // 카테고리를 수정합니다.
         category.updateCategoryName(categoryDto.getUpdatedCategoryName());
 
         // 카테고리를 수정합니다.
-        return ResponseCategoryDto.from(categoryRepository.save(category));
+        return ResponseCategoryDto.from(categoryRepo.save(category));
     }
 
     /**
@@ -83,10 +86,18 @@ public class CategoryService {
      */
     public void deleteCategory(Long categoryId) {
         // 카테고리를 조회합니다.
-        categoryRepository.findById(categoryId)
+        Category category = categoryRepo.findById(categoryId)
                 .orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
 
-        // 카테고리를 삭제합니다.
-        categoryRepository.deleteById(categoryId);
+        // 해당 카테고리를 참조하는 도서가 있는지 확인합니다.
+        List<BookInfo> bookInfoList = bookInfoRepo.findByCategory(category);
+        if (!bookInfoList.isEmpty()) {
+            // 참조하는 도서가 있으면 예외를 발생시킵니다.
+            throw new RestApiException(CategoryErrorCode.CATEGORY_IN_USE);
+        }
+
+        // 참조하는 도서가 없으면 카테고리를 삭제합니다.
+        categoryRepo.deleteById(categoryId);
     }
+
 }

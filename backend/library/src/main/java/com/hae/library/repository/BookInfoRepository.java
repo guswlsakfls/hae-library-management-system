@@ -2,6 +2,7 @@ package com.hae.library.repository;
 
 
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,4 +17,6 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long>,
         JpaSpecificationExecutor<BookInfo> {
     Optional<BookInfo> findByIsbn(String isbn);
     List<BookInfo> findByTitleContaining(String search);
+
+    List<BookInfo> findByCategory(Category category);
 }

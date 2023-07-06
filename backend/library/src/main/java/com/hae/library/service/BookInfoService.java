@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookApiDto;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
@@ -12,8 +13,11 @@ import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.CategoryRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,21 +30,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @Service
 public class BookInfoService {
 
     private final BookInfoRepository bookInfoRepo;
+    private final CategoryRepository categoryRepo;
 
     // TODO: @Value로 주입받아서 @RequiredArgsConstructor 에러가 나는 현상?
-    BookInfoService(BookInfoRepository bookInfoRepo) {
+    BookInfoService(BookInfoRepository bookInfoRepo, CategoryRepository categoryRepo) {
         this.bookInfoRepo = bookInfoRepo;
+        this.categoryRepo = categoryRepo;
     }
+
 
     @Value("${nationalIsbnApiKey}")
     private String nationalIsbnApiKey;
@@ -52,7 +59,7 @@ public class BookInfoService {
      * @return 저장된 책 정보 응답 DTO
      */
     @Transactional
-    public ResponseBookInfoDto createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
+    public BookInfo createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
         BookInfo bookInfo = BookInfo.builder()
                 .title(requestBookDto.getTitle())
                 .author(requestBookDto.getAuthor())
@@ -62,9 +69,20 @@ public class BookInfoService {
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
 
+        log.error("request!!!: {}", requestBookDto);
+        log.error("requestCategoryName: {}", requestBookDto.getCategoryName());
+        // 카테고리를 조회하고 책 객체에 추가합니다.
+        Optional<Category> categoryOptional =
+                categoryRepo.findByCategoryName(requestBookDto.getCategoryName());
+        if (!categoryOptional.isPresent()) {
+            throw new RestApiException(BookErrorCode.CATEGORY_NOT_FOUND);
+        }
+        Category category = categoryOptional.get();
+        log.error("category: {}", category.getCategoryName());
+        bookInfo.addCategory(category);
+        log.error("bookInfo: {}", bookInfo.getCategory().getCategoryName());
         // 생성한 BookInfo 객체를 DB에 저장하고, 저장된 객체를 다시 가져옵니다.
-        BookInfo newBookInfo = bookInfoRepo.save(bookInfo);
-        return ResponseBookInfoDto.from(newBookInfo);
+        return bookInfoRepo.save(bookInfo);
     }
 
     /**
@@ -75,18 +93,50 @@ public class BookInfoService {
      * @param size   페이지 크기
      * @return 책 정보 페이지 응답 DTO
      */
+//    @Transactional
+//    public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size, String category, String sort) {
+//        // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+//
+//        // Specification을 이용해 동적 쿼리를 생성합니다.
+//        Specification<BookInfo> spec = (root, query, cb) -> {
+//            if (search == null || search.trim().isEmpty()) {
+//                return cb.conjunction(); // 모든 결과를 반환합니다.
+//            }
+//            // title 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
+//            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+//        };
+//
+//        // 책 정보를 페이징하여 가져온 후, 가져온 책 정보를 Response DTO로 변환합니다.
+//        Page<BookInfo> bookInfoList = bookInfoRepo.findAll(spec, pageable);
+//        Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
+//        return responseBookInfoDtoList;
+//    }
+
     @Transactional
-    public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size) {
+    public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size,
+                                                    String categoryName, String sort) {
         // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Sort.Direction direction = sort.equals("최신도서") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
         // Specification을 이용해 동적 쿼리를 생성합니다.
         Specification<BookInfo> spec = (root, query, cb) -> {
-            if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction(); // 모든 결과를 반환합니다.
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (search != null && !search.trim().isEmpty()) {
+                // title 필드 또는 isbn 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
+                Predicate titleLike = cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+                Predicate isbnLike = cb.like(cb.lower(root.get("isbn")), "%" + search.toLowerCase() + "%");
+                predicates.add(cb.or(titleLike, isbnLike));
             }
-            // title 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
-            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
+
+            if (categoryName != null && !categoryName.trim().isEmpty() && !categoryName.equals("전체")) {
+                // category 필드가 주어진 카테고리와 일치하는 BookInfo 객체를 검색합니다.
+                predicates.add(cb.equal(root.get("category").get("categoryName"), categoryName));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
 
         // 책 정보를 페이징하여 가져온 후, 가져온 책 정보를 Response DTO로 변환합니다.
@@ -94,6 +144,9 @@ public class BookInfoService {
         Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
         return responseBookInfoDtoList;
     }
+
+
+
 
 
     /**

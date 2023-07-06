@@ -1,10 +1,7 @@
 package com.hae.library.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +10,7 @@ import java.util.List;
 @Getter
 @Table(name = "CATEGORY")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category {
+public class Category extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +24,9 @@ public class Category {
     private String categoryName;
 
     @Builder
-    public Category(String categoryName) {
+    public Category(String categoryName, List<BookInfo> bookInfoList, Long id) {
+        this.id = id;
+        this.bookInfoList = bookInfoList;
         this.categoryName = categoryName;
     }
 

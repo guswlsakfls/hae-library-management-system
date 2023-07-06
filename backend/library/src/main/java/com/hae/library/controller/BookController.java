@@ -128,7 +128,6 @@ public class BookController {
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 삭제에 성공하였습니다")
-                .data(null)
                 .build();
     }
 }

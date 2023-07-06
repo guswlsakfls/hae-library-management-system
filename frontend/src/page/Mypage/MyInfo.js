@@ -48,7 +48,7 @@ export default function MyInfo() {
                 대출권수
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
-                {myInfo.lendingList === null ? 0 : myInfo.lendingCount}
+                {myInfo.lendingCount === 0 ? '-' : myInfo.lendingCount}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

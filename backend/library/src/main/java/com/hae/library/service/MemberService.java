@@ -86,10 +86,6 @@ public class MemberService {
         Page<ResponseMemberDto> responseMemberDtoList = memberList.map(member -> {
             // 각 Member 객체를 ResponseMemberDto로 변환합니다.
             ResponseMemberDto dto = ResponseMemberDto.from(member);
-            // 각 Member의 대출 목록을 가져와 ResponseLendingDto 리스트로 변환하고, 이를 ResponseMemberDto에 설정합니다.
-            dto.updateLendingList(member.getLendingList().stream()
-                    .map(lending -> ResponseLendingDto.from(lending))
-                    .collect(Collectors.toList()));
             return dto;
         });
 
@@ -126,12 +122,6 @@ public class MemberService {
         }
 
         ResponseMemberDto responseMemberDto = ResponseMemberDto.from(member.get());
-
-        // 해당 사용자가 대출한 책 목록을 가져와 DTO로 변환합니다. 그리고 이를 사용자 DTO에 설정합니다.
-        responseMemberDto.updateLendingList(member.get().getLendingList().stream()
-                .map(lending -> ResponseLendingDto.from(lending))
-                .collect(Collectors.toList()));
-
 
         return responseMemberDto;
     }

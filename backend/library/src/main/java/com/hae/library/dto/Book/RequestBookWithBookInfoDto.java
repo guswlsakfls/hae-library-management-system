@@ -3,6 +3,7 @@ package com.hae.library.dto.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Enum.BookStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -14,22 +15,23 @@ public class RequestBookWithBookInfoDto {
     private Long id;
 
     // TODO: 각 변수에 맞는 validation 추가해야한다.
-    @NotBlank(message = "도서 번호를 입력해주세요.")
-//    @Pattern(regexp = "^[A-Z]{2}[0-9]{4}$", message = "도서 번호는 2자의 대문자와 4자의 숫자로 이루어져야 합니다.")
+    @NotBlank(message = "청구기호를 입력해주세요.")
+    @Size(max = 20, message = "청구기호는 20자를 넘을 수 없습니다.")
+    @Pattern(regexp = ".*\\.c\\d+$", message = "올바른 청구기호 형식이 아닙니다. .c 다음에 숫자를 입력해주세요.")
     private String callSign;
 
-    @Pattern(regexp = "^[0-9]{13}$", message = "ISBN은 13자의 숫자로 이루어져야 합니다.")
+    @Pattern(regexp = "^[0-9]{9,13}$", message = "ISBN은 9~13자의 숫자로 이루어져야 합니다.")
     private String isbn;
 
-    @Size(max = 200, message = "도서 제목은 200자를 넘을 수 없습니다.")
+    @Size(max = 300, message = "도서 제목은 300자를 넘을 수 없습니다.")
     @NotBlank(message = "도서 제목을 입력해주세요.")
     private String title;
 
-    @Size(max = 20, message = "저자는 20자를 넘을 수 없습니다.")
+    @Size(max = 300, message = "저자는 300자를 넘을 수 없습니다.")
     @NotBlank(message = "저자를 입력해주세요.")
     private String author;
 
-    @Size(max = 20, message = "출판사는 20자를 넘을 수 없습니다.")
+    @Size(max = 50, message = "출판사는 50자를 넘을 수 없습니다.")
     @NotBlank(message = "출판사를 입력해주세요.")
     private String publisher;
 
@@ -37,10 +39,15 @@ public class RequestBookWithBookInfoDto {
     @NotBlank(message = "이미지를 입력해주세요.")
     private String image;
 
-//    @Size(max = 10, message = "출판일은 10자를 넘을 수 없습니다.")
+    @Size(max = 20, message = "출판일은 10자를 넘을 수 없습니다.")
     @NotBlank(message = "출판일을 입력해주세요.")
     private String publishedAt;
 
+    @Size(max = 10, message = "도서 카테고리는 10자를 넘을 수 없습니다.")
+    @NotBlank(message = "도서 카테고리를 입력해주세요.")
+    private String categoryName;
+
+    @Size(max = 10, message = "도서 상태는 10자를 넘을 수 없습니다.")
     @NotBlank(message = "도서 상태를 입력해주세요.")
     private String status;
 
@@ -49,7 +56,7 @@ public class RequestBookWithBookInfoDto {
 
     @Builder
     public RequestBookWithBookInfoDto(Long id, String callSign, String isbn, String title,
-                           String author, String publisher,
+                           String author, String publisher, String CategoryName,
                           String image, String publishedAt, String status, String donator) {
         this.id = id;
         this.callSign = callSign;
@@ -59,6 +66,7 @@ public class RequestBookWithBookInfoDto {
         this.publisher = publisher;
         this.image = image;
         this.publishedAt = publishedAt;
+        this.categoryName = CategoryName;
         this.status = status;
         this.donator = donator;
     }

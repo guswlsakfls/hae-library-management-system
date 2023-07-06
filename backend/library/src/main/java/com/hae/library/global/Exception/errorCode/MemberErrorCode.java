@@ -19,6 +19,10 @@ public enum MemberErrorCode implements ErrorCode {
     // 회원가입
     MEMBER_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
     MEMBER_DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다"),
+
+    // 대출
+    USER_NOT_LENDING_AVAILABLE(HttpStatus.BAD_REQUEST, "3권까지 대출 가능합니다"),
+    USER_OVERDUE(HttpStatus.BAD_REQUEST, "연체일이 지난 후에 대출이 가능합니다"),
     ;
 
     private final HttpStatus httpStatus;

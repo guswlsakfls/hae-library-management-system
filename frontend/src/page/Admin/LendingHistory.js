@@ -104,7 +104,7 @@ export default function LendingHistory() {
       <div className="flex justify-between items-center my-10 mx-48">
         <h1 className="text-2xl font-bold">대출/반납 검색</h1>
         <SearchBar
-          text="제목 또는 청구기호로 검색해 주세요."
+          text="이메일 또는 도서 제목으로 검색해 주세요."
           url="admin/lending-history"
         ></SearchBar>
         <div className="flex">
@@ -175,7 +175,7 @@ export default function LendingHistory() {
               returningDate={item.returningAt}
               extension={item.renew ? '1회' : '-'}
               status={
-                item.returningLibrarianEmail != null ? '반납완료' : '대출중'
+                item.returningLibrarianEmail != null ? '반납완료' : '대출 중'
               }
             />
           ))}

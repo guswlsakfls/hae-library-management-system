@@ -4,6 +4,9 @@ import com.hae.library.domain.Enum.BookStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor()
@@ -18,10 +21,13 @@ public class Book extends BaseTimeEntity {
     @JoinColumn(name = "BOOK_INFO_ID")
     private BookInfo bookInfo;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Lending lending;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<Lending> lendingList = new ArrayList<>();
 
-    @Column(name = "CALL_SIGN", nullable = false, unique = true, length = 255) // 예시: 255자 제한
+    @Column(name = "lending_status", nullable = false)
+    private boolean lendingStatus = false;
+
+    @Column(name = "CALL_SIGN", nullable = false, length = 255) // 예시: 255자 제한
     private String callSign;
 
     @Enumerated(EnumType.STRING)
@@ -68,7 +74,12 @@ public class Book extends BaseTimeEntity {
      * @param lending 추가할 대여 정보
      */
     public void addLending(Lending lending) {
-        this.lending = lending;
+        this.lendingList.add(lending);
+
+        // 무한루프 체크
+        if (lending.getBook() != this) {
+            lending.updateBook(this);
+        }
     }
 
     /**
@@ -96,10 +107,16 @@ public class Book extends BaseTimeEntity {
     }
 
     /**
-     * 도서 정보를 업데이트합니다.
-     * @param bookInfo 업데이트할 도서 정보
+     * 도서를 대출처리 합니다.
      */
-    public void updateBookInfo(BookInfo bookInfo) {
-        this.bookInfo = bookInfo;
+    public void updateLending() {
+        this.lendingStatus = true;
+    }
+
+    /**
+     * 도서를 반납처리 합니다.
+     */
+    public void updateReturning() {
+        this.lendingStatus = false;
     }
 }

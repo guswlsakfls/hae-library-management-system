@@ -35,16 +35,10 @@ public class ResponseBookWithBookInfoDto {
     }
 
     public static ResponseBookWithBookInfoDto from(Book book) {
-        boolean isLending = false;
-
-        // 대출 중이라면 isLending을 true로 설정합니다.
-        if (book.getLending() != null) {
-            isLending = true;
-        }
         return ResponseBookWithBookInfoDto.builder()
                 .id(book.getId())
                 .bookInfo(ResponseBookInfoDto.from(book.getBookInfo()))
-                .isLending(isLending)
+                .isLending(book.isLendingStatus())
                 .callSign(book.getCallSign())
                 .status(book.getStatus())
                 .donator(book.getDonator())

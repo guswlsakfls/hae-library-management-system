@@ -1,10 +1,7 @@
 package com.hae.library.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +15,7 @@ public class BookInfo extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BOOK_INFO_ID")
+    @Column(name = "book_info_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,6 +24,24 @@ public class BookInfo extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.REMOVE)
     private List<Book> bookList = new ArrayList<>();
+
+    @Column(name = "isbn", nullable = false)
+    private String isbn;
+
+    @Column(name = "title", nullable = false, length = 300)
+    private String title;
+
+    @Column(name = "author", nullable = false, length = 300)
+    private String author;
+
+    @Column(name = "publisher", length = 100)
+    private String publisher;
+
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "published_at")
+    private String publishedAt;
 
     // TODO: 주석 처리된 부분은 관계 매핑을 위한 코드. 추후에 필요하면 주석 해제
     // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
@@ -40,25 +55,6 @@ public class BookInfo extends BaseTimeEntity{
 
     // @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.ALL)
     // private List<Reservation> reservationList = new ArrayList<>();
-
-    @Column(name = "isbn", nullable = false, unique = true)
-    private String isbn;
-
-    @Column(name = "title", nullable = false, length = 100)
-    private String title;
-
-    @Column(name = "author", nullable = false, length = 50)
-    private String author;
-
-    @Column(name = "publisher", length = 50)
-    private String publisher;
-
-    @Column(name = "image")
-    private String image;
-
-    @Column(name = "published_at")
-    private String publishedAt;
-
     @Builder
     public BookInfo(Long id, String isbn, String title, String author, String publisher,
                     String image, String publishedAt) {
@@ -81,13 +77,26 @@ public class BookInfo extends BaseTimeEntity{
      * @param image       새로운 도서 이미지
      */
     public void updateBookInfo(String title, String isbn, String author, String publisher,
-                               String publishedAt, String image) {
+                               String publishedAt, String image, Category category) {
         this.title = title;
         this.isbn = isbn;
         this.author = author;
         this.publisher = publisher;
         this.publishedAt = publishedAt;
         this.image = image;
+        this.category = category;
+    }
+
+    /**
+     * 카테고리와 책 정보 간의 관계를 설정합니다.
+     * @param category 카테고리
+     */
+    public void addCategory(Category category) {
+        this.category = category;
+
+        if(!category.getBookInfoList().contains(this)) {
+            category.getBookInfoList().add(this);
+        }
     }
 
     /**
@@ -104,6 +113,15 @@ public class BookInfo extends BaseTimeEntity{
      */
     public void updateId(Long nonExistingId) {
         this.id = nonExistingId;
+    }
+
+    /**
+     * 도서 재고 수량을 얻습니다.
+     * @param bookInfo 도서 정보
+     * @return 도서 재고 수량
+     */
+    public int getStockQuantity() {
+        return this.bookList.size();
     }
 }
 

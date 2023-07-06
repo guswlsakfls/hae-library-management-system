@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { addBookByIsbnApi, postAddBook } from '../../api/BookApi';
 import PostInputBar from '../../component/common/PostInputBar';
 import SelectBar from '../../component/common/SelectBar';
+import { getCategoryListApi } from '../../api/CategoryApi';
 
 const statusText = {
   FINE: '양호',
@@ -11,20 +12,7 @@ const statusText = {
   LOST: '분실',
 };
 
-const categoryList = [
-  '카테고리 선택',
-  '총류',
-  '철학',
-  '종교',
-  '자연과학',
-  '기술과학',
-  '예술',
-  '언어',
-  '문학',
-  '역사',
-];
-
-const bookStatus = ['카테고리 선택', 'FINE', 'BREAK'];
+const bookStatus = ['FINE', 'BREAK'];
 
 export default function AddBook() {
   const [bookList, setBookList] = useState([]);
@@ -38,44 +26,54 @@ export default function AddBook() {
   const [category, setCategory] = useState('');
   const [callSign, setCallSign] = useState('');
   const [donator, setDonator] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('FINE');
+  const [categoryList, setCategoryList] = useState([]);
 
   // ISBN을 가지고 도서 정보를 요청하는 함수
   const handleSearch = async isbn => {
     try {
-      const res = await addBookByIsbnApi(isbn);
-      setTitle(res.data.title);
-      setImage(res.data.image);
-      setAuthor(res.data.author);
-      setPublisher(res.data.publisher);
-      setPublishedAt(res.data.publishedAt);
-      setIsbn(res.data.isbn);
-      setCategory(res.data.category);
-      setCallSign(() => {
-        if (res.data.callSign === null) {
-          if (res.data.bookList.length > 0) {
-            const callSignWithoutLastChar = res.data.bookList[0].callSign.slice(
-              0,
-              -1
-            );
-            return callSignWithoutLastChar;
-          } else {
-            return ''; // or any default value
+      await addBookByIsbnApi(isbn).then(res => {
+        console.log(res.data);
+
+        setTitle(res.data.title);
+        setImage(res.data.image);
+        setAuthor(res.data.author);
+        setPublisher(res.data.publisher);
+        setPublishedAt(res.data.publishedAt);
+        setIsbn(res.data.isbn);
+        setCategory(res.data.category);
+        setCallSign(() => {
+          if (res.data.callSign === null) {
+            if (res.data.bookList.length > 0) {
+              const callSignWithoutLastChar =
+                res.data.bookList[0].callSign.slice(0, -1);
+              return callSignWithoutLastChar;
+            } else {
+              return ''; // or any default value
+            }
           }
-        }
-        return res.data.callSign + '.c';
+          return res.data.callSign + '.c';
+        });
+        setDonator(res.data.donator ? res.data.donator : '');
+        setBookList(res.data.bookList);
+        setStatus('FINE');
       });
-
-      setDonator(res.data.donator ? res.data.donator : '');
-      setBookList(res.data.bookList);
-      setStatus(res.data.status);
-
-      console.log(res.data);
     } catch (err) {
       alert(err.response.data.message);
       console.log(err.response.data);
       let errors = err.response.data.errors;
       if (!errors) {
+        setTitle('');
+        setImage('');
+        setAuthor('');
+        setPublisher('');
+        setPublishedAt('');
+        setIsbn('');
+        setCategory('');
+        setCallSign('');
+        setDonator('');
+        setBookList([]);
+        setStatus('FINE');
         return;
       }
       let errorMessages = errors
@@ -104,6 +102,17 @@ export default function AddBook() {
       })
       .catch(err => {
         alert(err.response.data.message);
+        setTitle('');
+        setImage('');
+        setAuthor('');
+        setPublisher('');
+        setPublishedAt('');
+        setIsbn('');
+        setCategory('');
+        setCallSign('');
+        setDonator('');
+        setBookList([]);
+        setStatus('');
 
         let errors = err.response.data.errors;
         if (!errors) {
@@ -115,6 +124,21 @@ export default function AddBook() {
         alert(errorMessages);
       });
   };
+
+  console.log(category);
+  console.log(status);
+
+  useEffect(() => {
+    getCategoryListApi()
+      .then(res => {
+        console.log(res);
+        setCategoryList(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+        alert('카테고리 목록을 불러오는데 실패했습니다.');
+      });
+  }, []);
 
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
@@ -197,12 +221,13 @@ export default function AddBook() {
                         </h4>
                         <h4
                           className={`text-sm font-medium mr-5 ${
-                            book.isAvailable === '대출 가능'
+                            book.isAvailable === false
                               ? 'text-blue-500'
                               : 'text-red-500'
                           }`}
                         >
-                          {book.isAvailable} {/* 대출상태 */}
+                          {book.isAvailable ? '대출 중' : '대출 가능'}{' '}
+                          {/* 대출상태 */}
                         </h4>
                         <h4
                           className={`text-sm font-medium mr-5 ${
@@ -231,7 +256,7 @@ export default function AddBook() {
             <SelectBar
               value={category}
               onChange={e => setCategory(e.target.value)}
-              items={categoryList}
+              items={categoryList.map(cat => cat.categoryName)}
             ></SelectBar>
           </div>
           <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

@@ -15,6 +15,7 @@ const postAddBook = async (
   donator,
   status
 ) => {
+  console.log('category:', category);
   const res = await axios.post(
     serverIp + '/admin/book/create',
     {
@@ -24,7 +25,7 @@ const postAddBook = async (
       publisher: publisher,
       publishedAt: publishedAt,
       isbn: isbn,
-      category: category,
+      categoryName: category,
       callSign: callSign,
       donator: donator,
       status: status,
@@ -37,13 +38,15 @@ const postAddBook = async (
 };
 
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
-const getBookListApi = async (search, page, size) => {
-  console.log(page);
+const getBookListApi = async (search, page, size, category, sort) => {
+  console.log(search, page, size, category, sort);
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
-      size: size === null ? 10 : size,
+      size: size === null ? 2 : size,
+      category: category,
+      sort: sort,
     },
   });
 
@@ -102,11 +105,11 @@ const lendingBookApi = async (bookId, userId, lendingCondition) => {
   return res.data;
 };
 
-const returningBookApi = async (bookId, returningCondition) => {
+const returningBookApi = async (lendingId, returningCondition) => {
   const res = await axios.put(
     serverIp + '/admin/lending/returning',
     {
-      bookId: bookId,
+      lendingId: lendingId,
       returningCondition: returningCondition,
     },
     { headers: { authorization: `Bearer ${accessToken}` } }
@@ -114,13 +117,8 @@ const returningBookApi = async (bookId, returningCondition) => {
   return res.data;
 };
 
-const getBookStockListApi = async (search, page, size) => {
-  const res = await axios.get(serverIp + '/admin/book/all', {
-    params: {
-      search: search,
-      page: page === null ? 0 : page,
-      size: size === null ? 10 : size,
-    },
+const getBookStockListApi = async id => {
+  const res = await axios.get(serverIp + `/bookinfo/` + id, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
 
@@ -128,19 +126,21 @@ const getBookStockListApi = async (search, page, size) => {
 };
 
 const updateBookStockApi = async editBook => {
+  console.log(editBook);
   const res = await axios.put(
     serverIp + '/admin/book/update',
     {
-      id: editBook.bookInfo.id,
-      title: editBook.bookInfo.title,
-      isbn: editBook.bookInfo.isbn,
-      author: editBook.bookInfo.author,
-      image: editBook.bookInfo.image,
+      id: editBook.id,
+      title: editBook.title,
+      isbn: editBook.isbn,
+      author: editBook.author,
+      image: editBook.image,
       callSign: editBook.callSign,
       donator: editBook.donator,
       status: editBook.status,
-      publisher: editBook.bookInfo.publisher,
-      publishedAt: editBook.bookInfo.publishedAt,
+      categoryName: editBook.category,
+      publisher: editBook.publisher,
+      publishedAt: editBook.publishedAt,
     },
     { headers: { authorization: `Bearer ${accessToken}` } }
   );
@@ -159,6 +159,23 @@ const getMeLendingHistoryListApi = async (search, page, size) => {
   return res.data;
 };
 
+const getLendgingInfoApi = async callSign => {
+  const res = await axios.get(serverIp + '/admin/lending/callsign', {
+    params: {
+      callSign: callSign,
+    },
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
+const deleteBookApi = async id => {
+  const res = await axios.delete(serverIp + `/admin/book/${id}/delete`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getBookListApi,
   getBookInfoByIdApi,
@@ -171,4 +188,6 @@ export {
   getBookStockListApi,
   updateBookStockApi,
   getMeLendingHistoryListApi,
+  getLendgingInfoApi,
+  deleteBookApi,
 };

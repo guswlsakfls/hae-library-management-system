@@ -32,12 +32,19 @@ public class BookInfoController {
     public ResponseResultDto getAllBookInfoByOptions(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String sort
     ) {
-        log.info("모든 책 정보 조회: [GET] /bookinfo/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
+        log.info("모든 책 정보 조회: [GET] /bookinfo/all - 검색: {}, 페이지: {}, 사이즈: {}, 카테고리: {}, 정렬: {}",
+                search,
+                page,
+                size,
+                category,
+                sort);
         // 검색 키워드와 페이지네이션 정보를 인자로 주어 책 정보를 가져옵니다.
         Page<ResponseBookInfoDto> responseBookInfoDtoList =
-                bookInfoService.getAllBookInfo(search, page, size);
+                bookInfoService.getAllBookInfo(search, page, size, category, sort);
 
         // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
