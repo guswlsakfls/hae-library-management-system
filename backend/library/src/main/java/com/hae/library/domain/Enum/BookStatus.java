@@ -7,9 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum BookStatus {
-    FINE("BOOK_FINE"), // 양호
-    BREAK("BOOK_BREAK"), // 손상
-    LOST("BOOK_LOST"); // 분실
-
-    private final String type;
+    FINE, BREAK, LOST
 }

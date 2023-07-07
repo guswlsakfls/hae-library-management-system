@@ -1,13 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import Footer from '../../component/Footer';
 import { memberLoginApi } from '../../api/MemberApi';
-import jwt_decode from 'jwt-decode';
-import { MemberContext } from '../../contextApi/MemberContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { setMemberInfo, memberInfo } = useContext(MemberContext);
 
   const handleLogin = () => {
     memberLoginApi(email, password)

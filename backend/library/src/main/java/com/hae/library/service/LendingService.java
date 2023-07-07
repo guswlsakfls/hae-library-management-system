@@ -2,6 +2,7 @@ package com.hae.library.service;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
 import com.hae.library.dto.Lending.*;
@@ -48,9 +49,13 @@ public class LendingService {
         // 도서가 있는지 조회합니다.
         Book book = bookRepo.findById(requestLendingDto.getBookId())
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
-        // 도서가 대출 가능한지 확인합니다.
+        // 도서가 대출 중인지 확인합니다.
         if (book.isLendingStatus()) {
             throw new RestApiException(BookErrorCode.BOOK_ALREADY_LENT);
+        }
+        // 분실도서인지 확인합니다.
+        if (book.getStatus() == BookStatus.LOST) {
+            throw new RestApiException(BookErrorCode.BOOK_LOST);
         }
         // 도서를 대출 처리합니다.
         book.updateLending();
