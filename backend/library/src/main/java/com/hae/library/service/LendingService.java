@@ -177,6 +177,8 @@ public class LendingService {
      * @param search 검색어
      * @param page   페이지 번호
      * @param size   페이지 크기
+     * @param isLendingOrReturning 대출/반납 여부
+     * @param sort   정렬 방식
      * @return 대출 및 페이지 정보
      */
     @Transactional

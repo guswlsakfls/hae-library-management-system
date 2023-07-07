@@ -46,12 +46,17 @@ public class MemberContorller {
     public ResponseResultDto<Object> getAllMember(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String sort
     ) {
-        log.info("모든 회원 정보 조회: [GET] /member/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
+        log.info("모든 회원 정보 조회: [GET] /member/all - search: {}, page: {}, size: {}, role: {}, " +
+                        "sort: {}",
+                search, page,
+                size, role, sort);
         // 검색 키워드와 페이진이션 정보를 인자로 주어 회원 정보를 가져옵니다.
         Page<ResponseMemberDto> responseMemberDtoList = memberService.getAllMember(search, page,
-                size);
+                size, role, sort);
         // 회원 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("memberList", responseMemberDtoList.getContent());

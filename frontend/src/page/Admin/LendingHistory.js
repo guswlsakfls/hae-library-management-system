@@ -45,7 +45,7 @@ const TableRow = ({
       <div className="flex items-center">
         <div className="ml-4">
           <div className="text-sm font-medium text-gray-900">
-            {returningDate}
+            {returningDate ? returningDate : '-'}
           </div>
           <div className="text-sm font-medium text-gray-500">
             {returningLibraryEmail}

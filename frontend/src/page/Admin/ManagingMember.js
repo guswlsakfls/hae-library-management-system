@@ -7,6 +7,13 @@ import { useSearchParams } from 'react-router-dom/dist';
 import { getMemberListApi, updateMemberApi } from '../../api/MemberApi';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
+import SelectBar from '../../component/common/SelectBar';
+
+// 회원, 관리자
+const roleList = ['전체', '일반회원', '관리자'];
+
+// 정렬 기준
+const sortList = ['최신순', '오랜된순'];
 
 export default function ManagingMember() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
@@ -25,6 +32,9 @@ export default function ManagingMember() {
     penaltyEndDate: '',
     activated: '',
   });
+  // 옵션 선택
+  const [role, setRole] = useState('전체');
+  const [sort, setSort] = useState('최신순');
 
   const modifyToggleModal = () => {
     modifySetIsOpen(!modifyIsOpen);
@@ -43,7 +53,7 @@ export default function ManagingMember() {
 
   const handlePageChange = page => {
     setPage(page - 1);
-    setSearchParams({ search, page: page, size });
+    setSearchParams({ search, page: page, size, role, sort });
   };
   const handleInputChange = event => {
     console.log(event.target.name, event.target.value);
@@ -97,7 +107,7 @@ export default function ManagingMember() {
   };
 
   useEffect(() => {
-    getMemberListApi(search, page, size)
+    getMemberListApi(search, page, size, role, sort)
       .then(res => {
         setMemberList(res.data.memberList);
         setTotal(res.data.totalElements);
@@ -114,7 +124,7 @@ export default function ManagingMember() {
         console.log(err.response);
         alert(err.response.data.message);
       });
-  }, [search, page, size]);
+  }, [search, page, size, role, sort]);
 
   const TableRow = ({ member }) => (
     <tr>
@@ -144,13 +154,17 @@ export default function ManagingMember() {
         {member.updatedAt}
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton size="small" onClick={() => handleEditClick(member)}>
-          수정
+        <DefaultButton color={'red'} size="small" onClick={checkToggleModal}>
+          삭제
         </DefaultButton>
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton size="small" onClick={checkToggleModal}>
-          삭제
+        <DefaultButton
+          color={'blue'}
+          size="small"
+          onClick={() => handleEditClick(member)}
+        >
+          수정
         </DefaultButton>
       </td>
     </tr>
@@ -163,17 +177,45 @@ export default function ManagingMember() {
           <h1 className="text-4xl font-bold">회원 관리</h1>
         </div>
         <div className="flex justify-between items-center my-10 mx-48">
-          <h1 className="text-2xl font-bold">회원 목록</h1>
+          <h1 className="text-2xl font-bold">회원 검색</h1>
           <SearchBar
             text="이메일로 검색해 주세요."
             url="admin/member"
           ></SearchBar>
-          <div className="flex">
-            <div className="mr-2">
-              <Dropdown option1="대출일 순"></Dropdown>
-            </div>
-            <div className="mr-2">
-              <Dropdown option1="대출중"></Dropdown>
+          <div className="flex mx-4 mt-2">
+            <SelectBar
+              width="120"
+              value={role}
+              onChange={e => {
+                setRole(e.target.value);
+                setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+                setSearchParams({
+                  search,
+                  page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                  size,
+                  role: e.target.value,
+                  sort,
+                });
+              }}
+              items={roleList}
+            ></SelectBar>
+            <div className="mx-2">
+              <SelectBar
+                width="120"
+                value={sort}
+                onChange={e => {
+                  setSort(e.target.value);
+                  setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+                  setSearchParams({
+                    search,
+                    page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                    size,
+                    role,
+                    sort: e.target.value,
+                  });
+                }}
+                items={sortList}
+              ></SelectBar>
             </div>
           </div>
         </div>

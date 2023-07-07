@@ -3,12 +3,14 @@ import axios from 'axios';
 const serverIp = 'http://localhost:8080/api';
 const accessToken = localStorage.getItem('accessToken');
 
-const getMemberListApi = async (search, page, size) => {
+const getMemberListApi = async (search, page, size, role, sort) => {
   const res = await axios.get(serverIp + '/admin/memberinfo/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
+      role: role === null ? '전체' : role,
+      sort: sort === null ? '최신순' : sort,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });
