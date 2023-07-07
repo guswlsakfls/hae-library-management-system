@@ -16,7 +16,7 @@ const createCategoryApi = async name => {
 };
 
 const getCategoryListApi = async () => {
-  const res = await axios.get(serverIp + '/admin/category/all', {
+  const res = await axios.get(serverIp + '/category/all', {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;

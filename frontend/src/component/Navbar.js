@@ -1,6 +1,7 @@
 import { Disclosure } from '@headlessui/react';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import jwt_decode from 'jwt-decode';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -11,14 +12,24 @@ export default function Navbar() {
   const [current, setCurrent] = useState('/');
 
   // 로그인 상태 체크 (localStorage에 accessToken이 저장되어 있는지 확인)
-  const isLogin = localStorage.getItem('accessToken') !== null;
+  const token = localStorage.getItem('accessToken');
+  const isLogin = token !== null;
+
+  // accessToken이 있는 경우, role 확인
+  let isAdmin = false;
+  if (isLogin) {
+    const decodedToken = jwt_decode(token);
+    isAdmin = decodedToken.ADMIN === 'ROLE_ADMIN';
+  }
 
   const navigation = [
-    {
-      name: '관리자페이지',
-      href: '/admin',
-      current: current.includes('/admin'),
-    },
+    isAdmin
+      ? {
+          name: '관리자페이지',
+          href: '/admin',
+          current: current.includes('/admin'),
+        }
+      : {},
     { name: '안내사항', href: '/info', current: current === '/info' },
     { name: '도서목록', href: '/booklist', current: current === '/booklist' },
     // 로그인 상태에 따라 다르게 표시

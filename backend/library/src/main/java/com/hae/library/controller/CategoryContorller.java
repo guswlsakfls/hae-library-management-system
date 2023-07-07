@@ -35,7 +35,7 @@ public class CategoryContorller {
     }
 
     // 카테고리 목록을 조회합니다.
-    @GetMapping(value = "/admin/category/all")
+    @GetMapping(value = "/category/all")
     public ResponseResultDto<Object> getAllCategory() {
         log.info("카테고리 목록 조회 요청: [GET] /category/all");
         List<ResponseCategoryDto> responseCategoryDtoList = categoryService.getAllCategory();
