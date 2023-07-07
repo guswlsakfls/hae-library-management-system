@@ -184,6 +184,7 @@ public class LendingService {
     @Transactional
     public Page<ResponseLendingDto> getAllLendingHistory(String search, int page, int size,
                                                          String isLendingOrReturning, String sort) {
+        // 정렬 방식을 설정합니다.
         Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
@@ -236,25 +237,51 @@ public class LendingService {
      * @return 회원의 대출 기록 리스트
      */
     @Transactional
-    public Page<ResponseMemberLendingDto> getMemberLendingHistory(String search, int page, int size) {
-        // 페이징 정보를 설정합니다.
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+    public Page<ResponseMemberLendingDto> getMemberLendingHistory(String search, int page,
+                                                                  int size, String isLendingOrReturning, String sort) {
+        // 정렬 방식을 설정합니다.
+        Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
         // 로그인한 회원을 조회합니다. (jwt 토큰에서 회원 ID를 가져옵니다.)
         Member user = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // Specification을 이용해 동적 쿼리를 생성합니다.
         Specification<Lending> spec = (root, query, cb) -> {
-            Predicate p = cb.equal(root.get("user"), user);
+            List<Predicate> predicates = new ArrayList<>();
 
+            // 검색어가 있는 경우 해당 검색어를 포함하는 결과를 반환합니다.
             if (search != null && !search.trim().isEmpty()) {
-                // 검색어가 포함된 경우 해당 결과를 추가합니다.
-                p = cb.and(p, cb.like(cb.lower(root.get("book").get("bookInfo").get("title")),
-                        "%" + search.toLowerCase() + "%"));
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("book").get("bookInfo").get("title")), "%" + search.toLowerCase() + "%"),
+                        cb.like(cb.lower(root.get("book").get("bookInfo").get("isbn")),
+                                "%" + search.toLowerCase() + "%"),
+                        cb.like(cb.lower(root.get("book").get("callSign")),
+                                "%" + search.toLowerCase() + "%"))
+                );
             }
 
-            return p;
+            // isLendingOrReturning 값에 따른 조건을 추가합니다.
+            if (isLendingOrReturning != null && !isLendingOrReturning.trim().isEmpty()) {
+                switch (isLendingOrReturning) {
+                    case "대출 중":
+                        // returningAt 값이 없는 경우를 찾음
+                        predicates.add(cb.isNull(root.get("returningEndAt")));
+                        break;
+                    case "반납 완료":
+                        // returningAt 값이 있는 경우를 찾음
+                        predicates.add(cb.isNotNull(root.get("returningEndAt")));
+                        break;
+                    case "전체":
+                        // 전체의 경우 추가 조건 없음
+                        break;
+                    default:
+                        throw new RestApiException(BookErrorCode.BAD_REQUEST_BOOK);
+                }
+            }
+
+            // 조합된 조건들로 쿼리 생성합니다.
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
 
         // 로그인한 회원의 대출 기록을 조회합니다.
@@ -266,30 +293,6 @@ public class LendingService {
         return responseMemberLendingDtoList;
     }
 
-
-    /**
-     * 대출 연장을 처리합니다.
-     *
-     * @param lendingId 대출 ID
-     * @return 연장된 대출 정보 DTO
-     */
-    @Transactional
-    public ResponseLendingDto updateRenew(Long lendingId) {
-        // 대출Id로 대출 정보를 조회합니다.
-        Lending lending = lendingRepo.findById(lendingId)
-                .orElseThrow(() -> new RestApiException(BookErrorCode.NOT_LENDING));
-
-        // 대출 연장이 가능한지 확인합니다.
-        if (lending.isRenew()) {
-            throw new RestApiException(BookErrorCode.BOOK_ALREADY_RENEWED);
-        }
-
-        // 대출 연장을 처리합니다.
-        lending.renewLending();
-        Lending updatedLending = lendingRepo.save(lending);
-
-        return ResponseLendingDto.from(updatedLending);
-    }
 
     /**
      * 대출 기록을 삭제합니다.

@@ -43,20 +43,16 @@ public class Lending extends BaseTimeEntity{
     @Column(name = "RETURNING_AT")
     private LocalDateTime returningEndAt;
 
-    @Column(name = "RENEW")
-    private boolean renew = false;
-
     @Builder
     public Lending(Member user ,Member lendingLibrarian, String lendingCondition,
                    Member returningLibrarian, String returningCondition,
-                   LocalDateTime returningEndAt, boolean renew) {
+                   LocalDateTime returningEndAt) {
         this.user = user;
         this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
         this.returningLibrarian = returningLibrarian;
         this.returningCondition = returningCondition;
         this.returningEndAt = returningEndAt;
-        this.renew = renew;
     }
 
     /**
@@ -65,18 +61,6 @@ public class Lending extends BaseTimeEntity{
      */
     public void updateIdTest(Long id) {
         this.id = id;
-    }
-
-    private void updateRenew(boolean renew) {
-        this.renew = renew;
-    }
-
-    /**
-     * 대출을 연장합니다.
-     */
-    public void renewLending() {
-        this.returningEndAt = this.returningEndAt.plusDays(7);
-        this.updateRenew(true);
     }
 
     /**

@@ -155,12 +155,20 @@ const updateBookStockApi = async editBook => {
   return res.data;
 };
 
-const getMeLendingHistoryListApi = async (search, page, size) => {
+const getMeLendingHistoryListApi = async (
+  search,
+  page,
+  size,
+  isLendingOrReturning,
+  sort
+) => {
   const res = await axios.get(serverIp + '/member/lending-history/me', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
+      isLendingOrReturning: isLendingOrReturning,
+      sort: sort,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });

@@ -47,15 +47,15 @@ export default function MyLendingHistory() {
         console.log(err.response);
         alert(err.response.data.message);
       });
-  }, [search, page, size]);
+  }, [search, page, size, isLendingOrReturning, sort]);
 
   const TableRow = ({ lending }) => (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {lending.bookTitle}
       </td>
-      <td className="px-8 py-4 whitespace-nowrap text-sm text-black-500">
-        {lending.renew ? '1회' : '-'}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
+        {lending.isbn ? lending.isbn : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {lending.bookCallSign}
@@ -78,7 +78,7 @@ export default function MyLendingHistory() {
         </div>
       </td>
       <td className="px-8 py-4 whitespace-nowrap text-sm text-black-500">
-        {lending.renew ? '1회' : '-'}
+        {lending.returningEndAt ? '반납 완료' : '대출 중'}
       </td>
     </tr>
   );
@@ -88,7 +88,7 @@ export default function MyLendingHistory() {
       <div className="flex justify-between items-center my-10 mx-48">
         <h1 className="text-2xl font-bold">대출/반납 검색</h1>
         <SearchBar
-          text="제목을 입력해주세요."
+          text="제목, ISBN 또는 청구기호를 입력해주세요."
           url="mypage/my-lending-history"
         ></SearchBar>
         <div className="flex mx-4 mt-2">
