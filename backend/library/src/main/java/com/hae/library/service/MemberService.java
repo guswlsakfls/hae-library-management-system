@@ -168,32 +168,34 @@ public class MemberService {
      * @return 변경된 회원 정보 DTO
      */
     @Transactional
-    public ResponseMemberDto changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
+    public void changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
         // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 요청으로 받은 이전 비밀번호와 회원의 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
-        if (!passwordEncoder.matches(requestChangePasswordDto.getExPassword(), member.getPassword())) {
+        // 요청으로 받은 현재 비밀번호와 DB에 저장되어 있는 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
+        if (!passwordEncoder.matches(requestChangePasswordDto.getNowPassword(),
+                member.getPassword())) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
 
         // 회원의 비밀번호를 새 비밀번호로 업데이트하고 이를 암호화합니다.
         member.updatePassword(passwordEncoder.encode((requestChangePasswordDto.getNewPassword())));
 
-        return ResponseMemberDto.from(memberRepository.save(member));
+        memberRepository.save(member);
     }
 
     /**
      * 회원 탈퇴 처리를 합니다. 회원의 activated 상태를 false로 변경합니다.
-     *
-     * @return 변경된 회원 정보 DTO
      */
     @Transactional
-    public ResponseMemberDto memberWithdrawal() {
+    public void memberWithdrawal() {
+        // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        // 회원의 activated 상태를 false로 변경합니다.
         member.updateActivated(false);
-        return ResponseMemberDto.from(memberRepository.save(member));
+        // 변경된 회원 정보를 저장합니다.
+        memberRepository.save(member);
     }
 }

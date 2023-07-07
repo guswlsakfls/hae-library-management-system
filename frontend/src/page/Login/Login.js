@@ -15,9 +15,10 @@ export default function Login() {
         window.location.href = '/';
       })
       .catch(err => {
+        console.log(err);
         if (err.response.status && err.response.status === 404) {
           alert('아이디와 비밀번호가 일치하지 않습니다.');
-        } else {
+        } else if (err.response.status && err.response.status === 400) {
           let errors = err.response.data.errors;
           if (!errors) {
             return;
@@ -26,6 +27,8 @@ export default function Login() {
             .map((error, index) => `${index + 1}. ${error.message}`)
             .join('\n\n');
           alert(errorMessages);
+        } else {
+          alert('휴면계정입니다. 관리자에게 문의하세요.');
         }
       });
   };

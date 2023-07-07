@@ -1,10 +1,16 @@
 import React from 'react';
 import SearchBar from '../../component/common/SearchBar';
-import Dropdown from '../../component/common/Dropdown';
 import Pagination from '../../component/common/Pagination';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom/dist';
 import { getMeLendingHistoryListApi } from '../../api/BookApi';
+import SelectBar from '../../component/common/SelectBar';
+
+// 대출 중, 반납완료
+const isLendingOrReturningList = ['전체', '대출 중', '반납 완료'];
+
+// 정렬 기준
+const sortList = ['최신순', '오랜된순'];
 
 // TODO: 2번 렌더링 되는 문제가 있다
 export default function MyLendingHistory() {
@@ -14,14 +20,17 @@ export default function MyLendingHistory() {
   const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
   const [lendingHistoryList, setLendingHistoryList] = useState([]);
   const [total, setTotal] = useState(0);
+  // 옵션 선택
+  const [isLendingOrReturning, setIsLendingOrReturning] = useState('전체');
+  const [sort, setSort] = useState('최신순');
 
   const handlePageChange = page => {
     setPage(page - 1);
-    setSearchParams({ search, page: page, size });
+    setSearchParams({ search, page: page, size, isLendingOrReturning, sort });
   };
 
   useEffect(() => {
-    getMeLendingHistoryListApi(search, page, size)
+    getMeLendingHistoryListApi(search, page, size, isLendingOrReturning, sort)
       .then(res => {
         setLendingHistoryList(res.data.myLendingHistory);
         setTotal(res.data.totalElements);
@@ -44,6 +53,9 @@ export default function MyLendingHistory() {
     <tr>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {lending.bookTitle}
+      </td>
+      <td className="px-8 py-4 whitespace-nowrap text-sm text-black-500">
+        {lending.renew ? '1회' : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {lending.bookCallSign}
@@ -79,12 +91,40 @@ export default function MyLendingHistory() {
           text="제목을 입력해주세요."
           url="mypage/my-lending-history"
         ></SearchBar>
-        <div className="flex">
-          <div className="mr-2">
-            <Dropdown option1="대출일 순"></Dropdown>
-          </div>
-          <div className="mr-2">
-            <Dropdown option1="대출중"></Dropdown>
+        <div className="flex mx-4 mt-2">
+          <SelectBar
+            width="110"
+            value={isLendingOrReturning}
+            onChange={e => {
+              setIsLendingOrReturning(e.target.value);
+              setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+              setSearchParams({
+                search,
+                page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                size,
+                isLendingOrReturning: e.target.value,
+                sort,
+              });
+            }}
+            items={isLendingOrReturningList}
+          ></SelectBar>
+          <div className="mx-2">
+            <SelectBar
+              width="120"
+              value={sort}
+              onChange={e => {
+                setSort(e.target.value);
+                setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+                setSearchParams({
+                  search,
+                  page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                  size,
+                  isLendingOrReturning,
+                  sort: e.target.value,
+                });
+              }}
+              items={sortList}
+            ></SelectBar>
           </div>
         </div>
       </div>
@@ -96,6 +136,12 @@ export default function MyLendingHistory() {
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               제목
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              ISBN
             </th>
             <th
               scope="col"
@@ -119,12 +165,12 @@ export default function MyLendingHistory() {
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              연장
+              대출 상태
             </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {lendingHistoryList === [] ? (
+          {lendingHistoryList.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-4">
                 대출/반납 기록이 없습니다.

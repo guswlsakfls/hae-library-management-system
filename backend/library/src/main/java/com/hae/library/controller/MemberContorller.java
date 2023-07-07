@@ -23,8 +23,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping(value = "/api")
 public class MemberContorller {
-    MemberService memberService;
-    AuthService authService;
+    private final MemberService memberService;
 
     // 회원가입 요청을 합니다
     @PostMapping(value = "/signup")
@@ -120,14 +119,12 @@ public class MemberContorller {
     @PutMapping(value = "/member/changePassword")
     public ResponseResultDto<Object> updateMemberPassword(@RequestBody RequestChangePasswordDto requestChangePasswordDto) {
         log.info("회원 비밀번호 변경: [PUT] /member/changePassword - {}", requestChangePasswordDto.toString());
-        ResponseMemberDto responseMemberDto =
-                memberService.changeMemberPassword(requestChangePasswordDto);
+        memberService.changeMemberPassword(requestChangePasswordDto);
 
         log.info("회원 비밀번호 변경에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원 비밀번호 변경에 성공하였습니다")
-                .data(responseMemberDto)
                 .build();
     }
 

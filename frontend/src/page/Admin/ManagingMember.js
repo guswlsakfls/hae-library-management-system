@@ -145,7 +145,7 @@ export default function ManagingMember() {
           : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {member.lendingCount === 0 ? '-' : member.lendingCount}
+        {member.lendingCount === 0 ? '-' : member.lendingCount + ' / 3'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {member.createdAt}

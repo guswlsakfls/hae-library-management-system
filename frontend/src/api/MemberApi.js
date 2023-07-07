@@ -69,6 +69,27 @@ const getMyInfoApi = async () => {
   return res.data;
 };
 
+const updateNewPasswordApi = async (nowPassword, newPassword) => {
+  const res = await axios.put(
+    serverIp + '/member/changePassword',
+    {
+      nowPassword: nowPassword,
+      newPassword: newPassword,
+    },
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return res.data;
+};
+
+const putMemberWidthdrawalApi = async () => {
+  const res = await axios.put(serverIp + '/member/withdrawal/me', null, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getUserByEmailApi,
   memberSignupApi,
@@ -76,4 +97,6 @@ export {
   getMemberListApi,
   updateMemberApi,
   getMyInfoApi,
+  updateNewPasswordApi,
+  putMemberWidthdrawalApi,
 };
