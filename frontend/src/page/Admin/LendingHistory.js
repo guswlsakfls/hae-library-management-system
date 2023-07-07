@@ -4,6 +4,7 @@ import SearchBar from '../../component/common/SearchBar';
 import { useState, useEffect } from 'react';
 import { getLendingListApi } from '../../api/BookApi';
 import { useSearchParams } from 'react-router-dom/dist';
+import SelectBar from '../../component/common/SelectBar';
 
 const TableRow = ({
   email,
@@ -15,7 +16,6 @@ const TableRow = ({
   returningLibraryEmail,
   returningCondition,
   returningDate,
-  extension,
   status,
 }) => (
   <tr>
@@ -55,29 +55,35 @@ const TableRow = ({
       </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-      {extension}
-    </td>
-    <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
       {status}
     </td>
   </tr>
 );
+
+// 대출 중, 반납완료
+const isLendingOrReturningList = ['전체', '대출 중', '반납 완료'];
+
+// 정렬 기준
+const sortList = ['최신순', '오랜된순'];
 
 export default function LendingHistory() {
   const [lendingList, setLendingList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 2);
   const [total, setTotal] = useState(0);
+  // 옵션 선택
+  const [isLendingOrReturning, setIsLendingOrReturning] = useState('전체');
+  const [sort, setSort] = useState('최신순');
 
   const handlePageChange = page => {
     setPage(page - 1);
-    setSearchParams({ search, page: page, size });
+    setSearchParams({ search, page: page, size, isLendingOrReturning, sort });
   };
 
   useEffect(() => {
-    getLendingListApi(search, page, size)
+    getLendingListApi(search, page, size, isLendingOrReturning, sort)
       .then(res => {
         setLendingList(res.data.lendingList);
         setTotal(res.data.totalElements);
@@ -94,7 +100,7 @@ export default function LendingHistory() {
         console.log(err.response);
         alert(err.response.data.message);
       });
-  }, [search, page, size]);
+  }, [search, page, size, isLendingOrReturning, sort]);
 
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
@@ -102,17 +108,45 @@ export default function LendingHistory() {
         <h1 className="text-4xl font-bold">대출/반납 기록</h1>
       </div>
       <div className="flex justify-between items-center my-10 mx-48">
-        <h1 className="text-2xl font-bold">대출/반납 검색</h1>
+        <h1 className="text-2xl font-bold mr-2">대출/반납 검색</h1>
         <SearchBar
           text="이메일 또는 도서 제목으로 검색해 주세요."
           url="admin/lending-history"
         ></SearchBar>
-        <div className="flex">
-          <div className="mr-2">
-            <Dropdown option1="대출일 순"></Dropdown>
-          </div>
-          <div className="mr-2">
-            <Dropdown option1="대출중"></Dropdown>
+        <div className="flex mx-4 mt-2">
+          <SelectBar
+            width="110"
+            value={isLendingOrReturning}
+            onChange={e => {
+              setIsLendingOrReturning(e.target.value);
+              setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+              setSearchParams({
+                search,
+                page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                size,
+                isLendingOrReturning: e.target.value,
+                sort,
+              });
+            }}
+            items={isLendingOrReturningList}
+          ></SelectBar>
+          <div className="mx-2">
+            <SelectBar
+              width="120"
+              value={sort}
+              onChange={e => {
+                setSort(e.target.value);
+                setPage(0); // 카테고리 변경 시, 페이지를 1로 설정 (0-based index이기 때문에 0)
+                setSearchParams({
+                  search,
+                  page: 1, // 카테고리 변경 시, 페이지를 1로 설정
+                  size,
+                  isLendingOrReturning,
+                  sort: e.target.value,
+                });
+              }}
+              items={sortList}
+            ></SelectBar>
           </div>
         </div>
       </div>
@@ -147,12 +181,6 @@ export default function LendingHistory() {
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              연장
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
               상태
             </th>
             <th scope="col" className="relative px-6 py-3">
@@ -173,10 +201,7 @@ export default function LendingHistory() {
               returningLibraryEmail={item.returningLibrarianEmail}
               returningCondition={item.returningCondition}
               returningDate={item.returningAt}
-              extension={item.renew ? '1회' : '-'}
-              status={
-                item.returningLibrarianEmail != null ? '반납완료' : '대출 중'
-              }
+              status={item.returningAt != null ? '반납완료' : '대출 중'}
             />
           ))}
         </tbody>

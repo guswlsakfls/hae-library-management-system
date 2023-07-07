@@ -33,7 +33,7 @@ export default function ManagingBook() {
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
   const [category, setCategory] = useState('전체');
-  const [sort, setSort] = useState('최신순');
+  const [sort, setSort] = useState('최신도서');
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
   const [categoryList, setCategoryList] = useState([]);
@@ -72,18 +72,6 @@ export default function ManagingBook() {
 
   // 수정 버튼 클릭 시 호출되는 함수
   const handleReadClick = id => {
-    console.log(id);
-    // // 카테고리 조회 합니다.
-    // getCategoryListApi()
-    //   .then(res => {
-    //     console.log(res);
-    //     setCategoryList(res.data);
-    //   })
-    //   .catch(err => {
-    //     console.log(err.response);
-    //     alert(err.response.data.message);
-    //   });
-
     // // 책 정보 조회 합니다.
     getBookStockListApi(id)
       .then(res => {
@@ -206,6 +194,9 @@ export default function ManagingBook() {
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {book.stockQuantity + ' 권'}
       </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
+        {book.createdAt && book.createdAt.split('T')[0]}
+      </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
         <DefaultButton
           color={'blue'}
@@ -217,6 +208,8 @@ export default function ManagingBook() {
       </td>
     </tr>
   );
+
+  console.log('bookInfoList: ', bookInfoList);
 
   return (
     <>
@@ -297,15 +290,29 @@ export default function ManagingBook() {
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                등록일
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               ></th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {bookInfoList &&
+            {bookInfoList.length !== 0 ? (
               bookInfoList.map((book, index) => (
                 <TableRow key={index} book={book} />
-              ))}
+              ))
+            ) : (
+              <tr>
+                <td className="text-center" colspan="5">
+                  검색한 도서가 존재하지 않습니다.
+                </td>
+              </tr>
+            )}
           </tbody>
+
           <tfoot className="bg-white divide-y divide-gray-200">
             <tr>
               <td colSpan={6}>
@@ -416,7 +423,7 @@ export default function ManagingBook() {
                             handleEditClick(bookStockList, book.id)
                           }
                         >
-                          수정
+                          상세
                         </DefaultButton>
                       </td>
                     </tr>

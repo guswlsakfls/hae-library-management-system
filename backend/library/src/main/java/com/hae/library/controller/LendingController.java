@@ -73,12 +73,15 @@ public class LendingController {
     public ResponseResultDto<Object> getAllLendingHistory(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) String isLendingOrReturning,
+            @RequestParam(required = false) String sort
     ) {
-        log.info("책 대여 기록 조회: [GET] /lending/all - search: {}, page: {}, size: {}", search, page,
-                size);
+        log.info("책 대여 기록 조회: [GET] /lending/all - search: {}, page: {}, size: {}, :isRenderingOrReturning: {}, sort: {}",
+                search, page,
+                size, isLendingOrReturning, sort);
         Page<ResponseLendingDto> responseLendingDtoList =
-                lendingService.getAllLendingHistory(search, page, size);
+                lendingService.getAllLendingHistory(search, page, size, isLendingOrReturning, sort);
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("lendingList", responseLendingDtoList.getContent());

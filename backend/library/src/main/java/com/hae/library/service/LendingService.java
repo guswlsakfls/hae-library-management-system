@@ -180,24 +180,48 @@ public class LendingService {
      * @return 대출 및 페이지 정보
      */
     @Transactional
-    public Page<ResponseLendingDto> getAllLendingHistory(String search, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+    public Page<ResponseLendingDto> getAllLendingHistory(String search, int page, int size,
+                                                         String isLendingOrReturning, String sort) {
+        Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
-        // Specification을 이용해 동적 쿼리 생성
         Specification<Lending> spec = (root, query, cb) -> {
-            if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction(); // 모든 결과 반환
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 검색어가 있는 경우 해당 검색어를 포함하는 결과를 반환합니다.
+            if (search != null && !search.trim().isEmpty()) {
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("book").get("bookInfo").get("title")), "%" + search.toLowerCase() + "%"),
+                        cb.like(cb.lower(root.get("user").get("email")), "%" + search.toLowerCase() + "%"))
+                );
             }
-            // 검색어(도서 제목, 이메일)가 포함된 경우 해당 결과 반환합니다.
-            return cb.or(cb.like(cb.lower(root.get("book").get("bookInfo").get("title")),
-                            "%" + search.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("user").get("email")), "%" + search.toLowerCase() +
-                            "%")
-            );
+
+            // isLendingOrReturning 값에 따른 조건을 추가합니다.
+            if (isLendingOrReturning != null && !isLendingOrReturning.trim().isEmpty()) {
+                switch (isLendingOrReturning) {
+                    case "대출 중":
+                        // returningAt 값이 없는 경우를 찾음
+                        predicates.add(cb.isNull(root.get("returningEndAt")));
+                        break;
+                    case "반납 완료":
+                        // returningAt 값이 있는 경우를 찾음
+                        predicates.add(cb.isNotNull(root.get("returningEndAt")));
+                        break;
+                    case "전체":
+                        // 전체의 경우 추가 조건 없음
+                        break;
+                    default:
+                        throw new RestApiException(BookErrorCode.BAD_REQUEST_BOOK);
+                }
+            }
+
+            // 조합된 조건들로 쿼리 생성합니다.
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        // 전체 대출 기록 조회
+        // 위의 spec를 사용하여 대출 기록 조회합니다.
         Page<Lending> lendingList = lendingRepo.findAll(spec, pageable);
+
         Page<ResponseLendingDto> responseLendingDtoList = lendingList.map(ResponseLendingDto::from);
 
         return responseLendingDtoList;

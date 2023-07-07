@@ -53,13 +53,21 @@ const getBookListApi = async (search, page, size, category, sort) => {
   return res.data; // 최신화 위해 역순으로 정렬.
 };
 
-const getLendingListApi = async (search, page, size) => {
-  console.log(page);
+const getLendingListApi = async (
+  search,
+  page,
+  size,
+  isLendingOrReturning,
+  sort
+) => {
+  console.log(search, page, size, isLendingOrReturning, sort);
   const res = await axios.get(serverIp + '/admin/lending/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
+      isLendingOrReturning: isLendingOrReturning,
+      sort: sort,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });
