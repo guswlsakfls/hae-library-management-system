@@ -13,12 +13,14 @@ public class RequestBook extends BaseTimeEntity {
     @Column(name = "request_book_id")
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "book_info_id")
-//    private BookInfo bookInfo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_info_id")
+    private BookInfo bookInfo;
 
+    @Column(name = "is_approved")
+    private boolean isApproved;
 }

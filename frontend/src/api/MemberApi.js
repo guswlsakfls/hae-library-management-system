@@ -90,6 +90,13 @@ const putMemberWidthdrawalApi = async () => {
   return res.data;
 };
 
+const deleteMemberApi = async id => {
+  const res = await axios.delete(serverIp + `/admin/member/${id}/delete`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getUserByEmailApi,
   memberSignupApi,
@@ -99,4 +106,5 @@ export {
   getMyInfoApi,
   updateNewPasswordApi,
   putMemberWidthdrawalApi,
+  deleteMemberApi,
 };
