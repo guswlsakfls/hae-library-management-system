@@ -1,4 +1,4 @@
-import { React, useContext, useEffect } from 'react';
+import { React, useEffect } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -21,7 +21,6 @@ import ManageingMemeberPage from './ManagingMemeberPage';
 import ManagingCategoryPage from './ManagingCategoryPage';
 import DefaultModal from '../component/DefaultModal';
 import Mypage from './/Mypage/Mypage';
-import { MemberProvider } from '../contextApi/MemberProvider';
 import jwt_decode from 'jwt-decode';
 
 function AdminRoutes() {
@@ -57,23 +56,21 @@ function AdminRoutes() {
 
 const Router = () => {
   return (
-    <MemberProvider>
-      <BrowserRouter>
-        <div className="flex flex-col h-screen">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/booklist" element={<BookList />} />
-            <Route path="/book/:id" element={<BookInfo />} />
-            <Route path="/mypage/*" element={<Mypage />} />
-            <Route path="/admin/*" element={<AdminRoutes />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </MemberProvider>
+    <BrowserRouter>
+      <div className="flex flex-col h-screen">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/booklist" element={<BookList />} />
+          <Route path="/book/:id" element={<BookInfo />} />
+          <Route path="/mypage/*" element={<Mypage />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 };
 
