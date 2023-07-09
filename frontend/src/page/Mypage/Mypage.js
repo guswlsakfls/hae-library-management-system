@@ -49,7 +49,7 @@ export default function Mypage() {
             }`}
           >
             <span className="text-2xl group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              대출 기록
+              대출 / 반납 기록
             </span>
           </button>
         </div>

@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Footer from '../../component/Footer';
 import { memberLoginApi } from '../../api/MemberApi';
+import jwt_decode from 'jwt-decode';
+import { MemberContext } from '../../contextApi/MemberContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setMemberInfo, memberInfo } = useContext(MemberContext);
 
   const handleLogin = () => {
     memberLoginApi(email, password)
       .then(res => {
-        console.log(res);
         alert(res.message);
-        localStorage.setItem('accessToken', res.data.accessToken);
+        const accessToken = res.data.accessToken;
+        // accessToken 파싱
+        localStorage.setItem('accessToken', accessToken);
+
         window.location.href = '/';
       })
       .catch(err => {
+        console.log(err);
         if (err.response.status && err.response.status === 404) {
           alert('아이디와 비밀번호가 일치하지 않습니다.');
-        } else {
+        } else if (err.response.status && err.response.status === 400) {
           let errors = err.response.data.errors;
           if (!errors) {
             return;
@@ -26,6 +32,8 @@ export default function Login() {
             .map((error, index) => `${index + 1}. ${error.message}`)
             .join('\n\n');
           alert(errorMessages);
+        } else {
+          alert('휴면계정입니다. 관리자에게 문의하세요.');
         }
       });
   };
@@ -59,7 +67,7 @@ export default function Login() {
                   name="email"
                   type="email"
                   placeholder="이메일을 입력해주세요."
-                  valuse={email}
+                  value={email}
                   onChange={event => setEmail(event.target.value)}
                   className="block w-full rounded-md border-0 px-1.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />

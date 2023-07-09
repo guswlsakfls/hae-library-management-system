@@ -18,7 +18,6 @@ public class ResponseLendingDto {
     private String returningCondition;
     private String createdAt;
     private String returningAt;
-    private boolean renew;
 
     public static ResponseLendingDto from(Lending lending) {
         ResponseLendingDto dto = new ResponseLendingDto();
@@ -34,7 +33,6 @@ public class ResponseLendingDto {
             dto.returningCondition = lending.getReturningCondition();
             dto.returningAt = lending.getReturningEndAt().toLocalDate().toString();
         }
-        dto.renew = lending.isRenew();
         return dto;
     }
 }

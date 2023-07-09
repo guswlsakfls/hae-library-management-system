@@ -13,11 +13,6 @@ export default function SearchBar(props) {
     }
   }, []);
 
-  // const handleSubmit = event => {
-  //   event.preventDefault();
-  //   window.location.href = `http://localhost:3000/booklist?search=${searchTerm}`;
-  // };
-
   const handleSubmit = event => {
     event.preventDefault();
     navigate(`/${props.url}?search=${searchTerm}&category=전체&sort=최신도서`);
@@ -33,7 +28,7 @@ export default function SearchBar(props) {
           type="text"
           name="book"
           id="book"
-          className="block w-32 lg:w-96 h-10 rounded-md border-0 py-2 pl-8 pr-2 text-base text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+          className="block w-32 lg:w-80 h-10 rounded-md border-0 py-2 pl-8 pr-2 text-base text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
           placeholder={props.text}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}

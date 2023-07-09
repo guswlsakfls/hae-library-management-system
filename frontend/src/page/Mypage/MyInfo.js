@@ -1,10 +1,22 @@
 import DefaultButton from '../../component/common/DefaultButton';
 import { useEffect, useState } from 'react';
 import { getMyInfoApi } from '../../api/MemberApi';
+import {
+  updateNewPasswordApi,
+  putMemberWidthdrawalApi,
+} from '../../api/MemberApi';
+import { MemberContext } from '../../contextApi/MemberContext';
+import { useContext } from 'react';
 
 export default function MyInfo() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
   const [myInfo, setMyInfo] = useState({});
+  const [nowPassword, setNowPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordCheck, setNewPasswordCheck] = useState('');
+
+  const { memberInfo } = useContext(MemberContext);
+  console.log(memberInfo);
 
   const modifyToggleModal = () => {
     modifySetIsOpen(!modifyIsOpen);
@@ -14,6 +26,49 @@ export default function MyInfo() {
     if (window.confirm('로그아웃 하시겠습니까?')) {
       localStorage.removeItem('accessToken');
       window.location.href = '/';
+    }
+  };
+
+  const onChangeNowPassword = e => {
+    setNowPassword(e.target.value);
+  };
+
+  const onChangeNewPassword = e => {
+    setNewPassword(e.target.value);
+  };
+
+  const onChangeNewPasswordCheck = e => {
+    setNewPasswordCheck(e.target.value);
+  };
+
+  const updateNewPassword = () => {
+    if (newPassword !== newPasswordCheck) {
+      alert('새 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    updateNewPasswordApi(nowPassword, newPassword)
+      .then(res => {
+        console.log(res);
+        alert('비밀번호가 변경되었습니다.');
+        modifyToggleModal();
+      })
+      .catch(err => {
+        alert(err.response.data.message);
+      });
+  };
+
+  const memberWidthdrawal = () => {
+    if (window.confirm('회원탈퇴 하시겠습니까?')) {
+      putMemberWidthdrawalApi()
+        .then(res => {
+          console.log(res);
+          alert('회원탈퇴가 완료되었습니다.');
+          localStorage.removeItem('accessToken');
+          window.location.href = '/';
+        })
+        .catch(err => {
+          alert(err.response.data.message);
+        });
     }
   };
 
@@ -37,7 +92,7 @@ export default function MyInfo() {
           <dl className="divide-y divide-gray-100">
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                이메일
+                이메일 :
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
                 {myInfo.email}
@@ -45,15 +100,17 @@ export default function MyInfo() {
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                대출권수
+                대출권수 :
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
-                {myInfo.lendingCount === 0 ? '-' : myInfo.lendingCount}
+                {myInfo.lendingCount === 0
+                  ? '-'
+                  : myInfo.lendingCount + ' / 3 권'}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6 text-gray-900">
-                연체현황
+                연체현황 :
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-500 sm:col-span-2 sm:mt-0">
                 {myInfo.penaltyEndDate &&
@@ -71,13 +128,15 @@ export default function MyInfo() {
         </div>
       </div>
       <div className="flex justify-center items-center my-10 mx-48">
-        <DefaultButton size="large" onClick={modifyToggleModal}>
+        <DefaultButton size="large" onClick={memberWidthdrawal}>
+          탈퇴하기
+        </DefaultButton>
+        <DefaultButton color="blue" size="large" onClick={modifyToggleModal}>
           비밀번호 변경
         </DefaultButton>
-        <DefaultButton size="large" onClick={logOut}>
+        <DefaultButton color="red" size="large" onClick={logOut}>
           로그 아웃
         </DefaultButton>
-        <DefaultButton size="large">탈퇴하기</DefaultButton>
       </div>
       {/*  멤버 수정 모달 창  */}
       {modifyIsOpen && (
@@ -106,13 +165,13 @@ export default function MyInfo() {
                     현재 비밀번호
                   </label>
                   <input
-                    type="text"
+                    type="password" // 타입을 "password"로 변경했습니다.
                     name="nowPassword"
                     id="nowPassword"
                     className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mb-5 mr-96"
                     placeholder="현재 비밀번호를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={nowPassword}
+                    onChange={onChangeNowPassword}
                   />
 
                   <label
@@ -122,13 +181,13 @@ export default function MyInfo() {
                     새로운 비밀번호
                   </label>
                   <input
-                    type="text"
+                    type="password" // 타입을 "password"로 변경했습니다.
                     name="newPassword"
                     id="newPassword"
                     className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mb-5 mr-96"
                     placeholder="새로운 비밀번호를 입력하세요."
-                    // value={email}
-                    // onChange={onChangeEmail}
+                    value={newPassword}
+                    onChange={onChangeNewPassword}
                   />
 
                   <label
@@ -138,32 +197,32 @@ export default function MyInfo() {
                     새로운 비밀번호 확인
                   </label>
                   <input
-                    type="text"
-                    name="reNewPassword"
-                    id="reNewPassword"
+                    type="password" // 타입을 "password"로 변경했습니다.
+                    name="newPasswordCheck"
+                    id="newPasswordCheck"
                     className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mb-5"
                     placeholder="새로운 비밀번호를 재입력하세요."
-                    // value={penalty}
-                    // onChange={onChangePenalty}
+                    value={newPasswordCheck}
+                    onChange={onChangeNewPasswordCheck}
                   />
                 </div>
               </div>
               {/* 버튼 */}
               <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                  onClick={modifyToggleModal}
+                <DefaultButton
+                  color="red"
+                  size="large"
+                  click={modifyToggleModal}
                 >
-                  취소하기
-                </button>
-                <button
-                  type="button"
-                  className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                  onClick={modifyToggleModal}
+                  취소
+                </DefaultButton>
+                <DefaultButton
+                  color="blue"
+                  size="large"
+                  click={updateNewPassword}
                 >
-                  확인
-                </button>
+                  변경
+                </DefaultButton>
               </div>
             </div>
           </div>

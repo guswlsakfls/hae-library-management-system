@@ -10,7 +10,7 @@ import {
 import DefaultSearchBar from '../../component/common/DefaultSearchBar';
 
 export default function Lending() {
-  const [searchEmail, serSearchEmail] = useState('');
+  const [searchEmail, setSearchEmail] = useState('');
   const [searchCallSign, setSearchCallSign] = useState('');
   const [condition, setCondition] = useState('');
   const [user, setUser] = useState({});
@@ -26,6 +26,7 @@ export default function Lending() {
         console.log(res);
       })
       .catch(err => {
+        setBook({});
         setUser({});
         alert(err.response.data.message);
         console.log(err.response.data);
@@ -63,7 +64,7 @@ export default function Lending() {
       })
       .catch(err => {
         setBook({});
-        setReturningAt('');
+        setUser({});
         alert(err.response.data.message);
         console.log(err.response.data);
         let errors = err.response.data.errors;
@@ -160,7 +161,7 @@ export default function Lending() {
   };
 
   useEffect(() => {
-    serSearchEmail('');
+    setSearchEmail('');
     setSearchCallSign('');
     setCondition('');
     setUser({});
@@ -188,7 +189,7 @@ export default function Lending() {
           <DefaultSearchBar
             text="이메일을 입력해 주세요."
             value={searchEmail}
-            setValue={serSearchEmail}
+            setValue={setSearchEmail}
             handler={handleGetUser}
           ></DefaultSearchBar>
         </div>
@@ -220,10 +221,10 @@ export default function Lending() {
               <dd className="mt-1 text-lg leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                 {transactionType == 'lending'
                   ? user.lendingCount
-                    ? user.lendingCount
+                    ? user.lendingCount + ' / 3 권'
                     : '-'
                   : lendingInfo.lendingCount
-                  ? lendingInfo.lendingCount
+                  ? lendingInfo.lendingCount + ' / 3 권'
                   : '-'}
               </dd>
             </div>

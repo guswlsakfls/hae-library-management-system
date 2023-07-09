@@ -10,6 +10,7 @@ import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.util.SecurityUtil;
 import com.hae.library.domain.Member;
 import com.hae.library.repository.MemberRepository;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -64,21 +66,33 @@ public class MemberService {
      * @param search 검색어
      * @param page   페이지 번호
      * @param size   페이지 크기
+     * @param role   역할
+     * @param sort   정렬
      * @return 회원 정보 페이지
      */
-    public Page<ResponseMemberDto> getAllMember(String search, int page, int size) {
-        // 페이지 정보를 설정합니다. 페이지는 0부터 시작하며, 정렬은 'createdAt' 컬럼을 기준으로 오름차순으로 합니다.
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+    public Page<ResponseMemberDto> getAllMember(String search, int page, int size, String role,
+                                                String sort) {
+        // 페이지 정보를 설정합니다. 페이지는 0부터 시작하며, 정렬은 'createdAt' 컬럼을 기준으로 최신순, 오래된순으로 정렬합니다.
+        Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
-        // Specification을 이용해 동적 쿼리를 생성합니다.
         Specification<Member> spec = (root, query, cb) -> {
-            // 검색어가 null이거나 비어있는 경우, 모든 회원 정보를 반환합니다.
-            if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction();
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 검색어가 null이거나 비어있는 경우를 제외하고, 검색어를 포함하는 회원 정보를 반환합니다.
+            if (search != null && !search.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("email")), "%" + search.toLowerCase() + "%"));
             }
-            // 검색어가 존재하는 경우, 이메일이 검색어를 포함하는 회원 정보를 반환합니다.
-            return cb.like(cb.lower(root.get("email")), "%" + search.toLowerCase() + "%");
+
+            // 역할에 따라 검색을 합니다.
+            if (!"전체".equals(role)) {
+                Role roleEnum = "관리자".equals(role) ? Role.ROLE_ADMIN : Role.ROLE_USER;
+                predicates.add(cb.equal(root.get("role"), roleEnum));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
+
 
         // 검색어에 따른 동적 쿼리로 회원 정보를 페이지 단위로 가져옵니다.
         Page<Member> memberList = memberRepository.findAll(spec, pageable);
@@ -154,32 +168,34 @@ public class MemberService {
      * @return 변경된 회원 정보 DTO
      */
     @Transactional
-    public ResponseMemberDto changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
+    public void changeMemberPassword(RequestChangePasswordDto requestChangePasswordDto) {
         // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 요청으로 받은 이전 비밀번호와 회원의 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
-        if (!passwordEncoder.matches(requestChangePasswordDto.getExPassword(), member.getPassword())) {
+        // 요청으로 받은 현재 비밀번호와 DB에 저장되어 있는 현재 비밀번호가 일치하지 않는 경우, 예외를 발생시킵니다.
+        if (!passwordEncoder.matches(requestChangePasswordDto.getNowPassword(),
+                member.getPassword())) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
 
         // 회원의 비밀번호를 새 비밀번호로 업데이트하고 이를 암호화합니다.
         member.updatePassword(passwordEncoder.encode((requestChangePasswordDto.getNewPassword())));
 
-        return ResponseMemberDto.from(memberRepository.save(member));
+        memberRepository.save(member);
     }
 
     /**
      * 회원 탈퇴 처리를 합니다. 회원의 activated 상태를 false로 변경합니다.
-     *
-     * @return 변경된 회원 정보 DTO
      */
     @Transactional
-    public ResponseMemberDto memberWithdrawal() {
+    public void memberWithdrawal() {
+        // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        // 회원의 activated 상태를 false로 변경합니다.
         member.updateActivated(false);
-        return ResponseMemberDto.from(memberRepository.save(member));
+        // 변경된 회원 정보를 저장합니다.
+        memberRepository.save(member);
     }
 }

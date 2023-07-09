@@ -3,12 +3,14 @@ import axios from 'axios';
 const serverIp = 'http://localhost:8080/api';
 const accessToken = localStorage.getItem('accessToken');
 
-const getMemberListApi = async (search, page, size) => {
+const getMemberListApi = async (search, page, size, role, sort) => {
   const res = await axios.get(serverIp + '/admin/memberinfo/all', {
     params: {
       search: search,
       page: page === null ? 0 : page,
       size: size === null ? 10 : size,
+      role: role === null ? '전체' : role,
+      sort: sort === null ? '최신순' : sort,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });
@@ -67,6 +69,27 @@ const getMyInfoApi = async () => {
   return res.data;
 };
 
+const updateNewPasswordApi = async (nowPassword, newPassword) => {
+  const res = await axios.put(
+    serverIp + '/member/changePassword',
+    {
+      nowPassword: nowPassword,
+      newPassword: newPassword,
+    },
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return res.data;
+};
+
+const putMemberWidthdrawalApi = async () => {
+  const res = await axios.put(serverIp + '/member/withdrawal/me', null, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  return res.data;
+};
+
 export {
   getUserByEmailApi,
   memberSignupApi,
@@ -74,4 +97,6 @@ export {
   getMemberListApi,
   updateMemberApi,
   getMyInfoApi,
+  updateNewPasswordApi,
+  putMemberWidthdrawalApi,
 };

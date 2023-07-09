@@ -6,6 +6,8 @@ import com.hae.library.dto.Category.Response.ResponseCategoryDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class ResponseBookInfoDto {
@@ -18,6 +20,7 @@ public class ResponseBookInfoDto {
     private int stockQuantity;
     private String publisher;
     private String publishedAt;
+    private LocalDateTime createdAt;
 
     public static ResponseBookInfoDto from(BookInfo bookInfo) {
         // bookInfo가 null인 경우 예외 처리 또는 기본값 설정 등을 수행 // TODO: 수정 필요(필요 없을 듯?)
@@ -35,6 +38,7 @@ public class ResponseBookInfoDto {
                 .stockQuantity(bookInfo.getStockQuantity())
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
+                .createdAt(bookInfo.getCreatedAt())
                 .build();
     }
 }

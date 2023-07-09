@@ -117,7 +117,7 @@ public class BookInfoService {
     public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size,
                                                     String categoryName, String sort) {
         // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
-        Sort.Direction direction = sort.equals("최신도서") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = sort.equals("최신도서") ?  Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
         // Specification을 이용해 동적 쿼리를 생성합니다.

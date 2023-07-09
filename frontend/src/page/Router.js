@@ -1,5 +1,11 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { React, useContext, useEffect } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import Navbar from '../component/Navbar';
 import Home from './Home/Home';
 import Login from './Login/Login';
@@ -15,34 +21,59 @@ import ManageingMemeberPage from './ManagingMemeberPage';
 import ManagingCategoryPage from './ManagingCategoryPage';
 import DefaultModal from '../component/DefaultModal';
 import Mypage from './/Mypage/Mypage';
+import { MemberProvider } from '../contextApi/MemberProvider';
+import jwt_decode from 'jwt-decode';
+
+function AdminRoutes() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      navigate('/', { state: { from: location } });
+    } else {
+      const decodedToken = jwt_decode(accessToken);
+      if (decodedToken.ADMIN !== 'ROLE_ADMIN') {
+        navigate('/', { state: { from: location } });
+      }
+    }
+  }, [navigate, location]);
+
+  return (
+    <Routes>
+      <Route path="" element={<LendingPage />} />
+      <Route path="lending" element={<LendingPage />} />
+      <Route path="addbook" element={<AddBookPage />} />
+      <Route path="lending-history" element={<LendingHistoryPage />} />
+      <Route path="book-stock" element={<ManagingBookPage />} />
+      <Route path="category" element={<ManagingCategoryPage />} />
+      <Route path="member" element={<ManageingMemeberPage />} />
+      <Route path="modal" element={<DefaultModal />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const Router = () => {
   return (
-    <BrowserRouter>
-      <div className="flex flex-col h-screen">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/booklist" element={<BookList />} />
-          <Route path="/book/:id" element={<BookInfo />} />
-          <Route path="/mypage/*" element={<Mypage />} />
-          <Route path="/admin/*">
-            <Route path="" element={<LendingPage />} />
-            <Route path="lending" element={<LendingPage />} />{' '}
-            <Route path="addbook" element={<AddBookPage />} />{' '}
-            <Route path="lending-history" element={<LendingHistoryPage />} />
-            <Route path="book-stock" element={<ManagingBookPage />} />
-            <Route path="category" element={<ManagingCategoryPage />} />
-            <Route path="member" element={<ManageingMemeberPage />} />
-            <Route path="modal" element={<DefaultModal />} />
+    <MemberProvider>
+      <BrowserRouter>
+        <div className="flex flex-col h-screen">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/booklist" element={<BookList />} />
+            <Route path="/book/:id" element={<BookInfo />} />
+            <Route path="/mypage/*" element={<Mypage />} />
+            <Route path="/admin/*" element={<AdminRoutes />} />
             <Route path="*" element={<NotFound />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </MemberProvider>
   );
 };
 

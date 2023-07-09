@@ -73,12 +73,15 @@ public class LendingController {
     public ResponseResultDto<Object> getAllLendingHistory(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) String isLendingOrReturning,
+            @RequestParam(required = false) String sort
     ) {
-        log.info("책 대여 기록 조회: [GET] /lending/all - search: {}, page: {}, size: {}", search, page,
-                size);
+        log.info("책 대여 기록 조회: [GET] /lending/all - search: {}, page: {}, size: {}, :isRenderingOrReturning: {}, sort: {}",
+                search, page,
+                size, isLendingOrReturning, sort);
         Page<ResponseLendingDto> responseLendingDtoList =
-                lendingService.getAllLendingHistory(search, page, size);
+                lendingService.getAllLendingHistory(search, page, size, isLendingOrReturning, sort);
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("lendingList", responseLendingDtoList.getContent());
@@ -100,11 +103,14 @@ public class LendingController {
     public ResponseResultDto<Object> getMemberLendingHistory(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
+            @RequestParam(required = false) int size,
+            @RequestParam(required = false) String isLendingOrReturning,
+            @RequestParam(required = false) String sort
     ) {
-        log.info("책 대여 기록 조회: [GET] /lending/me");
+        log.info("책 대여 기록 조회: [GET] /lending/me - search: {}, page: {}, size: {}, :isRenderingOrReturning: {}, sort: {}",
+                search, page, size, isLendingOrReturning, sort);
         Page<ResponseMemberLendingDto> responseMemberLendingDtoList =
-                lendingService.getMemberLendingHistory(search, page, size);
+                lendingService.getMemberLendingHistory(search, page, size, isLendingOrReturning, sort);
 
         // 회원이 빌린 대출/반납 기록 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
         Map<String, Object> responseData = new HashMap<>();
@@ -118,20 +124,6 @@ public class LendingController {
                 .statusCode(HttpStatus.OK.value())
                 .message("책 대여 기록 조회에 성공하였습니다")
                 .data(responseData)
-                .build();
-    }
-
-    // 책 대여 기간 연장을 합니다.
-    @PutMapping(value = "/member/lending/{lendingId}/renew")
-    public ResponseResultDto<Object> updateRenew(@PathVariable Long lendingId) {
-        log.info("책 대여 기간 연장: [PUT] /lending/{lendingId}/renew - lendingId: {}", lendingId);
-        ResponseLendingDto responseLendingDto = lendingService.updateRenew(lendingId);
-
-        log.info("책 대여 기간 연장에 성공하였습니다");
-        return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("책 대여 기간 연장에 성공하였습니다")
-                .data(responseLendingDto)
                 .build();
     }
 
