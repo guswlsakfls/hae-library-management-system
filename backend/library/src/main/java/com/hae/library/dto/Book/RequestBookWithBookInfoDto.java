@@ -70,5 +70,13 @@ public class RequestBookWithBookInfoDto {
         this.status = status;
         this.donator = donator;
     }
+
+    /**
+     * 청구기호를 업데이트 한다.
+     * @param callSign
+     */
+    public void updateCallSign(String callSign) {
+        this.callSign = callSign;
+    }
 }
 

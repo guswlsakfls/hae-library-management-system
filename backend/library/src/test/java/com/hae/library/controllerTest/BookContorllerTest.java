@@ -151,7 +151,7 @@ public class BookContorllerTest {
             @DisplayName("책 데이터 입력시 책 생성")
             public void createBookWithBookInfoTest() throws Exception {
                 // Given
-                when(bookService.createBook(any(RequestBookWithBookInfoDto.class))).thenReturn(responseBookWithBookInfoDto1);
+//                when(bookService.createBook(any(RequestBookWithBookInfoDto.class))).thenReturn(responseBookWithBookInfoDto1);
 
                 // When & Then
                 mockMvc.perform(post("/api/admin/book/create")

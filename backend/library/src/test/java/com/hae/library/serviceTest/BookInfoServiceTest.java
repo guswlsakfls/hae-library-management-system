@@ -5,6 +5,7 @@ import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.Member.RequestSignupDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
@@ -12,6 +13,7 @@ import com.hae.library.repository.CategoryRepository;
 import com.hae.library.service.BookInfoService;
 import jakarta.persistence.criteria.Predicate;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,22 +44,22 @@ public class BookInfoServiceTest {
     @InjectMocks
     private BookInfoService bookInfoService;
 
-    private RequestBookWithBookInfoDto createRequestBookInfoWithBook() {
-        RequestBookWithBookInfoDto requestBookWithBookInfoDto =
-                RequestBookWithBookInfoDto.builder()
-                        .callSign("12345")
-                        .status("FINE")
-                        .donator("John Doe")
-                        .title("Java Programming")
-                        .author("John Smith")
-                        .isbn("9781234567890")
-                        .image("book-image.jpg")
-                        .publisher("ABC Publishing")
-                        .publishedAt("2022-01-01")
-                        .categoryName("총류")
-                        .build();
+    private RequestBookWithBookInfoDto requestBookWithBookInfoDto;
 
-        return requestBookWithBookInfoDto;
+    @BeforeEach
+    public void setup() {
+         requestBookWithBookInfoDto = RequestBookWithBookInfoDto.builder()
+                            .callSign("12345")
+                            .status("FINE")
+                            .donator("John Doe")
+                            .title("Java Programming")
+                            .author("John Smith")
+                            .isbn("9781234567890")
+                            .image("book-image.jpg")
+                            .publisher("ABC Publishing")
+                            .publishedAt("2022-01-01")
+                            .categoryName("총류")
+                            .build();
     }
 
     @Nested
@@ -71,8 +73,6 @@ public class BookInfoServiceTest {
             @DisplayName("책 정보를 입력받아 책 정보를 생성한다.")
             void createBookInfoSuccess() {
                 // Given
-                RequestBookWithBookInfoDto requestBookWithBookInfoDto = createRequestBookInfoWithBook();
-
                 BookInfo bookInfo = BookInfo.builder()
                         .title(requestBookWithBookInfoDto.getTitle())
                         .author(requestBookWithBookInfoDto.getAuthor())
@@ -106,8 +106,6 @@ public class BookInfoServiceTest {
         @DisplayName("책 정보 생성 실패 - 카테고리 없음")
         void createBookInfoFail_NoCategory() {
             // Given
-            RequestBookWithBookInfoDto requestBookWithBookInfoDto = createRequestBookInfoWithBook();
-
             // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
             when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
 

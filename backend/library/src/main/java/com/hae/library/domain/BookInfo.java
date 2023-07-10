@@ -57,7 +57,7 @@ public class BookInfo extends BaseTimeEntity{
     // private List<Reservation> reservationList = new ArrayList<>();
     @Builder
     public BookInfo(Long id, String isbn, String title, String author, String publisher,
-                    String image, String publishedAt, Category category) {
+                    String image, String publishedAt, Category category, List<Book> bookList) {
         this.id = id;
         this.isbn = isbn;
         this.title = title;
@@ -118,7 +118,6 @@ public class BookInfo extends BaseTimeEntity{
 
     /**
      * 도서 재고 수량을 얻습니다.
-     * @param bookInfo 도서 정보
      * @return 도서 재고 수량
      */
     public int getStockQuantity() {
