@@ -38,13 +38,12 @@ public class BookController {
     @PostMapping(value = "/admin/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("책 생성 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
-        ResponseBookWithBookInfoDto responseBookWithBookInfoDto = bookService.createBook(requestBookWithBookInfoDto);
+        bookService.createBook(requestBookWithBookInfoDto);
 
         log.info("책이 성공적으로 등록되었습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책이 성공적으로 등록되었습니다")
-                .data(responseBookWithBookInfoDto)
                 .build();
     }
 
