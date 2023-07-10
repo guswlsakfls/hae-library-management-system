@@ -35,7 +35,7 @@ public class LendingRepositoryTest {
                 // Given
                 Member user = Member.builder().email("hyujo@gmail.com").build();
                 Book book = Book.builder().callSign("100.10.v1.c1").build();
-                Member librarian = Member.builder().name("hyujo").build();
+                Member librarian = Member.builder().email("admin@gmail.com").build();
                 String lendingCondition = "책이 좀 더럽네요";
 
                 // When
@@ -111,7 +111,7 @@ public class LendingRepositoryTest {
                 // Given
                 Member user = Member.builder().email("hyujo@gmail.com").build();
                 Book book = Book.builder().callSign("100.10.v1.c1").build();
-                Member librarian = Member.builder().name("hyujo").build();
+                Member librarian = Member.builder().email("admin@gmail.com").build();
                 String lendingCondition = "없";
 
                 // When
@@ -385,35 +385,6 @@ public class LendingRepositoryTest {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
-            @Test
-            @DisplayName("대출을 연장한다")
-            public void renewLendingTest() {
-                // Given
-                Member user = Member.builder().email("hyujo@gmail.com").build();
-                Book book = Book.builder().callSign("100.10.v1.c1").build();
-                Member librarian = Member.builder().name("librarian").build();
-                String lendingCondition = "없sdfasdfasdfasdfasdfasdf";
-                LocalDateTime returningAt = LocalDateTime.now();
-
-                Lending lending = Lending.builder()
-                        .user(user)
-                        .lendingLibrarian(librarian)
-                        .lendingCondition(lendingCondition)
-                        .returningEndAt(returningAt)
-                        .build();
-
-                lending.addBook(book);
-
-                lendingRepo.save(lending);
-
-                // When
-                lending.renewLending();
-                Lending updateRenewLending = lendingRepo.save(lending);
-
-                // Then
-                assertEquals(lending.isRenew(), updateRenewLending.isRenew());
-                assertEquals(lending.getReturningEndAt(), updateRenewLending.getReturningEndAt());
-            }
         }
 
         @Nested
@@ -435,7 +406,7 @@ public class LendingRepositoryTest {
                 // Given
                 Member user = Member.builder().email("hyujo@gmail.com").build();
                 Book book = Book.builder().callSign("100.10.v1.c1").build();
-                Member librarian = Member.builder().name("librarian").build();
+                Member librarian = Member.builder().email("admin@gmail.com").build();
                 String lendingCondition = "없sdfasdfasdfasdfasdfasdf";
 
                 Lending lending = Lending.builder()

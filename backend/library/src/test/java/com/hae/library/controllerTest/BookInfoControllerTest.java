@@ -93,7 +93,10 @@ public class BookInfoControllerTest {
                 String searchKey = "";
                 int page = 0;
                 int size = 10;
-                given(bookInfoService.getAllBookInfo(searchKey, page, size)).willReturn(responseBookInfoDtoList);
+                String categoryName = "전체";
+                String sort = "최신도서";
+
+                given(bookInfoService.getAllBookInfo(searchKey, page, size, categoryName, sort)).willReturn(responseBookInfoDtoList);
 
                 // When & Then
                 mockMvc.perform(get("/api/bookinfo/all").accept(MediaType.APPLICATION_JSON))

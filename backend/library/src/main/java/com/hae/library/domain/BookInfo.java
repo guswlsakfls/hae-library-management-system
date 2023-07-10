@@ -57,7 +57,7 @@ public class BookInfo extends BaseTimeEntity{
     // private List<Reservation> reservationList = new ArrayList<>();
     @Builder
     public BookInfo(Long id, String isbn, String title, String author, String publisher,
-                    String image, String publishedAt) {
+                    String image, String publishedAt, Category category) {
         this.id = id;
         this.isbn = isbn;
         this.title = title;
@@ -65,6 +65,7 @@ public class BookInfo extends BaseTimeEntity{
         this.publisher = publisher;
         this.image = image;
         this.publishedAt = publishedAt;
+        this.category = category;
     }
 
     /**

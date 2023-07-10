@@ -29,13 +29,12 @@ public class MemberContorller {
     @PostMapping(value = "/signup")
     public ResponseResultDto<Object> signUp(@RequestBody @Valid RequestSignupDto requestSignupDto) {
         log.info("회원가입 요청: [POST] /member/signup - {}", requestSignupDto.toString());
-        ResponseMemberDto responseMemberDto = memberService.signup(requestSignupDto);
+        memberService.signup(requestSignupDto);
 
         log.info("회원가입에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원가입에 성공하였습니다")
-                .data(responseMemberDto)
                 .build();
     }
 

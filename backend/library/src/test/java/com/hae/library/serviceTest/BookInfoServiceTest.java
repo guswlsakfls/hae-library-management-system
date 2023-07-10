@@ -1,24 +1,30 @@
 package com.hae.library.serviceTest;
 
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.CategoryRepository;
 import com.hae.library.service.BookInfoService;
+import jakarta.persistence.criteria.Predicate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +33,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookInfoServiceTest {
-
     @Mock
     private BookInfoRepository bookInfoRepo;
+
+    @Mock
+    private CategoryRepository categoryRepo;
 
     @InjectMocks
     private BookInfoService bookInfoService;
@@ -46,6 +54,7 @@ public class BookInfoServiceTest {
                         .image("book-image.jpg")
                         .publisher("ABC Publishing")
                         .publishedAt("2022-01-01")
+                        .categoryName("총류")
                         .build();
 
         return requestBookWithBookInfoDto;
@@ -59,7 +68,7 @@ public class BookInfoServiceTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("책 정보 생성")
+            @DisplayName("책 정보를 입력받아 책 정보를 생성한다.")
             void createBookInfoSuccess() {
                 // Given
                 RequestBookWithBookInfoDto requestBookWithBookInfoDto = createRequestBookInfoWithBook();
@@ -73,38 +82,45 @@ public class BookInfoServiceTest {
                         .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
                         .build();
 
+                // 테스트를 위한 mock 카테고리를 만듭니다.
+                Category mockCategory = Category.builder()
+                        .categoryName(requestBookWithBookInfoDto.getCategoryName())
+                        .bookInfoList(new ArrayList<>())
+                        .build();
+
+                when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.of(mockCategory));
                 when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(bookInfo);
 
                 // When
-                ResponseBookInfoDto createdBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+                BookInfo createdBookInfo =
+                        bookInfoService.createBookInfo(requestBookWithBookInfoDto);
 
                 // Then
                 Assertions.assertThat(createdBookInfo).isNotNull();
                 Assertions.assertThat(createdBookInfo.getTitle()).isEqualTo(requestBookWithBookInfoDto.getTitle());
             }
-        }
-
-        @Nested
-        @DisplayName("실패 케이스")
-        public class Fail {
-            @Test
-            @DisplayName("책 정보 생성")
-            void createBookInfoFail() {
-                // Given
-                RequestBookWithBookInfoDto requestBookWithBookInfoDto = createRequestBookInfoWithBook();
-
-                when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(null);
-
-                // When
-                Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-                    bookInfoService.createBookInfo(requestBookWithBookInfoDto);
-                });
-
-                // Then
-                Assertions.assertThat(exception.getMessage()).isEqualTo("bookInfo cannot be null");
-            }
 
         }
+
+        @Test
+        @DisplayName("책 정보 생성 실패 - 카테고리 없음")
+        void createBookInfoFail_NoCategory() {
+            // Given
+            RequestBookWithBookInfoDto requestBookWithBookInfoDto = createRequestBookInfoWithBook();
+
+            // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
+            when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
+
+            // When
+            Exception exception = assertThrows(RestApiException.class, () -> {
+                bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+            });
+
+            // Then
+            // 출력되는 에러코드가 맞는지 확인합니다.
+            Assertions.assertThat(((RestApiException) exception).getErrorCode().getMessage()).contains(BookErrorCode.CATEGORY_NOT_FOUND.getMessage());
+        }
+
     }
 
     @Nested
@@ -118,6 +134,10 @@ public class BookInfoServiceTest {
             @DisplayName("모든 책 정보 조회")
             void getAllBookInfoTest() {
                 // Given
+                Category category = Category.builder()
+                        .categoryName("전체")
+                        .build();
+
                 BookInfo bookInfo1 = BookInfo.builder()
                         .title("Java Programming")
                         .author("John Smith")
@@ -125,6 +145,7 @@ public class BookInfoServiceTest {
                         .image("book-image.jpg")
                         .publisher("ABC Publishing")
                         .publishedAt("2022-01-01")
+                        .category(category)
                         .build();
 
                 BookInfo bookInfo2 = BookInfo.builder()
@@ -134,22 +155,39 @@ public class BookInfoServiceTest {
                         .image("book-image.jpg")
                         .publisher("DEF Publishing")
                         .publishedAt("2022-01-01")
+                        .category(category)
                         .build();
 
-                when(bookInfoRepo.findAll()).thenReturn(List.of(bookInfo1, bookInfo2));
+                Page<BookInfo> pageOfBookInfo = new PageImpl<>(List.of(bookInfo1, bookInfo2));
 
                 int page = 0;
                 int size = 10;
                 String searchKey = "";
+                String categoryName = "전체";
+                String sort = "최신도서";
+
+                Sort.Direction direction = sort.equals("최신도서") ?  Sort.Direction.DESC : Sort.Direction.ASC;
+                Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+                Specification<BookInfo> spec = (root, query, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+
+                    // Empty specification
+                    return cb.and(predicates.toArray(new Predicate[0]));
+                };
+
+                // TODO: 통합 테스트로 Specification 테스트를 시도 해야함.
+                // specification객체를 직접 제어하는 대신 ArugmentMatchers를 사용하여 일부 또는 모든 인수를 일치 시켯습니다.
+                when(bookInfoRepo.findAll(ArgumentMatchers.<Specification<BookInfo>>any(), ArgumentMatchers.eq(pageable))).thenReturn(pageOfBookInfo);
 
                 // When
                 Page<ResponseBookInfoDto> bookInfoList = bookInfoService.getAllBookInfo(searchKey
-                        , page, size);
+                        , page, size, categoryName, sort);
 
                 // Then
                 Assertions.assertThat(bookInfoList).isNotNull();
-//                Assertions.assertThat(bookInfoList.size()).isEqualTo(2);
+                Assertions.assertThat(bookInfoList.getTotalElements()).isEqualTo(2);
             }
+
 
             @Test
             @DisplayName("id로 책 정보 조회")
@@ -162,6 +200,7 @@ public class BookInfoServiceTest {
                         .image("book-image.jpg")
                         .publisher("ABC Publishing")
                         .publishedAt("2022-01-01")
+                        .category(Category.builder().categoryName("총류").build())
                         .build();
 
                 when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.ofNullable(bookInfo));
@@ -179,22 +218,30 @@ public class BookInfoServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("하나도 책 정보가 없을 때")
+            @DisplayName("책 정보가 한 개도 없을 경우")
             void getAllBookInfoEmptyTest() {
                 // Given
-                when(bookInfoRepo.findAll()).thenReturn(List.of());
+                // 빈 페이지를 반환합니다.
+                Page<BookInfo> expectedPage = Page.empty();
+                // Pageable 객체를 생성합니다.
+                Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+                // Specification 객체를 통해 빈 값이 예상되는 메서드를 호출합니다.
+                when(bookInfoRepo.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
 
+                // 검색 키워드, 페이지, 사이즈, 카테고리, 정렬 방식을 지정합니다.
+                String searchKey = "";
                 int page = 0;
                 int size = 10;
-                String searchKey = "";
+                String categoryName = "총류";
+                String sort = "최신도서";
 
                 // When
                 Page<ResponseBookInfoDto> bookInfoList = bookInfoService.getAllBookInfo(searchKey
-                        , page, size);
+                        , page, size, categoryName, sort);
 
                 // Then
-                Assertions.assertThat(bookInfoList).isNotNull();
-//                Assertions.assertThat(bookInfoList.size()).isEqualTo(0);
+                // 빈 페이지가 반환되는지 확인합니다.
+                Assertions.assertThat(bookInfoList.getContent()).isEmpty();
             }
         }
     }

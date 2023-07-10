@@ -6,9 +6,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-@Configuration // 이 애너테이션은 이 클래스가 스프링 설정 파일임을 나타냅니다.
+@Configuration
 public class CorsConfig {
-    @Bean // 이 애너테이션은 스프링 컨테이너에 의해 관리되는 객체, 즉 Bean임을 나타냅니다. 스프링 컨테이너가 시작될 때 이 메서드를 실행하고 반환된 객체를 Bean으로 등록합니다.
+    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(); // URL 기반 CORS 구성을 위한 소스를 생성합니다.
         CorsConfiguration config = new CorsConfiguration(); // CORS 구성을 생성합니다.

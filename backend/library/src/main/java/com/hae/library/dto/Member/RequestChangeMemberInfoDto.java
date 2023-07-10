@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,4 +32,12 @@ public class RequestChangeMemberInfoDto {
     @NotNull(message = "activated는 필수 입력 값입니다.")
     private Boolean activated; // null을 허용하지 않기 위해 Boolean으로 선언
 
+    @Builder
+    public RequestChangeMemberInfoDto(Long id, String email, LocalDateTime penaltyEndDate, Role role, Boolean activated) {
+        this.id = id;
+        this.email = email;
+        this.penaltyEndDate = penaltyEndDate;
+        this.role = role;
+        this.activated = activated;
+    }
 }

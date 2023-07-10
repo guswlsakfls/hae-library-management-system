@@ -84,30 +84,31 @@ public class BookService {
     }
 
 
+    // TODO: 도서관리 페이지를 수정해서 이 메서드는 필요없을 것 같음.(추후 결정)
     // 모든 책을 조회하는 메서드입니다.
-    @Transactional
-    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
-        // 페이징 정보를 설정합니다.
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-
-        // Specification을 이용해 동적 쿼리를 생성합니다.
-        Specification<Book> spec = (root, query, cb) -> {
-            if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction(); // 모든 결과를 반환합니다.
-            }
-            // 검색어가 포함된 경우 해당 결과를 반환합니다.
-            return cb.or(
-                    cb.like(cb.lower(root.get("bookInfo").get("title")),
-                            "%" + search.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
-            );
-        };
-
-        // 위에서 생성한 쿼리를 실행하여 책 리스트를 얻어옵니다.
-        Page<Book> bookList = bookRepo.findAll(spec, pageable);
-        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
-        return responseBookWithBookInfoDtoList;
-    }
+//    @Transactional
+//    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
+//        // 페이징 정보를 설정합니다.
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+//
+//        // Specification을 이용해 동적 쿼리를 생성합니다.
+//        Specification<Book> spec = (root, query, cb) -> {
+//            if (search == null || search.trim().isEmpty()) {
+//                return cb.conjunction(); // 모든 결과를 반환합니다.
+//            }
+//            // 검색어가 포함된 경우 해당 결과를 반환합니다.
+//            return cb.or(
+//                    cb.like(cb.lower(root.get("bookInfo").get("title")),
+//                            "%" + search.toLowerCase() + "%"),
+//                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
+//            );
+//        };
+//
+//        // 위에서 생성한 쿼리를 실행하여 책 리스트를 얻어옵니다.
+//        Page<Book> bookList = bookRepo.findAll(spec, pageable);
+//        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
+//        return responseBookWithBookInfoDtoList;
+//    }
 
     // 책을 ID로 조회하는 메서드입니다.
     @Transactional

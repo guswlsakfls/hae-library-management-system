@@ -48,31 +48,32 @@ public class BookController {
                 .build();
     }
 
-    // 모든 책을 검색하거나, 검색어에 해당하는 책을 검색합니다
-    @GetMapping(value = "/admin/book/all")
-    public ResponseResultDto getAllBook(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) int page,
-            @RequestParam(required = false) int size
-    ) {
-        log.info("모든 책 정보 조회: [GET] /book/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
-        Page<ResponseBookWithBookInfoDto> responseBookList = bookService.getAllBook(search, page,
-                size);
-
-        // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("bookList", responseBookList.getContent());
-        responseData.put("totalElements", responseBookList.getTotalElements());
-        responseData.put("currentPage", responseBookList.getNumber());
-        responseData.put("size", responseBookList.getSize());
-
-        log.info("모든 책 정보 조회에 성공하였습니다.");
-        return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("모든 책 조회에 성공하였습니다")
-                .data(responseData)
-                .build();
-    }
+    // TODO: 도서관리페이지를 수정해서 필요 없을거 같음.(추후 결정)
+//    // 모든 책을 검색하거나, 검색어에 해당하는 책을 검색합니다
+//    @GetMapping(value = "/admin/book/all")
+//    public ResponseResultDto getAllBook(
+//            @RequestParam(required = false) String search,
+//            @RequestParam(required = false) int page,
+//            @RequestParam(required = false) int size
+//    ) {
+//        log.info("모든 책 정보 조회: [GET] /book/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
+//        Page<ResponseBookWithBookInfoDto> responseBookList = bookService.getAllBook(search, page,
+//                size);
+//
+//        // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
+//        Map<String, Object> responseData = new HashMap<>();
+//        responseData.put("bookList", responseBookList.getContent());
+//        responseData.put("totalElements", responseBookList.getTotalElements());
+//        responseData.put("currentPage", responseBookList.getNumber());
+//        responseData.put("size", responseBookList.getSize());
+//
+//        log.info("모든 책 정보 조회에 성공하였습니다.");
+//        return ResponseResultDto.builder()
+//                .statusCode(HttpStatus.OK.value())
+//                .message("모든 책 조회에 성공하였습니다")
+//                .data(responseData)
+//                .build();
+//    }
 
 
     // 지정된 ID를 가진 책을 검색합니다

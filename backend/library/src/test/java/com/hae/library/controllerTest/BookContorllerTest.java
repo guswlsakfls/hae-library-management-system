@@ -1,6 +1,8 @@
 package com.hae.library.controllerTest;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.controller.BookController;
 import com.hae.library.controller.BookInfoController;
@@ -9,8 +11,10 @@ import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
+import com.hae.library.dto.Member.RequestLoginDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
+import com.hae.library.mockCustomUser.WithMockCustomUser;
 import com.hae.library.service.BookInfoService;
 import com.hae.library.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,6 +58,8 @@ public class BookContorllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String jwtToken;
+
     private RequestBookWithBookInfoDto requestBookWithBookInfoDto;
     private ResponseBookInfoDto responseBookInfoDto;
     private ResponseBookWithBookInfoDto responseBookWithBookInfoDto1;
@@ -59,7 +67,40 @@ public class BookContorllerTest {
     private List<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
+//        // 로그인 요청을 위한 DTO 생성
+//        RequestLoginDto loginDto = new RequestLoginDto();
+//        loginDto.setEmail("admin@gmail.com");
+//        loginDto.setPassword("1234");
+//
+//        // 로그인 요청
+//        MvcResult result = mockMvc.perform(post("/api/auth")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(loginDto)))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        // JWT 토큰 추출
+//        String jwtToken = result.getResponse().getHeader("Authorization");
+//        System.out.println("jwtToken = " + jwtToken);
+
+//        // 로그인 요청을 위한 DTO 생성
+//        RequestLoginDto loginDto = new RequestLoginDto();
+//        loginDto.setEmail("admin@gmail.com");
+//        loginDto.setPassword("password");
+//
+//        // 로그인 API 호출
+//        MvcResult result = mockMvc.perform(post("/api/auth")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(loginDto)))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        // JWT 토큰 추출
+//        String response = result.getResponse().getContentAsString();
+//        JsonNode responseJson = objectMapper.readTree(response);
+//        jwtToken = responseJson.get("accessToken").asText();
+
         requestBookWithBookInfoDto = RequestBookWithBookInfoDto.builder()
                 .id(1L)
                 .callSign("123.12.v1.c1")
@@ -106,13 +147,14 @@ public class BookContorllerTest {
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
+            @WithMockCustomUser
             @DisplayName("책 데이터 입력시 책 생성")
             public void createBookWithBookInfoTest() throws Exception {
                 // Given
                 when(bookService.createBook(any(RequestBookWithBookInfoDto.class))).thenReturn(responseBookWithBookInfoDto1);
 
                 // When & Then
-                mockMvc.perform(post("/api/book/create")
+                mockMvc.perform(post("/api/admin/book/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBookWithBookInfoDto))
                                 .accept(MediaType.APPLICATION_JSON))
@@ -213,22 +255,30 @@ public class BookContorllerTest {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
-            @Test
-            @DisplayName("책 전체 조회")
-            public void getBooksTest() throws Exception {
-                // Given
-                when(bookService.getAllBook()).thenReturn(responseBookWithBookInfoDtoList);
 
-                // When & Then
-                mockMvc.perform(get("/api/book/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.data.length()").value(2))
-                        .andExpect(jsonPath("$.statusCode").value(200))
-                        .andExpect(jsonPath("$.message").value("모든 책 조회에 성공하였습니다"));
-            }
+            // TODO: 도서 관리 페이지 수정으로 필요 없어짐. (추후 쓰일 곳 있는지 보고 삭제)
+//            @Test
+//            @DisplayName("책 전체 조회")
+//            public void getBooksTest() throws Exception {
+//                // Given
+//                String searchKey = "";
+//                int page = 0;
+//                int size = 10;
+//                String categoryName = "전체";
+//                String sort = "최신도서";
+//
+//                when(bookService.getAllBook(searchKey, page, size, categoryName, sort)).thenReturn(Page<responseBookWithBookInfoDtoList>);
+//
+//                // When & Then
+//                mockMvc.perform(get("/api/book/all")
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .accept(MediaType.APPLICATION_JSON))
+//                        .andExpect(status().isOk())
+//                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                        .andExpect(jsonPath("$.data.length()").value(2))
+//                        .andExpect(jsonPath("$.statusCode").value(200))
+//                        .andExpect(jsonPath("$.message").value("모든 책 조회에 성공하였습니다"));
+//            }
 
             @Test
             @DisplayName("책 id로 조회")
@@ -250,22 +300,24 @@ public class BookContorllerTest {
         @Nested
         @DisplayName("실패 케이스")
         public class FailCaseTest {
-            @Test
-            @DisplayName("책 전체 조회시 책이 없을 경우 빈 리스트 반환")
-            public void getBooksFailTest() throws Exception {
-                // Given
-                when(bookService.getAllBook()).thenReturn(Collections.emptyList());
 
-                // When & Then
-                mockMvc.perform(get("/api/book/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.data.length()").value(0))
-                        .andExpect(jsonPath("$.statusCode").value(200))
-                        .andExpect(jsonPath("$.message").value("모든 책 조회에 성공하였습니다"));
-            }
+            // TODO: 도서 관리 페이지 수정으로 필요 없어짐.(추후 쓰일 곳 있는지 보고 삭제)
+//            @Test
+//            @DisplayName("책 전체 조회시 책이 없을 경우 빈 리스트 반환")
+//            public void getBooksFailTest() throws Exception {
+//                // Given
+//                when(bookService.getAllBook()).thenReturn(Collections.emptyList());
+//
+//                // When & Then
+//                mockMvc.perform(get("/api/book/all")
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .accept(MediaType.APPLICATION_JSON))
+//                        .andExpect(status().isOk())
+//                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                        .andExpect(jsonPath("$.data.length()").value(0))
+//                        .andExpect(jsonPath("$.statusCode").value(200))
+//                        .andExpect(jsonPath("$.message").value("모든 책 조회에 성공하였습니다"));
+//            }
 
             @Test
             @DisplayName("책 상세 조회시 책이 없을 경우 에러 메시지 반환")

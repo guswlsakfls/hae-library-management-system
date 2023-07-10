@@ -37,9 +37,12 @@ public class MemberService {
      * 회원가입을 처리합니다.
      *
      * @param requestSignupDto 회원 가입 정보 DTO
-     * @return 회원 정보 DTO
+     * @return responseMemberDto 회원 정보 DTO
+     *
+     * @throws MemberErrorCode 패스워드와 패스워드 재확인이 일치하지 않을 때
+     * @throws MemberErrorCode 이미 존재하는 이메일일 때
      */
-    public ResponseMemberDto signup(RequestSignupDto requestSignupDto) {
+    public void signup(RequestSignupDto requestSignupDto) {
         // 입력받은 패스워드와 패스워드 재확인이 일치하지 않으면 예외를 발생시킵니다.
         if (!requestSignupDto.isPasswordMatching()) {
             throw new RestApiException(MemberErrorCode.MEMBER_PASSWORD_NOT_MATCH);
@@ -57,7 +60,7 @@ public class MemberService {
                 .role(Role.valueOf("ROLE_USER"))
                 .build();
 
-        return ResponseMemberDto.from(memberRepository.save(member));
+        memberRepository.save(member);
     }
 
     /**
@@ -68,7 +71,7 @@ public class MemberService {
      * @param size   페이지 크기
      * @param role   역할
      * @param sort   정렬
-     * @return 회원 정보 페이지
+     * @return Page<ResponseMemberDto> 회원 정보 페이지
      */
     public Page<ResponseMemberDto> getAllMember(String search, int page, int size, String role,
                                                 String sort) {
@@ -86,6 +89,10 @@ public class MemberService {
 
             // 역할에 따라 검색을 합니다.
             if (!"전체".equals(role)) {
+                // "전체", "관리자", "일반회원" 중 하나가 아닌 경우 예외를 발생시킵니다.
+                if (!"관리자".equals(role) && !"일반회원".equals(role)) {
+                    throw new RestApiException(MemberErrorCode.MEMBER_ROLE_NOT_FOUND);
+                }
                 Role roleEnum = "관리자".equals(role) ? Role.ROLE_ADMIN : Role.ROLE_USER;
                 predicates.add(cb.equal(root.get("role"), roleEnum));
             }
@@ -111,7 +118,7 @@ public class MemberService {
     /**
      * 현재 로그인한 사용자의 정보를 조회합니다.
      *
-     * @return 현재 로그인한 사용자의 정보 DTO
+     * @return ResponseMemberDto 현재 로그인한 사용자의 정보 DTO
      */
     public ResponseMemberDto getMyInfoBySecurity() {
         // jwt토큰에서 받아온 사용자의 이메일을 기준으로 회원 정보를 조회합니다.
@@ -124,7 +131,9 @@ public class MemberService {
      * 이메일을 기준으로 회원 정보를 조회합니다.
      *
      * @param requestEmailDto 이메일 정보 DTO
-     * @return 회원 정보 DTO
+     * @return ResponseMemberDto 회원 정보 DT
+     * O
+     * @throws MemberErrorCode 회원을 찾지 못했을 때
      */
     public ResponseMemberDto getMemberByEmail(RequestEmailDto requestEmailDto) {
         // 이메일로 사용자를 찾습니다.
@@ -145,7 +154,10 @@ public class MemberService {
      * 특정 회원의 정보를 수정합니다.
      *
      * @param requestChangeMemberInfoDto 변경할 회원 정보 DTO
-     * @return 변경된 회원 정보 DTO
+     * @return responseMemberDto 변경된 회원 정보 DTO
+     *
+     * @throws MemberErrorCode 이메일이 이미 존재할 때
+     * @throws MemberErrorCode 회원을 찾지 못했을 때
      */
     @Transactional
     public ResponseMemberDto modifyMemberInfo(RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
@@ -157,6 +169,8 @@ public class MemberService {
         // 요청받은 ID로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findById(requestChangeMemberInfoDto.getId()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // 회원 정보를 수정합니다.
         member.updateMemberInfo(requestChangeMemberInfoDto);
         return ResponseMemberDto.from(memberRepository.save(member));
     }
@@ -186,7 +200,9 @@ public class MemberService {
     }
 
     /**
-     * 회원 탈퇴 처리를 합니다. 회원의 activated 상태를 false로 변경합니다.
+     * 회원을 휴면계정 처리 합니다. 회원의 activated 상태를 false로 변경합니다.
+     *
+     * @throws MemberErrorCode 이메일로 회원을 찾지 못했을 때
      */
     @Transactional
     public void memberWithdrawal() {
@@ -203,6 +219,8 @@ public class MemberService {
      * 회원정보를 삭제합니다.
      *
      * @param id 삭제할 회원의 ID
+     *
+     * Throws MemberErrorCode id로 회원을 찾지 못했을 때
      */
     @Transactional
     public void deleteMember(Long id) {

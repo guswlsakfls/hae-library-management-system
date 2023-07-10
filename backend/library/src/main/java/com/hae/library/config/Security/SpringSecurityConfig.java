@@ -88,11 +88,6 @@ public class SpringSecurityConfig {
                         .requestMatchers(ADMIN_URL_ARRAY).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-//                .formLogin(formLogin -> formLogin
-////                        .loginPage("/login")
-////                        .loginProcessingUrl("/api/auth")
-//                        .failureHandler(customAuthFailureHandler)
-//                )
                 // 세션을 사용하지 않기 때문에 STATELESS로 설정
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
