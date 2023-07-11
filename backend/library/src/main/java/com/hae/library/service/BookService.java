@@ -35,11 +35,16 @@ public class BookService {
     private final BookInfoService bookInfoService;
     private final CategoryRepository categoryRepo;
 
-    // 새로운 책을 생성하는 메서드입니다.
+    /**
+     * 새로운 책을 추가하는 메서드입니다.
+     *
+     * @param requestBookWithBookInfoDto 새로운 책 정보 요청 DTO
+     * @return ResponseBookWithBookInfoDto 새로운 책 정보 응답 DTO
+     *
+     * @throws BookErrorCode 청구기호가 중복되는 경우
+     */
     @Transactional
-    public ResponseBookWithBookInfoDto createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
-        log.error("requestBookDto???: {}", requestBookWithBookInfoDto);
-
+    public void createBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         // 청구기호가 중복되는지 확인합니다. 중복되는 경우 예외 처리합니다.
         if (bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())) {
             throw new RestApiException(BookErrorCode.DUPLICATE_BOOK);
@@ -53,22 +58,22 @@ public class BookService {
         if (bookInfoOptional.isPresent()) {
             // BookInfo가 존재하는 경우 기존 BookInfo를 사용합니다.
             BookInfo bookInfo = bookInfoOptional.get();
-
-            responseBookWithBookInfoDto =
-                    saveBookWithBookInfo(requestBookWithBookInfoDto,
-                            bookInfo);
+            // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
+            saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         } else {
             // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.
             BookInfo newBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
-            responseBookWithBookInfoDto =
-                    saveBookWithBookInfo(requestBookWithBookInfoDto, newBookInfo);
+            saveBookWithBookInfo(requestBookWithBookInfoDto, newBookInfo);
         }
-        return responseBookWithBookInfoDto;
     }
 
-    // 책과 BookInfo를 함께 저장하는 메서드입니다.
-    private ResponseBookWithBookInfoDto saveBookWithBookInfo(RequestBookWithBookInfoDto requestBookWithBookInfoDto,
+    /**
+     * createBook에 중복 되는 메서드인, book을 저장하는 메서드입니다.
+     *
+     * @param requestBookWithBookInfoDto 새로운 책 정보 요청 DTO
+     */
+    private void saveBookWithBookInfo(RequestBookWithBookInfoDto requestBookWithBookInfoDto,
                                                              BookInfo bookInfo) {
         Book book = Book.builder()
                 .callSign(requestBookWithBookInfoDto.getCallSign())
@@ -78,38 +83,44 @@ public class BookService {
         // 생성한 책 객체에 BookInfo를 추가합니다.
         book.addBookInfo(bookInfo);
         // 책 객체를 데이터베이스에 저장합니다.
-
         Book updateBook = bookRepo.save(book);
-        return ResponseBookWithBookInfoDto.from(updateBook);
     }
 
 
+    // TODO: 도서관리 페이지를 수정해서 이 메서드는 필요없을 것 같음.(추후 결정)
     // 모든 책을 조회하는 메서드입니다.
-    @Transactional
-    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
-        // 페이징 정보를 설정합니다.
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+//    @Transactional
+//    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
+//        // 페이징 정보를 설정합니다.
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+//
+//        // Specification을 이용해 동적 쿼리를 생성합니다.
+//        Specification<Book> spec = (root, query, cb) -> {
+//            if (search == null || search.trim().isEmpty()) {
+//                return cb.conjunction(); // 모든 결과를 반환합니다.
+//            }
+//            // 검색어가 포함된 경우 해당 결과를 반환합니다.
+//            return cb.or(
+//                    cb.like(cb.lower(root.get("bookInfo").get("title")),
+//                            "%" + search.toLowerCase() + "%"),
+//                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
+//            );
+//        };
+//
+//        // 위에서 생성한 쿼리를 실행하여 책 리스트를 얻어옵니다.
+//        Page<Book> bookList = bookRepo.findAll(spec, pageable);
+//        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
+//        return responseBookWithBookInfoDtoList;
+//    }
 
-        // Specification을 이용해 동적 쿼리를 생성합니다.
-        Specification<Book> spec = (root, query, cb) -> {
-            if (search == null || search.trim().isEmpty()) {
-                return cb.conjunction(); // 모든 결과를 반환합니다.
-            }
-            // 검색어가 포함된 경우 해당 결과를 반환합니다.
-            return cb.or(
-                    cb.like(cb.lower(root.get("bookInfo").get("title")),
-                            "%" + search.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
-            );
-        };
-
-        // 위에서 생성한 쿼리를 실행하여 책 리스트를 얻어옵니다.
-        Page<Book> bookList = bookRepo.findAll(spec, pageable);
-        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
-        return responseBookWithBookInfoDtoList;
-    }
-
-    // 책을 ID로 조회하는 메서드입니다.
+    /**
+     * 책을 ID로 조회하는 메서드입니다.
+     *
+     * @param bookId 책 ID
+     * @return ResponseBookWithBookInfoDto 책 정보 응답 DTO
+     *
+     * @throws BookErrorCode 책을 찾을 수 없는 경우
+     */
     @Transactional
     public ResponseBookWithBookInfoDto getBookById(Long bookId) {
         // 주어진 ID를 이용하여 도서를 검색합니다. 만약 도서를 찾을 수 없다면 예외를 발생시킵니다.
@@ -117,15 +128,32 @@ public class BookService {
         return ResponseBookWithBookInfoDto.from(book);
     }
 
-    // 책을 청구기호로 조회하는 메서드입니다.
+    /**
+     * 책을 청구기호로 조회하는 메서드입니다.
+     *
+     * @param callSign 청구기호
+     * @return ResponseBookWithBookInfoDto 책 정보 응답 DTO
+     *
+     * @throws BookErrorCode 책을 찾을 수 없는 경우
+     */
     @Transactional
     public ResponseBookWithBookInfoDto getBookByCallSign(String callSign) {
-        // 청구기호를 사용하여 도서를 검색합니다. 만약 도서를 찾을 수 없다면 예외를 발생시킵니다.
+        // 청구기호를 사용하여 도서를 검색합니다.
+        // 만약 도서를 찾을 수 없다면 예외를 발생시킵니다.
         Book book = bookRepo.findByCallSign(callSign).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
         return ResponseBookWithBookInfoDto.from(book);
     }
 
-    // 책을 수정하는 메서드입니다.
+    /**
+     * 책을 수정하는 메서드입니다.
+     *
+     * @param requestBookWithBookInfoDto 책 정보 요청 DTO
+     * @return ResponseBookWithBookInfoDto 책 정보 응답 DTO
+     *
+     * @throws BookErrorCode 책을 찾을 수 없는 경우
+     * @throws BookErrorCode 청구기호가 중복되는 경우
+     * @throws BookErrorCode 카테고리를 찾을 수 없는 경우
+     */
     public ResponseBookWithBookInfoDto updateBook(RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         // request DTO에서 ID를 얻어와 해당 ID의 도서를 찾습니다. 도서를 찾지 못하면 예외를 발생시킵니다.
         Book book = bookRepo.findById(requestBookWithBookInfoDto.getId()).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
@@ -158,7 +186,14 @@ public class BookService {
         return ResponseBookWithBookInfoDto.from(book);
     }
 
-    // 책을 삭제하는 메서드입니다.
+    /**
+     * 책을 삭제하는 메서드입니다.
+     *
+     * @param bookId 책 ID
+     *
+     * @throws BookErrorCode 책을 찾을 수 없는 경우
+     * @throws BookErrorCode 대여중인 책을 삭제하려고 하는 경우
+     */
     public void deleteBookById(Long bookId) {
         // 삭제할 도서를 ID를 이용하여 검색합니다. 도서를 찾지 못하면 예외를 발생시킵니다.
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
@@ -175,7 +210,5 @@ public class BookService {
 
         // 찾은 도서를 데이터베이스에서 삭제합니다.
         bookRepo.deleteById(bookId);
-
     }
-
 }

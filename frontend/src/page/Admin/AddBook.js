@@ -12,7 +12,7 @@ const statusText = {
   LOST: '분실',
 };
 
-const bookStatus = ['FINE', 'BREAK'];
+const bookStatus = ['FINE', 'BREAK', 'LOST'];
 
 export default function AddBook() {
   const [bookList, setBookList] = useState([]);

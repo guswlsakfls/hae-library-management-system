@@ -1,6 +1,7 @@
 package com.hae.library.repositoryTest;
 
 import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
 import com.hae.library.repository.BookInfoRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +54,7 @@ public class BookInfoRepositoryTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("isbn null 값 대입시 생성하지 못한다")
+            @DisplayName("isbn입력값이 없을 시 생성하지 못한다")
             public void createBookInfoTest() {
                 // Given
                 BookInfo bookInfo = BookInfo.builder()
@@ -242,8 +243,12 @@ public class BookInfoRepositoryTest {
                 String newPublisher = "Updated Publisher";
                 String newImage = "updated.jpg";
                 String newPublishedAt = "2023-07-01";
+                Category newCategory = Category.builder()
+                        .categoryName("총류")
+                        .build();
 
-                bookInfo.updateBookInfo(newIsbn, newTitle, newAuthor, newPublisher, newImage, newPublishedAt);
+                bookInfo.updateBookInfo(newTitle, newIsbn, newAuthor, newPublisher, newPublishedAt
+                        , newImage, newCategory);
                 BookInfo updatedBookInfo = bookInfoRepository.save(bookInfo);
 
                 // Then

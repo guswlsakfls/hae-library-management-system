@@ -69,8 +69,6 @@ public class BookInfoService {
                 .publishedAt(requestBookDto.getPublishedAt())
                 .build();
 
-        log.error("request!!!: {}", requestBookDto);
-        log.error("requestCategoryName: {}", requestBookDto.getCategoryName());
         // 카테고리를 조회하고 책 객체에 추가합니다.
         Optional<Category> categoryOptional =
                 categoryRepo.findByCategoryName(requestBookDto.getCategoryName());
@@ -78,9 +76,8 @@ public class BookInfoService {
             throw new RestApiException(BookErrorCode.CATEGORY_NOT_FOUND);
         }
         Category category = categoryOptional.get();
-        log.error("category: {}", category.getCategoryName());
+        // 책 정보에 카테고리를 추가합니다.
         bookInfo.addCategory(category);
-        log.error("bookInfo: {}", bookInfo.getCategory().getCategoryName());
         // 생성한 BookInfo 객체를 DB에 저장하고, 저장된 객체를 다시 가져옵니다.
         return bookInfoRepo.save(bookInfo);
     }

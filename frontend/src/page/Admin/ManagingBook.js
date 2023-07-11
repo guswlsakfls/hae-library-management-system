@@ -402,8 +402,13 @@ export default function ManagingBook() {
                         {book.isAvailable ? '대출 중' : '대출 가능'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-                        {book.status === 'FINE' ? '양호' : '파손'}
+                        {book.status === 'FINE'
+                          ? '양호'
+                          : book.status === 'BREAK'
+                          ? '파손'
+                          : '분실'}
                       </td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
                         {book.createdAt}
                       </td>
@@ -566,8 +571,9 @@ export default function ManagingBook() {
                       value={editBook.status}
                       onChange={handleInputChange}
                     >
-                      <option value="FINE">보통</option>
+                      <option value="FINE">양호</option>
                       <option value="BREAK">파손</option>
+                      <option value="LOST">분실</option>
                     </select>
 
                     <label

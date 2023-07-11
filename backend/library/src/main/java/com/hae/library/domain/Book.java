@@ -38,10 +38,14 @@ public class Book extends BaseTimeEntity {
     private String donator;
 
     @Builder
-    public Book(String callSign, BookStatus status, String donator) {
+    public Book(Long id, String callSign, Boolean lendingStatus, BookStatus status, String donator,
+                BookInfo bookInfo) {
+        this.id = id;
         this.callSign = callSign;
+        this.lendingStatus = lendingStatus || false;
         this.status = status;
         this.donator = donator;
+        this.bookInfo = bookInfo;
     }
 
     /**

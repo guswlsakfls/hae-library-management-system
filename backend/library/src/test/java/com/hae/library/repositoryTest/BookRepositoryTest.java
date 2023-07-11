@@ -72,7 +72,7 @@ public class BookRepositoryTest {
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
-            @DisplayName("책을 ID로 조회한다")
+            @DisplayName("책을 ID로 조회하고 반환한다")
             public void findBookByIdTest() {
                 // Given
                 Book book = Book.builder()

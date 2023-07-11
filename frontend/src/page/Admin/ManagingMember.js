@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import DefaultButton from '../../component/common/DefaultButton';
-import Dropdown from '../../component/common/Dropdown';
 import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
 import { useSearchParams } from 'react-router-dom/dist';
-import { getMemberListApi, updateMemberApi } from '../../api/MemberApi';
+import {
+  getMemberListApi,
+  updateMemberApi,
+  deleteMemberApi,
+} from '../../api/MemberApi';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import SelectBar from '../../component/common/SelectBar';
@@ -47,8 +50,37 @@ export default function ManagingMember() {
     console.log(member);
   };
 
-  const checkToggleModal = () => {
-    alert('삭제하시겠습니까?');
+  const checkToggleModal = id => {
+    if (
+      window.confirm(
+        '삭제하시겠습니까?\n주위! 관련된 데이터가 모두 삭제되고 복수할 수 없습니다.'
+      )
+    ) {
+      // '확인' 버튼을 눌렀을 때의 로직을 여기에 작성하세요.
+      deleteMemberApi(id)
+        .then(res => {
+          console.log(res);
+          alert(res.message);
+          window.location.reload();
+        })
+        .catch(err => {
+          console.log(err.response);
+          if (err.response.status === 401 || err.response.status === 403) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/login';
+            return;
+          }
+          alert(err.response.data.message);
+          let errors = err.response.data.errors;
+          if (!errors) {
+            return;
+          }
+          let errorMessages = errors
+            .map((error, index) => `${index + 1}. ${error.message}`)
+            .join('\n\n');
+          alert(errorMessages);
+        });
+    }
   };
 
   const handlePageChange = page => {
@@ -154,7 +186,11 @@ export default function ManagingMember() {
         {member.updatedAt}
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton color={'red'} size="small" onClick={checkToggleModal}>
+        <DefaultButton
+          color={'red'}
+          size="small"
+          onClick={() => checkToggleModal(member.id)}
+        >
           삭제
         </DefaultButton>
       </td>

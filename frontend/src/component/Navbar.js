@@ -30,7 +30,6 @@ export default function Navbar() {
           current: current.includes('/admin'),
         }
       : {},
-    { name: '안내사항', href: '/info', current: current === '/info' },
     { name: '도서목록', href: '/booklist', current: current === '/booklist' },
     // 로그인 상태에 따라 다르게 표시
     {

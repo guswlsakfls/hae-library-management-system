@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor // TODO: 이 옵션에 대해 다시 알아 보기. (access = AccessLevel.PROTECTED)
 @Table(name = "MEMBER")
 public class Member extends BaseTimeEntity {
 
@@ -23,7 +23,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Lending> lendingList = new ArrayList<Lending>();
 
     @Column(name = "lending_count")
@@ -46,12 +46,14 @@ public class Member extends BaseTimeEntity {
     private boolean activated = true;
 
     @Builder
-    public Member(String email, String password, Role role,
-                  LocalDateTime penaltyEndDate) {
+    public Member(Long id, String email, String password, Role role,
+                  LocalDateTime penaltyEndDate, boolean activated) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
         this.penaltyEndDate = penaltyEndDate;
+        this.activated = activated;
     }
 
     /**
@@ -104,15 +106,6 @@ public class Member extends BaseTimeEntity {
     public void addLending(Lending lending) {
         lending.updateMember(this);
         this.lendingList.add(lending);
-    }
-
-    /**
-     * 반납한 대출 정보를 삭제합니다.
-     * @param lending 삭제할 대출 정보
-     */
-    public void removeLending(Lending lending) {
-        this.lendingList.remove(lending);
-//        lending.updateMember(null);
     }
 
     /**

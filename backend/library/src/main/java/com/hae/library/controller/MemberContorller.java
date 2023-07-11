@@ -29,13 +29,12 @@ public class MemberContorller {
     @PostMapping(value = "/signup")
     public ResponseResultDto<Object> signUp(@RequestBody @Valid RequestSignupDto requestSignupDto) {
         log.info("회원가입 요청: [POST] /member/signup - {}", requestSignupDto.toString());
-        ResponseMemberDto responseMemberDto = memberService.signup(requestSignupDto);
+        memberService.signup(requestSignupDto);
 
         log.info("회원가입에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("회원가입에 성공하였습니다")
-                .data(responseMemberDto)
                 .build();
     }
 
@@ -129,16 +128,29 @@ public class MemberContorller {
     }
 
 
-    // TODO: 회원 탈퇴시 boolean으로 처리(1: 회원, 0: 탈퇴)
+    // 회원을 휴면계정으로 전환 합니다.
     @PutMapping(value = "/member/withdrawal/me")
     public ResponseResultDto<Object> memberWithdrawal() {
-        log.info("회원 탈퇴: [PUT] /member/withdrawal");
+        log.info("회원 휴면계정 전환: [PUT] /member/withdrawal");
         memberService.memberWithdrawal();
 
-        log.info("회원 탈퇴에 성공하였습니다");
+        log.info("회원이 휴면계정 전환에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("회원 탈퇴에 성공하였습니다")
+                .message("회원이 휴면계정 전환에 성공하였습니다")
+                .build();
+    }
+
+    // 회원을 삭제합니다.
+    @DeleteMapping(value = "/admin/member/{memberId}/delete")
+    public ResponseResultDto<Object> deleteMember(@PathVariable Long memberId) {
+        log.info("회원 삭제: [DELETE] /member/delete - {}", memberId);
+        memberService.deleteMember(memberId);
+
+        log.info("회원 삭제에 성공하였습니다");
+        return ResponseResultDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("회원 삭제에 성공하였습니다")
                 .build();
     }
 

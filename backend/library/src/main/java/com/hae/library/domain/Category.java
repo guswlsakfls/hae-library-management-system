@@ -30,6 +30,10 @@ public class Category extends BaseTimeEntity {
         this.categoryName = categoryName;
     }
 
+    /**
+     * 카테고리 이름 변경
+     * @param categoryName 변경할 카테고리 이름
+     */
     public void updateCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }

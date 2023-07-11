@@ -56,7 +56,7 @@ public class RequestBookWithBookInfoDto {
 
     @Builder
     public RequestBookWithBookInfoDto(Long id, String callSign, String isbn, String title,
-                           String author, String publisher, String CategoryName,
+                           String author, String publisher, String categoryName,
                           String image, String publishedAt, String status, String donator) {
         this.id = id;
         this.callSign = callSign;
@@ -66,9 +66,17 @@ public class RequestBookWithBookInfoDto {
         this.publisher = publisher;
         this.image = image;
         this.publishedAt = publishedAt;
-        this.categoryName = CategoryName;
+        this.categoryName = categoryName;
         this.status = status;
         this.donator = donator;
+    }
+
+    /**
+     * 청구기호를 업데이트 한다.
+     * @param callSign
+     */
+    public void updateCallSign(String callSign) {
+        this.callSign = callSign;
     }
 }
 

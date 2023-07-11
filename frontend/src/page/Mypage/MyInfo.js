@@ -5,8 +5,6 @@ import {
   updateNewPasswordApi,
   putMemberWidthdrawalApi,
 } from '../../api/MemberApi';
-import { MemberContext } from '../../contextApi/MemberContext';
-import { useContext } from 'react';
 
 export default function MyInfo() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);
@@ -14,9 +12,6 @@ export default function MyInfo() {
   const [nowPassword, setNowPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordCheck, setNewPasswordCheck] = useState('');
-
-  const { memberInfo } = useContext(MemberContext);
-  console.log(memberInfo);
 
   const modifyToggleModal = () => {
     modifySetIsOpen(!modifyIsOpen);
