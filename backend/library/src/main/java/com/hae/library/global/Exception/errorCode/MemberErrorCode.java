@@ -22,7 +22,7 @@ public enum MemberErrorCode implements ErrorCode {
     MEMBER_DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다"),
 
     // 대출
-    USER_NOT_LENDING_AVAILABLE(HttpStatus.BAD_REQUEST, "3권까지 대출 가능합니다"),
+    OVER_LENDING_COUNT(HttpStatus.BAD_REQUEST, "3권까지 대출 가능합니다"),
     USER_OVERDUE(HttpStatus.BAD_REQUEST, "연체일이 지난 후에 대출이 가능"),
 
     // 검색어

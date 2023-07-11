@@ -23,7 +23,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lendingUser", cascade = CascadeType.ALL)
     private List<Lending> lendingList = new ArrayList<Lending>();
 
     @Column(name = "lending_count")

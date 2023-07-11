@@ -58,6 +58,7 @@ public class MemberService {
                 .email(requestSignupDto.getEmail())
                 .password(passwordEncoder.encode(requestSignupDto.getPassword()))
                 .role(Role.valueOf("ROLE_USER"))
+                .activated(true)
                 .build();
 
         memberRepository.save(member);

@@ -24,7 +24,7 @@ public class ResponseLendingDto {
         dto.id = lending.getId();
         dto.bookTitle = lending.getBook().getBookInfo().getTitle();
         dto.bookCallSign = lending.getBook().getCallSign();
-        dto.userEmail = lending.getUser().getEmail();
+        dto.userEmail = lending.getLendingUser().getEmail();
         dto.lendingLibrarianEmail = lending.getLendingLibrarian().getEmail();
         dto.lendingCondition = lending.getLendingCondition();
         dto.createdAt = lending.getCreatedAt().toLocalDate().toString();
