@@ -39,7 +39,6 @@ public class MemberContorller {
     }
 
     // 회원 정보 전체를 조회합니다.
-//    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/admin/memberinfo/all")
     public ResponseResultDto<Object> getAllMember(
             @RequestParam(required = false) String search,
@@ -99,7 +98,6 @@ public class MemberContorller {
     }
 
     // 회원 정보를 수정합니다.
-//    @RoleInterface.AdminAuthorize
     @PutMapping(value = "/admin/member/update")
     public ResponseResultDto<Object> modifyMemberInfo(@RequestBody @Valid RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         log.info("회원 정보 수정: [PUT] /member/update - {}", requestChangeMemberInfoDto.toString());
