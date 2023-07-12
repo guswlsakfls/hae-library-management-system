@@ -24,7 +24,7 @@ import java.util.Map;
 public class LendingController {
     private final LendingService lendingService;
 
-    // 책 대여 요청을 합니다.
+    // 책 대여 요청 정보를 받아 저장합니다.
     @PostMapping(value = "/admin/lending/create")
     public ResponseResultDto<Object> LendingBook(@RequestBody @Valid RequestLendingDto requestLendingDto) {
         log.info("책 대여 요청: [POST] /lending/create - {}", requestLendingDto.toString());
@@ -37,7 +37,7 @@ public class LendingController {
                 .build();
     }
 
-    // 책 반납 요청을 합니다.
+    // 책 반납 요청을 받아 처리합니다.
     @PutMapping(value = "/admin/lending/returning")
     public ResponseResultDto<Object> ReturningBook(@RequestBody @Valid RequestReturningDto requestReturningDto) {
         log.info("책 반납 요청: [PUT] /lending/returning - {}", requestReturningDto.toString());
@@ -51,13 +51,14 @@ public class LendingController {
     }
 
     // 반납을 위한 책 대여 기록을 조회합니다.
-    @GetMapping(value = "/admin/lending/callsign")
+    @GetMapping(value = "/admin/lending/{callsign}")
     public ResponseResultDto<Object> getLendingInfoByCallSign(
-            @RequestParam @NotBlank(message = "청구기호를 입력해주세요.") @Size(max=20,
-                    message = "20자 이하로 입력해 주세요") String callSign
+            @PathVariable @NotBlank(message = "청구기호를 입력해주세요.") @Size(max=20,
+                    message = "20자 이하로 입력해 주세요") String callsign
     ) {
-        log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", callSign);
-        ResponseLendingInfoForReturningDto responseLendingDto = lendingService.getLendingInfoByCallSign(callSign);
+        log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", callsign);
+        ResponseLendingInfoForReturningDto responseLendingDto =
+                lendingService.getLendingInfoByCallSign(callsign);
 
         log.info("반납을 위한 책 대여 기록 조회에 성공하였습니다");
         return ResponseResultDto.builder()

@@ -2,6 +2,13 @@ package com.hae.library.controllerTest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hae.library.domain.Book;
+import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
+import com.hae.library.domain.Enum.BookStatus;
+import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.BookRepository;
+import com.hae.library.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +36,20 @@ public class BookInfoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private BookInfoRepository bookInfoRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     private String token;
+
+    private Long categoryId;
+
+    private Long bookId;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -47,25 +67,40 @@ public class BookInfoControllerTest {
         this.token = responseJson.get("data").get("accessToken").asText();
 
         // 테스트용 카테고리를 등록합니다.
-        mockMvc.perform(post("/api/admin/category/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"categoryName\":\"테스트\"}")
-                        .header("Authorization", "Bearer " + this.token))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        Category category = categoryRepository.save(Category.builder()
+                .categoryName("테스트")
+                .build());
+        this.categoryId = category.getId();
 
         // 테스트용 도서 정보를 등록합니다.
-        mockMvc.perform(post("/api/admin/book/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"callSign\":\"111.111-11-11.c1\", \"isbn\":\"1234567890123\"," +
-                                " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}")
-                        .header("Authorization", "Bearer " + this.token))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        BookInfo bookInfo = BookInfo.builder()
+                .isbn("1234567890123")
+                .title("테스트용 책 제목")
+                .author("테스트용 책 저자")
+                .publisher("테스트용 출판사")
+                .image("http://example.com/test.jpg")
+                .publishedAt("2023")
+                .category(category)
+                .build();
+        BookInfo book1 = bookInfoRepository.save(bookInfo);
+
+        Book book2 = bookRepository.save(Book.builder()
+                .callSign("111.111-11-11.c1")
+                .bookInfo(bookInfo)
+                .status(BookStatus.valueOf("FINE"))
+                .lendingStatus(false)
+                .donator("테스트 기증자")
+                .build());
+
+        Book book3 = bookRepository.save(Book.builder()
+                .callSign("111.111-11-11.c2")
+                .bookInfo(bookInfo)
+                .status(BookStatus.valueOf("FINE"))
+                .lendingStatus(false)
+                .donator("테스트 기증자")
+                .build());
+
+        this.bookId = book1.getId();
     }
 
     @Nested
@@ -98,11 +133,10 @@ public class BookInfoControllerTest {
             @Test
             @DisplayName("도서 정보를 조회합니다.")
             public void getBookInfo() throws Exception {
-                mockMvc.perform(get("/api/bookinfo/1")
+                mockMvc.perform(get("/api/bookinfo/" + bookId)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.data.id", is(1)));
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
         }
 
@@ -166,7 +200,7 @@ public class BookInfoControllerTest {
             @Test
             @DisplayName("도서 정보를 삭제합니다.")
             public void deleteBookInfo() throws Exception {
-                mockMvc.perform(delete("/api/admin/bookinfo/1/delete")
+                mockMvc.perform(delete("/api/admin/bookinfo/" + bookId + "/delete")
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))

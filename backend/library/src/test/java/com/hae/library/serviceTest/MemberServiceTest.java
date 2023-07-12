@@ -116,7 +116,7 @@ public class MemberServiceTest {
             }
 
             @Test
-            @DisplayName("중복 이메일로 회원가입 시도 시 예외 발생") // TODO: data.sql에 admin@gmail이 존재해야 함
+            @DisplayName("중복 이메일로 회원가입 시도 시 예외 발생") // TODO: data.sql.sql에 admin@gmail이 존재해야 함
             public void shouldThrowExceptionWhenSignupWithDuplicatedEmail() {
                 // Given
                 RequestSignupDto requestSignupDto = RequestSignupDto.builder()

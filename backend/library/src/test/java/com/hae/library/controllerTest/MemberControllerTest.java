@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.Enum.Role;
 import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
-import com.hae.library.dto.Member.RequestChangePasswordDto;
-import com.hae.library.dto.Member.RequestEmailDto;
 import com.hae.library.dto.Member.RequestSignupDto;
 import com.hae.library.repository.MemberRepository;
 import com.hae.library.service.MemberService;
@@ -41,11 +39,6 @@ public class MemberControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-//    private RequestSignupDto requestSignupDto;
-//    private RequestEmailDto requestEmailDto;
-//    private RequestChangeMemberInfoDto requestChangeMemberInfoDto;
-//    private RequestChangePasswordDto requestChangePasswordDto;
 
     private String token;
 
