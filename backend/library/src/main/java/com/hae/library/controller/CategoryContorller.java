@@ -51,9 +51,8 @@ public class CategoryContorller {
     // 카테고리를 수정합니다.
     @PutMapping(value = "/admin/category/update")
     public ResponseResultDto<Object> updateCategory(@RequestBody @Valid RequestUpdateCategoryDto requestUpdateCategoryDto) {
-        log.info("카테고리 수정 요청: [PUT] /category/update");
-        ResponseCategoryDto responseCategoryDto = categoryService.updateCategory
-        (requestUpdateCategoryDto);
+        log.info("카테고리 수정 요청: [PUT] /category/update - {}, {}", requestUpdateCategoryDto.getCategoryId(), requestUpdateCategoryDto.getUpdatedCategoryName());
+        categoryService.updateCategory(requestUpdateCategoryDto);
 
         log.info("카테고리 수정에 성공하였습니다");
         return ResponseResultDto.builder()
@@ -65,7 +64,7 @@ public class CategoryContorller {
     // 카테고리를 삭제합니다.
     @DeleteMapping(value = "/admin/category/{categoryId}/delete")
     public ResponseResultDto<Object> deleteCategory(@PathVariable("categoryId") Long categoryId) {
-        log.info("카테고리 삭제 요청: [DELETE] /category/delete");
+        log.info("카테고리 삭제 요청: [DELETE] /category/delete - {}", categoryId);
         categoryService.deleteCategory(categoryId);
 
         log.info("카테고리 삭제에 성공하였습니다");

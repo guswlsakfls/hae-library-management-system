@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "CATEGORY")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Category extends BaseTimeEntity {
 
     @Id
