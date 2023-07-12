@@ -85,7 +85,7 @@ public class BookInfoServiceTest {
                 // 테스트를 위한 mock 카테고리를 만듭니다.
                 Category mockCategory = Category.builder()
                         .categoryName(requestBookWithBookInfoDto.getCategoryName())
-                        .bookInfoList(new ArrayList<>())
+//                        .bookInfoList(new ArrayList<>())
                         .build();
 
                 when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.of(mockCategory));

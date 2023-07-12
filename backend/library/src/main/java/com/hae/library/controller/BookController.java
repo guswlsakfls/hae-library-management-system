@@ -33,7 +33,6 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
-
     // 새 책을 생성합니다
     @PostMapping(value = "/admin/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {

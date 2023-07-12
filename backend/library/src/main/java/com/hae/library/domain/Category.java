@@ -24,9 +24,8 @@ public class Category extends BaseTimeEntity {
     private String categoryName;
 
     @Builder
-    public Category(String categoryName, List<BookInfo> bookInfoList, Long id) {
+    public Category(String categoryName, Long id) {
         this.id = id;
-        this.bookInfoList = bookInfoList;
         this.categoryName = categoryName;
     }
 
@@ -36,5 +35,9 @@ public class Category extends BaseTimeEntity {
      */
     public void updateCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public void updateBookInfoList(ArrayList<Object> objects) {
+        this.bookInfoList = bookInfoList;
     }
 }

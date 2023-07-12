@@ -3,14 +3,12 @@ package com.hae.library.controllerTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.Enum.Role;
-import com.hae.library.domain.Member;
 import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
 import com.hae.library.dto.Member.RequestChangePasswordDto;
 import com.hae.library.dto.Member.RequestEmailDto;
 import com.hae.library.dto.Member.RequestSignupDto;
 import com.hae.library.repository.MemberRepository;
 import com.hae.library.service.MemberService;
-import com.jayway.jsonpath.JsonPath;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,19 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-
-import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -51,10 +42,10 @@ public class MemberControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private RequestSignupDto requestSignupDto;
-    private RequestEmailDto requestEmailDto;
-    private RequestChangeMemberInfoDto requestChangeMemberInfoDto;
-    private RequestChangePasswordDto requestChangePasswordDto;
+//    private RequestSignupDto requestSignupDto;
+//    private RequestEmailDto requestEmailDto;
+//    private RequestChangeMemberInfoDto requestChangeMemberInfoDto;
+//    private RequestChangePasswordDto requestChangePasswordDto;
 
     private String token;
 

@@ -71,7 +71,7 @@ public class CategoryRepositoryTest {
                 String categoryName = "테스트 카테고리";
                 Category category = Category.builder()
                         .categoryName(categoryName)
-                        .bookInfoList(new ArrayList<>())
+//                        .bookInfoList(new ArrayList<>())
                         .build();
                 categoryRepo.save(category);
 

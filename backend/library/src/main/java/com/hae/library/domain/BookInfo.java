@@ -95,6 +95,11 @@ public class BookInfo extends BaseTimeEntity{
     public void addCategory(Category category) {
         this.category = category;
 
+        // category.getBookInfoList()가 null인 경우 처리
+        if (category.getBookInfoList() == null) {
+            category.updateBookInfoList(new ArrayList<>());
+        }
+
         if(!category.getBookInfoList().contains(this)) {
             category.getBookInfoList().add(this);
         }
