@@ -10,44 +10,46 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "LENDING")
 @NoArgsConstructor()
+@Table(name = "lending")
+//@Table(name = "LENDING")
 public class Lending extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "LENDING_ID")
+    @Column(name = "lending_id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOK")
+    @JoinColumn(name = "book", nullable = false)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER")
-    private Member user;
+    @JoinColumn(name = "lending_user", nullable = false)
+    private Member lendingUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LENDING_LIBRARIAN")
+    @JoinColumn(name = "lending_librarian", nullable = false)
     private Member lendingLibrarian;
 
-    @Column(name = "LENDING_CONDITION", nullable = false, length = 300 )
+    @Column(name = "lending_condition", nullable = false, length = 300 )
     private String lendingCondition;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RETURNING_LIBRARIAN")
+    @JoinColumn(name = "returning_librarian")
     private Member returningLibrarian;
 
-    @Column(name = "RETURNING_CONDITION")
+    @Column(name = "returning_condition", length = 300)
     private String returningCondition;
 
-    @Column(name = "RETURNING_AT")
+    @Column(name = "returning_end_at")
     private LocalDateTime returningEndAt;
 
     @Builder
-    public Lending(Member user ,Member lendingLibrarian, String lendingCondition,
+    public Lending(Long id, Member lendingUser ,Member lendingLibrarian, String lendingCondition,
                    Member returningLibrarian, String returningCondition,
                    LocalDateTime returningEndAt) {
-        this.user = user;
+        this.id = id;
+        this.lendingUser = lendingUser;
         this.lendingLibrarian = lendingLibrarian;
         this.lendingCondition = lendingCondition;
         this.returningLibrarian = returningLibrarian;
@@ -109,7 +111,7 @@ public class Lending extends BaseTimeEntity{
      * @param user 추가할 사용자
      */
     public void addUser(Member user) {
-        this.user = user;
+        this.lendingUser = user;
 
         // 무한루프 체크
         if (!user.getLendingList().contains(this)) {
@@ -122,7 +124,7 @@ public class Lending extends BaseTimeEntity{
      * @param member 업데이트할 사용자 정보
      */
     public void updateMember(Member member) {
-        this.user = member;
+        this.lendingUser = member;
     }
 
     /**

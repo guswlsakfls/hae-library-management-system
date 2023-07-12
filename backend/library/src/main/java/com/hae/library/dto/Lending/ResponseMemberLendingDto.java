@@ -23,7 +23,7 @@ public class ResponseMemberLendingDto {
         dto.bookTitle = lending.getBook().getBookInfo().getTitle();
         dto.isbn = lending.getBook().getBookInfo().getIsbn();
         dto.bookCallSign = lending.getBook().getCallSign();
-        dto.userEmail = lending.getUser().getEmail();
+        dto.userEmail = lending.getLendingUser().getEmail();
         dto.createdAt = lending.getCreatedAt().toLocalDate().toString();
         // 반납일이 없으면 null이므로 null이 아닐때만 반환
         if (lending.getReturningEndAt() != null) {

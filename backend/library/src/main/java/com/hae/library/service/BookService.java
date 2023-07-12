@@ -79,6 +79,7 @@ public class BookService {
                 .callSign(requestBookWithBookInfoDto.getCallSign())
                 .status(BookStatus.valueOf(requestBookWithBookInfoDto.getStatus()))
                 .donator(requestBookWithBookInfoDto.getDonator())
+                .lendingStatus(false)
                 .build();
         // 생성한 책 객체에 BookInfo를 추가합니다.
         book.addBookInfo(bookInfo);

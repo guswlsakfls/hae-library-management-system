@@ -31,6 +31,7 @@ public class BookRepositoryTest {
                         .callSign("800.23.v1.c1")
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .build();
 
                 // When
@@ -54,6 +55,7 @@ public class BookRepositoryTest {
                         .callSign(null)
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .build();
 
                 // When
@@ -79,6 +81,7 @@ public class BookRepositoryTest {
                         .callSign("800.23.v1.c1")
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .build();
                 bookRepository.save(book);
 
@@ -127,6 +130,7 @@ public class BookRepositoryTest {
                         .callSign("800.23.v1.c1")
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .build();
                 bookRepository.save(book);
 
@@ -165,6 +169,7 @@ public class BookRepositoryTest {
                         .callSign("800.23.v1.c1")
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .build();
                 bookRepository.save(book);
 

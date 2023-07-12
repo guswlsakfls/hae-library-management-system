@@ -28,13 +28,12 @@ public class LendingController {
     @PostMapping(value = "/admin/lending/create")
     public ResponseResultDto<Object> LendingBook(@RequestBody @Valid RequestLendingDto requestLendingDto) {
         log.info("책 대여 요청: [POST] /lending/create - {}", requestLendingDto.toString());
-        ResponseLendingDto responseLendingDto = lendingService.lendingBook(requestLendingDto);
+        lendingService.lendingBook(requestLendingDto);
 
         log.info("책 대여에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 대여에 성공하였습니다")
-                .data(responseLendingDto)
                 .build();
     }
 
@@ -131,13 +130,12 @@ public class LendingController {
     @DeleteMapping(value = "/admin/lending/{lendingId}/delete")
     public ResponseResultDto<Object> deleteLending(@PathVariable Long lendingId) {
         log.info("책 대여 기록 삭제: [DELETE] /lending/{lendingId}/delete - lendingId: {}", lendingId);
-        ResponseMemberLendingDto responsMemberLendingDto = lendingService.deleteLending(lendingId);
+        lendingService.deleteLending(lendingId);
 
         log.info("책 대여 기록 삭제에 성공하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 대여 기록 삭제에 성공하였습니다")
-                .data(responsMemberLendingDto)
                 .build();
     }
 }

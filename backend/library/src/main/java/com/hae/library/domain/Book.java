@@ -14,11 +14,11 @@ import java.util.List;
 public class Book extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BOOK_ID")
+    @Column(name = "book_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOK_INFO_ID")
+    @JoinColumn(name = "book_info_id")
     private BookInfo bookInfo;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
@@ -27,14 +27,14 @@ public class Book extends BaseTimeEntity {
     @Column(name = "lending_status", nullable = false)
     private boolean lendingStatus = false;
 
-    @Column(name = "CALL_SIGN", nullable = false, length = 255) // 예시: 255자 제한
+    @Column(name = "call_sign", nullable = false, length = 255) // 예시: 255자 제한
     private String callSign;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookStatus status = BookStatus.FINE;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String donator;
 
     @Builder
@@ -113,14 +113,14 @@ public class Book extends BaseTimeEntity {
     /**
      * 도서를 대출처리 합니다.
      */
-    public void updateLending() {
+    public void updateLendingStatus() {
         this.lendingStatus = true;
     }
 
     /**
      * 도서를 반납처리 합니다.
      */
-    public void updateReturning() {
+    public void updateReturningStatus() {
         this.lendingStatus = false;
     }
 }

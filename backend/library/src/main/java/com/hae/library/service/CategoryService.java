@@ -46,7 +46,6 @@ public class CategoryService {
         return categoryRepo.findAll().stream()
                 .map(ResponseCategoryDto::from)
                 .collect(Collectors.toList());
-
     }
 
     /**

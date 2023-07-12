@@ -203,6 +203,7 @@ public class BookServiceTest {
                                 .callSign("12345")
                                 .status(BookStatus.valueOf("FINE"))
                                 .donator("John Doe")
+                                .lendingStatus(false)
                                 .bookInfo(BookInfo.builder()
                                         .title("Java Programming")
                                         .author("John Smith")
@@ -240,6 +241,7 @@ public class BookServiceTest {
                         .callSign(validCallSign)
                         .status(BookStatus.valueOf("FINE"))
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .bookInfo(BookInfo.builder()
                                 .title("Java Programming")
                                 .author("John Smith")
@@ -325,6 +327,7 @@ public class BookServiceTest {
                         .callSign(callSign)
                         .status(BookStatus.valueOf(status))
                         .donator(donator)
+                        .lendingStatus(false)
                         .bookInfo(new BookInfo())  // 기타 필요한 BookInfo 정보 설정
                         .build();
                 mockBook.setCreatedAt(LocalDateTime.now());
@@ -409,6 +412,7 @@ public class BookServiceTest {
                         .callSign("12345")
                         .status(BookStatus.FINE)
                         .donator("John Doe")
+                        .lendingStatus(false)
                         .bookInfo(new BookInfo())  // 기타 필요한 BookInfo 정보 설정
                         .build();
                 mockBook.setCreatedAt(LocalDateTime.now());

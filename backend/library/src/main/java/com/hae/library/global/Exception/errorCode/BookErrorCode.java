@@ -18,9 +18,9 @@ public enum BookErrorCode implements ErrorCode {
     NOT_DELETE_BECAUSE_RENT_BOOK(HttpStatus.BAD_REQUEST, "대충중인 책은 삭제할 수 없습니다."),
 
     // 대출
-    NOT_LENDING(HttpStatus.BAD_REQUEST, "존재하지 않는 대출 정보입니다."),
+    BAD_REQUEST_LENDING(HttpStatus.BAD_REQUEST, "존재하지 않는 대출 정보입니다."),
     BOOK_ALREADY_LENT(HttpStatus.BAD_REQUEST, "이미 대출된 책입니다."),
-    BOOK_ALREADY_RETURNED(HttpStatus.BAD_REQUEST, "이미 반납된 책입니다."),
+    NOT_LENDING_BOOK(HttpStatus.BAD_REQUEST, "대출되지 않은 책입니다."),
     BOOK_ALREADY_RENEWED(HttpStatus.BAD_REQUEST, "이미 연장된 책입니다."),
     BOOK_LOST(HttpStatus.BAD_REQUEST, "분실된 책입니다.");
 
