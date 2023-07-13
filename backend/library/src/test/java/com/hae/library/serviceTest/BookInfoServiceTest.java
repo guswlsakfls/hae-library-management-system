@@ -3,6 +3,7 @@ package com.hae.library.serviceTest;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.dto.Member.RequestSignupDto;
@@ -82,6 +83,16 @@ public class BookInfoServiceTest {
                         .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
                         .build();
 
+                RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
+                        .title(requestBookWithBookInfoDto.getTitle())
+                        .author(requestBookWithBookInfoDto.getAuthor())
+                        .isbn(requestBookWithBookInfoDto.getIsbn())
+                        .image(requestBookWithBookInfoDto.getImage())
+                        .publisher(requestBookWithBookInfoDto.getPublisher())
+                        .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
+                        .categoryName(requestBookWithBookInfoDto.getCategoryName())
+                        .build();
+
                 // 테스트를 위한 mock 카테고리를 만듭니다.
                 Category mockCategory = Category.builder()
                         .categoryName(requestBookWithBookInfoDto.getCategoryName())
@@ -93,7 +104,7 @@ public class BookInfoServiceTest {
 
                 // When
                 BookInfo createdBookInfo =
-                        bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+                        bookInfoService.createBookInfo(requestBookInfoDto);
 
                 // Then
                 Assertions.assertThat(createdBookInfo).isNotNull();
@@ -107,11 +118,20 @@ public class BookInfoServiceTest {
         void createBookInfoFail_NoCategory() {
             // Given
             // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
-            when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
+            RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
+                    .title(requestBookWithBookInfoDto.getTitle())
+                    .author(requestBookWithBookInfoDto.getAuthor())
+                    .isbn(requestBookWithBookInfoDto.getIsbn())
+                    .image(requestBookWithBookInfoDto.getImage())
+                    .publisher(requestBookWithBookInfoDto.getPublisher())
+                    .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
+                    .build();
+
+            when(categoryRepo.findByCategoryName(requestBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
 
             // When
             Exception exception = assertThrows(RestApiException.class, () -> {
-                bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+                bookInfoService.createBookInfo(requestBookInfoDto);
             });
 
             // Then

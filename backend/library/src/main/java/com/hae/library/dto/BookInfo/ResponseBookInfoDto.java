@@ -2,6 +2,7 @@ package com.hae.library.dto.BookInfo;
 
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
+import com.hae.library.domain.RequestBook;
 import com.hae.library.dto.Category.Response.ResponseCategoryDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,13 +22,13 @@ public class ResponseBookInfoDto {
     private String publisher;
     private String publishedAt;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean isApproved;
+    private LocalDateTime approvedAt;
+    private String requestMemberEmail;
 
+    // 도서 정보를 가지고 도서 요청 정보를 반환할 때 사용합니다.
     public static ResponseBookInfoDto from(BookInfo bookInfo) {
-        // bookInfo가 null인 경우 예외 처리 또는 기본값 설정 등을 수행 // TODO: 수정 필요(필요 없을 듯?)
-        if (bookInfo == null) {
-            throw new IllegalArgumentException("bookInfo cannot be null");
-        }
-
         return ResponseBookInfoDto.builder()
                 .id(bookInfo.getId())
                 .title(bookInfo.getTitle())
@@ -39,6 +40,25 @@ public class ResponseBookInfoDto {
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
                 .createdAt(bookInfo.getCreatedAt())
+                .build();
+    }
+
+    // 도서 요청 정보를 가지고 구매요청 도서 정보를 반환할 때 사용합니다.
+    public static ResponseBookInfoDto from(RequestBook requestBook) {
+        return ResponseBookInfoDto.builder()
+                .id(requestBook.getId())
+                .title(requestBook.getBookInfo().getTitle())
+                .author(requestBook.getBookInfo().getAuthor())
+                .isbn(requestBook.getBookInfo().getIsbn())
+                .image(requestBook.getBookInfo().getImage())
+                .categoryName(ResponseCategoryDto.from(requestBook.getBookInfo().getCategory()).getCategoryName())
+                .publisher(requestBook.getBookInfo().getPublisher())
+                .publishedAt(requestBook.getBookInfo().getPublishedAt())
+                .isApproved(requestBook.isApproved())
+                .createdAt(requestBook.getCreatedAt())
+                .updatedAt(requestBook.getUpdatedAt())
+                .approvedAt(requestBook.getApprovedAt())
+                .requestMemberEmail(requestBook.getMember().getEmail())
                 .build();
     }
 }
