@@ -103,7 +103,7 @@ public class MemberRepositoryTest  {
 
                 // Then
                 assertNotNull(members);
-                assertEquals(3, members.size()); // data.sql 때문 수정.
+                assertEquals(3, members.size());
                 assertTrue(members.stream()
                         .anyMatch(m -> m.getEmail().equals("test1@gmail.com") && m.getRole().equals(Role.valueOf("ROLE_ADMIN"))));
                 assertTrue(members.stream()

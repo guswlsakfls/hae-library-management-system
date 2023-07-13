@@ -154,11 +154,11 @@ public class BookInfoService {
      */
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoById(Long bookInfoId) {
-        log.info("bookInfoId: {}", bookInfoId);
+        // bookInfoId가 null이라면 예외를 발생시킵니다.
         BookInfo bookInfo =
                 bookInfoRepo.findById(bookInfoId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
+        // 책 정보에 속한 실물 책들을 가져옵니다.
         List<Book> bookList = bookInfo.getBookList();
-        log.info("bookList: {}", bookList.toString());
         return ResponseBookInfoWithBookDto.from(bookInfo);
     }
 

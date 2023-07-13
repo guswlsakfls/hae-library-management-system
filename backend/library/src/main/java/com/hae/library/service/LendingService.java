@@ -265,6 +265,9 @@ public class LendingService {
         Specification<Lending> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            // 로그인한 회원의 대출 기록만 조회합니다.
+            predicates.add(cb.equal(root.get("lendingUser"), user));
+
             // 검색어가 있는 경우 해당 검색어를 포함하는 결과를 반환합니다.
             if (search != null && !search.trim().isEmpty()) {
                 predicates.add(cb.or(

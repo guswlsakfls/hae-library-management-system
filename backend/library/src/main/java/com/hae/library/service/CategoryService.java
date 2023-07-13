@@ -64,9 +64,10 @@ public class CategoryService {
      * 카테고리를 수정 합니다.
      *
      * @param categoryDto 카테고리 수정할 정보 DTO
-     * @return ResponseCategoryDto 수정된 카테고리 정보 DTO
+     *
+     * @throws RestApiException 카테고리가 존재하지 않을 경우 예외를 발생시킵니다.
      */
-    public ResponseCategoryDto updateCategory(RequestUpdateCategoryDto categoryDto) {
+    public void updateCategory(RequestUpdateCategoryDto categoryDto) {
         // 카테고리를 조회합니다.
         Category category = categoryRepo.findById(categoryDto.getCategoryId())
                 .orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
@@ -74,8 +75,8 @@ public class CategoryService {
         // 카테고리를 수정합니다.
         category.updateCategoryName(categoryDto.getUpdatedCategoryName());
 
-        // 카테고리를 수정합니다.
-        return ResponseCategoryDto.from(categoryRepo.save(category));
+        // 카테고리를 수정한 것을 저장합니다.
+        categoryRepo.save(category);
     }
 
     /**

@@ -33,47 +33,18 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
-
-    // 새 책을 생성합니다
+    // 새 도서를 추가합니다
     @PostMapping(value = "/admin/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
-        log.info("책 생성 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
+        log.info("도서 추가 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
         bookService.createBook(requestBookWithBookInfoDto);
 
-        log.info("책이 성공적으로 등록되었습니다");
+        log.info("도서를 성공적으로 등록하였습니다");
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("책이 성공적으로 등록되었습니다")
+                .message("도서를 성공적으로 등록하였습니다")
                 .build();
     }
-
-    // TODO: 도서관리페이지를 수정해서 필요 없을거 같음.(추후 결정)
-//    // 모든 책을 검색하거나, 검색어에 해당하는 책을 검색합니다
-//    @GetMapping(value = "/admin/book/all")
-//    public ResponseResultDto getAllBook(
-//            @RequestParam(required = false) String search,
-//            @RequestParam(required = false) int page,
-//            @RequestParam(required = false) int size
-//    ) {
-//        log.info("모든 책 정보 조회: [GET] /book/all - 검색: {}, 페이지: {}, 사이즈: {}", search, page, size);
-//        Page<ResponseBookWithBookInfoDto> responseBookList = bookService.getAllBook(search, page,
-//                size);
-//
-//        // 책 정보 리스트 와 페이지 네이션 정보를 데이터로 설정합니다.
-//        Map<String, Object> responseData = new HashMap<>();
-//        responseData.put("bookList", responseBookList.getContent());
-//        responseData.put("totalElements", responseBookList.getTotalElements());
-//        responseData.put("currentPage", responseBookList.getNumber());
-//        responseData.put("size", responseBookList.getSize());
-//
-//        log.info("모든 책 정보 조회에 성공하였습니다.");
-//        return ResponseResultDto.builder()
-//                .statusCode(HttpStatus.OK.value())
-//                .message("모든 책 조회에 성공하였습니다")
-//                .data(responseData)
-//                .build();
-//    }
-
 
     // 지정된 ID를 가진 책을 검색합니다
     @GetMapping(value = "/member/book/{bookId}/info")
@@ -90,8 +61,8 @@ public class BookController {
     }
 
     // 청구기호로 책을 검색합니다
-    @GetMapping(value = "/admin/book/callsign")
-    public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
+    @GetMapping(value = "/admin/book/{callsign}") // param -> path로 수정했음
+    public ResponseResultDto getBookByCallSign(@PathVariable("callsign") @NotBlank(message =
             "청구기호를 입력해 주세요.") String callSign) {
         log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", callSign);
         ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(callSign);

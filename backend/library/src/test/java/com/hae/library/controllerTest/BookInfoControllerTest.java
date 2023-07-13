@@ -1,126 +1,142 @@
 package com.hae.library.controllerTest;
 
-import com.hae.library.controller.BookInfoController;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
-import com.hae.library.global.Exception.RestApiException;
-import com.hae.library.global.Exception.errorCode.BookErrorCode;
-import com.hae.library.service.BookInfoService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hae.library.domain.Book;
+import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
+import com.hae.library.domain.Enum.BookStatus;
+import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.BookRepository;
+import com.hae.library.repository.CategoryRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
-import java.util.List;
-
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = BookInfoController.class)
-@ExtendWith(MockitoExtension.class)
-@DisplayName("BookInfoController 단위 테스트")
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@DisplayName("BookInfoController 통합 테스트")
 public class BookInfoControllerTest {
-    @MockBean
-    private BookInfoService bookInfoService;
-
     @Autowired
     private MockMvc mockMvc;
 
-    private ResponseBookInfoDto responseBookInfoDto1;
-    private ResponseBookInfoDto responseBookInfoDto2;
-    private ResponseBookInfoWithBookDto responseBookInfoWithBookDto;
-    private Page<ResponseBookInfoDto> responseBookInfoDtoList;
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private BookInfoRepository bookInfoRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    private String token;
+
+    private Long categoryId;
+
+    private Long bookId;
 
     @BeforeEach
-    public void setUp() {
-        responseBookInfoDto1 = ResponseBookInfoDto.builder()
-                .title("Java Programming")
-                .author("John Smith")
-                .isbn("9781234567890")
-                .image("book-image.jpg")
-                .publisher("ABC Publishing")
-                .publishedAt("2022-01-01")
-                .build();
+    public void setup() throws Exception {
+        // 로그인하여 토큰을 발급받습니다.
+        String loginResponse = mockMvc.perform(post("/api/auth")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"admin@gmail.com\", \"password\":\"ehdaud11!\"}"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        responseBookInfoDto2 = ResponseBookInfoDto.builder()
-                .title("Python Programming")
-                .author("Jane Doe")
-                .isbn("9780987654321")
-                .image("book-image.jpg")
-                .publisher("DEF Publishing")
-                .publishedAt("2022-01-01")
-                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode responseJson = objectMapper.readTree(loginResponse);
+        this.token = responseJson.get("data").get("accessToken").asText();
 
-        responseBookInfoWithBookDto = ResponseBookInfoWithBookDto.builder()
-                .title("Java Programming")
-                .author("John Smith")
-                .isbn("9781234567890")
-                .image("book-image.jpg")
-                .publisher("ABC Publishing")
-                .publishedAt("2022-01-01")
-                .build();
+        // 테스트용 카테고리를 등록합니다.
+        Category category = categoryRepository.save(Category.builder()
+                .categoryName("테스트")
+                .build());
+        this.categoryId = category.getId();
 
-//        responseBookInfoDtoList = List.of(
-//                responseBookInfoDto1,
-//                responseBookInfoDto2
-//        );
+        // 테스트용 도서 정보를 등록합니다.
+        BookInfo bookInfo = BookInfo.builder()
+                .isbn("1234567890123")
+                .title("테스트용 책 제목")
+                .author("테스트용 책 저자")
+                .publisher("테스트용 출판사")
+                .image("http://example.com/test.jpg")
+                .publishedAt("2023")
+                .category(category)
+                .build();
+        BookInfo book1 = bookInfoRepository.save(bookInfo);
+
+        Book book2 = bookRepository.save(Book.builder()
+                .callSign("111.111-11-11.c1")
+                .bookInfo(bookInfo)
+                .status(BookStatus.valueOf("FINE"))
+                .lendingStatus(false)
+                .donator("테스트 기증자")
+                .build());
+
+        Book book3 = bookRepository.save(Book.builder()
+                .callSign("111.111-11-11.c2")
+                .bookInfo(bookInfo)
+                .status(BookStatus.valueOf("FINE"))
+                .lendingStatus(false)
+                .donator("테스트 기증자")
+                .build());
+
+        this.bookId = book1.getId();
     }
 
     @Nested
-    @DisplayName("책 정보 조회 컨트롤러")
-    public class CreateBookInfoControllerTest {
+    @DisplayName("GET /api/bookInfo/all")
+    public class GetAllBookInfo {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
-            @DisplayName("[GET] 모든 책 정보 조회시 모든 책 정보 리스트 반환")
-            public void getAllBookInfoTest() throws Exception {
-                //Given
-                String searchKey = "";
-                int page = 0;
-                int size = 10;
-                String categoryName = "전체";
-                String sort = "최신도서";
-
-                given(bookInfoService.getAllBookInfo(searchKey, page, size, categoryName, sort)).willReturn(responseBookInfoDtoList);
-
-                // When & Then
-                mockMvc.perform(get("/api/bookinfo/all").accept(MediaType.APPLICATION_JSON))
+            @DisplayName("모든 도서 정보를 조회합니다.")
+            public void getAllBookInfo() throws Exception {
+                mockMvc.perform(get("/api/bookinfo/all")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .param("sort", "최신도서")
+                                .param("role", "전체")
+                                .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(result -> jsonPath("$", hasSize(2)));
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
+        }
+    }
 
+    @Nested
+    @DisplayName("GET /api/bookInfo/{bookId}")
+    public class GetBookInfo {
+        @Nested
+        @DisplayName("성공 케이스")
+        public class SuccessCaseTest {
             @Test
-            @DisplayName("[GET] id로 책 정보 조회시 책 정보 반환")
-            public void getBookInfoWithBookByIdTest() throws Exception {
-                // Given
-                given(bookInfoService.getBookInfoById(1L)).willReturn(responseBookInfoWithBookDto);
-
-                // When & Then
-                mockMvc.perform(get("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))
+            @DisplayName("도서 정보를 조회합니다.")
+            public void getBookInfo() throws Exception {
+                mockMvc.perform(get("/api/bookinfo/" + bookId)
+                                .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(result -> jsonPath("$.title").value("Java Programming"))
-                        .andExpect(result -> jsonPath("$.author").value("John Smith"))
-                        .andExpect(result -> jsonPath("$.isbn").value("9781234567890"))
-                        .andExpect(result -> jsonPath("$.image").value("book-image.jpg"))
-                        .andExpect(result -> jsonPath("$.publisher").value("ABC Publishing"))
-                        .andExpect(result -> jsonPath("$.publishedAt").value("2022-01-01"));
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
         }
 
@@ -128,50 +144,33 @@ public class BookInfoControllerTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("[GET] 모든 책 정보 조회시 책 정보가 없을 경우 빈 리스트 반환")
-            public void getAllBookInfoTest() throws Exception {
-//                //Given
-//                String searchKey = "";
-//                int page = 0;
-//                int size = 10;
-//
-//                given(bookInfoService.getAllBookInfo(searchKey, page, size)).willReturn(List.of());
-//
-//                // When & Then
-//                mockMvc.perform(get("/api/bookinfo/all").accept(MediaType.APPLICATION_JSON))
-//                        .andExpect(status().isOk())
-//                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                        .andExpect(result -> jsonPath("$", hasSize(0)));
-            }
-
-            @Test
-            @DisplayName("[GET] id로 책 정보 조회시 책 정보가 없을 경우 404 반환")
-            public void getBookInfoWithBookByIdTest() throws Exception {
-                //Given
-                given(bookInfoService.getBookInfoById(1L)).willThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
-
-                // When & Then
-                mockMvc.perform(get("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isNotFound());
+            @DisplayName("존재하지 않는 도서 정보를 조회합니다.")
+            public void getBookInfo() throws Exception {
+                mockMvc.perform(get("/api/bookinfo/1000")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message", is("존재하지 않는 책 정보입니다.")));
             }
         }
     }
 
     @Nested
-    @DisplayName("책 정보 삭제 컨트롤러")
-    public class DeleteBookInfoTest {
+    @DisplayName("POST /api/admin/bookInfo/isbn")
+    public class GetBookInfoByIsbn {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
-            @DisplayName("[DELETE] id로 책 정보 삭제시 200 반환")
-            public void deleteBookInfoByIdTest() throws Exception {
-                // When
-                doNothing().when(bookInfoService).deleteBookInfoById(1L);
-
-                // Then
-                mockMvc.perform(delete("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk());
+            @DisplayName("ISBN으로 도서 정보를 조회합니다.")
+            public void getBookInfoByIsbn() throws Exception {
+                mockMvc.perform(get("/api/admin/bookinfo/isbn")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("isbn", "1234567890123")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.data.title", is("테스트용 책 제목")));
             }
         }
 
@@ -179,14 +178,47 @@ public class BookInfoControllerTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("[DELETE] id로 책 정보 삭제시 책 정보가 없을 경우 404 반환")
-            public void deleteBookInfoByIdTest() throws Exception {
-                //Given
-                doThrow(new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO)).when(bookInfoService).deleteBookInfoById(1L);
+            @DisplayName("존재하지 않는 ISBN으로 도서 정보를 조회합니다.")
+            public void getBookInfoByIsbn() throws Exception {
+                mockMvc.perform(get("/api/admin/bookinfo/isbn")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("isbn", "1221507890123")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message", is("존재하지 않는 책 정보입니다.")));
+            }
+        }
+    }
 
-                // When & Then
-                mockMvc.perform(delete("/api/bookinfo/1").accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isNotFound());
+    @Nested
+    @DisplayName("DELETE /api/admin/bookinfo/{bookInfoId}/delete")
+    public class DeleteBookInfo {
+        @Nested
+        @DisplayName("성공 케이스")
+        public class SuccessCaseTest {
+            @Test
+            @DisplayName("도서 정보를 삭제합니다.")
+            public void deleteBookInfo() throws Exception {
+                mockMvc.perform(delete("/api/admin/bookinfo/" + bookId + "/delete")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message", is("책 정보 삭제에 성공하였습니다")));
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        public class FailCaseTest {
+            @Test
+            @DisplayName("존재하지 않는 도서 정보를 삭제합니다.")
+            public void deleteBookInfo() throws Exception {
+                mockMvc.perform(delete("/api/admin/bookinfo/1000/delete")
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.message", is("존재하지 않는 책입니다.")));
             }
         }
     }

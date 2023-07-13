@@ -122,7 +122,7 @@ public class BookServiceTest {
                 // Given
                 Category mockCategory = Category.builder()
                         .categoryName(requestBookWithBookInfoDto.getCategoryName())
-                        .bookInfoList(new ArrayList<>())
+//                        .bookInfoList(new ArrayList<>())
                         .build();
 
                 BookInfo newBookInfo = BookInfo.builder()
