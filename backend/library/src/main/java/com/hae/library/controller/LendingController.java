@@ -68,7 +68,7 @@ public class LendingController {
                 .build();
     }
 
-    // 책 대여 기록을 조회합니다.
+    // 모든 책 대여 기록을 조회합니다.
     @GetMapping(value = "/admin/lending/all")
     public ResponseResultDto<Object> getAllLendingHistory(
             @RequestParam(required = false) String search,
@@ -97,8 +97,7 @@ public class LendingController {
                 .build();
     }
 
-    // TODO: 프론트 2번 렌더링 되는 문제 -> 페이징이 되지 않았다.
-    // 책 대여 기록을 조회합니다.
+    // 자신의 책 대여 기록을 조회합니다.
     @GetMapping(value = "/member/lending-history/me")
     public ResponseResultDto<Object> getMemberLendingHistory(
             @RequestParam(required = false) String search,
