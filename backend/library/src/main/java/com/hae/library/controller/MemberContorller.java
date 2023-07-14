@@ -1,11 +1,7 @@
 package com.hae.library.controller;
 
-import com.hae.library.config.Security.RoleInterface;
 import com.hae.library.dto.Member.*;
 import com.hae.library.dto.ResponseResultDto;
-import com.hae.library.global.Exception.RestApiException;
-import com.hae.library.global.Exception.errorCode.MemberErrorCode;
-import com.hae.library.service.AuthService;
 import com.hae.library.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -15,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j

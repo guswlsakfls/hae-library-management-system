@@ -6,6 +6,7 @@ import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
@@ -141,7 +142,7 @@ public class BookServiceTest {
                 // bookInfo가 존재하지 않는 경우
                 when(bookInfoRepo.findByIsbn(requestBookWithBookInfoDto.getIsbn())).thenReturn(Optional.empty());
                 // 도서 정보가 저장되어 반환 되는 경우
-                when(bookInfoService.createBookInfo(any(RequestBookWithBookInfoDto.class))).thenReturn(newBookInfo);
+                when(bookInfoService.createBookInfo(any(RequestBookInfoDto.class))).thenReturn(newBookInfo);
 
                 // When
                 bookService.createBook(requestBookWithBookInfoDto);

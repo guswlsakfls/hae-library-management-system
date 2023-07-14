@@ -57,9 +57,19 @@ public class BookInfoService {
      *
      * @param requestBookDto 새로운 책 정보 요청 DTO
      * @return 저장된 책 정보 응답 DTO
+     *
+     * @throws BookErrorCode.DUPLICATE_ISBN 책 정보 중복
+     * @throws BookErrorCode.CATEGORY_NOT_FOUND 카테고리를 찾을 수 없음
      */
     @Transactional
-    public BookInfo createBookInfo(RequestBookWithBookInfoDto requestBookDto) {
+    public BookInfo createBookInfo(RequestBookInfoDto requestBookDto) {
+        // 중복되는 책 정보가 있는지 확인합니다.
+        Optional<BookInfo> bookInfoOptional =
+                bookInfoRepo.findByIsbn(requestBookDto.getIsbn());
+        if (bookInfoOptional.isPresent()) {
+            throw new RestApiException(BookErrorCode.DUPLICATE_ISBN);
+        }
+
         BookInfo bookInfo = BookInfo.builder()
                 .title(requestBookDto.getTitle())
                 .author(requestBookDto.getAuthor())
@@ -88,27 +98,10 @@ public class BookInfoService {
      * @param search 검색어
      * @param page   페이지 번호
      * @param size   페이지 크기
+     * @param categoryName 카테고리 이름
+     * @param sort   정렬 방식
      * @return 책 정보 페이지 응답 DTO
      */
-//    @Transactional
-//    public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size, String category, String sort) {
-//        // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-//
-//        // Specification을 이용해 동적 쿼리를 생성합니다.
-//        Specification<BookInfo> spec = (root, query, cb) -> {
-//            if (search == null || search.trim().isEmpty()) {
-//                return cb.conjunction(); // 모든 결과를 반환합니다.
-//            }
-//            // title 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.
-//            return cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%");
-//        };
-//
-//        // 책 정보를 페이징하여 가져온 후, 가져온 책 정보를 Response DTO로 변환합니다.
-//        Page<BookInfo> bookInfoList = bookInfoRepo.findAll(spec, pageable);
-//        Page<ResponseBookInfoDto> responseBookInfoDtoList = bookInfoList.map(ResponseBookInfoDto::from);
-//        return responseBookInfoDtoList;
-//    }
 
     @Transactional
     public Page<ResponseBookInfoDto> getAllBookInfo(String search, int page, int size,

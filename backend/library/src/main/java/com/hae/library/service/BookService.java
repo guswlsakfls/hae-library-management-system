@@ -4,8 +4,10 @@ import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
+import com.hae.library.domain.RequestBook;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
@@ -14,6 +16,7 @@ import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
 import com.hae.library.repository.CategoryRepository;
+import com.hae.library.repository.RequestBookInfoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +37,7 @@ public class BookService {
     private final BookInfoRepository bookInfoRepo;
     private final BookInfoService bookInfoService;
     private final CategoryRepository categoryRepo;
+    private final RequestBookInfoRepository requestBookInfoRepo;
 
     /**
      * 새로운 책을 추가하는 메서드입니다.
@@ -58,11 +62,27 @@ public class BookService {
         if (bookInfoOptional.isPresent()) {
             // BookInfo가 존재하는 경우 기존 BookInfo를 사용합니다.
             BookInfo bookInfo = bookInfoOptional.get();
+            // 구매 요청한 도서이고 아직 승인을 하지 않았으면, 도서 구매 요청을 true로 변경하고, 구매일을 추가합니다.
+            RequestBook requestBook = bookInfo.getRequestBook();
+            if (requestBook != null && requestBook.isApproved() == false) {
+                requestBook.approve();
+                requestBook.updateApprovedAt();
+                requestBookInfoRepo.save(requestBook);
+            }
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
             saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         } else {
             // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.
-            BookInfo newBookInfo = bookInfoService.createBookInfo(requestBookWithBookInfoDto);
+            RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
+                    .isbn(requestBookWithBookInfoDto.getIsbn())
+                    .title(requestBookWithBookInfoDto.getTitle())
+                    .author(requestBookWithBookInfoDto.getAuthor())
+                    .publisher(requestBookWithBookInfoDto.getPublisher())
+                    .image(requestBookWithBookInfoDto.getImage())
+                    .publisher(requestBookWithBookInfoDto.getPublisher())
+                    .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
+                    .build();
+            BookInfo newBookInfo = bookInfoService.createBookInfo(requestBookInfoDto);
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
             saveBookWithBookInfo(requestBookWithBookInfoDto, newBookInfo);
         }
@@ -86,33 +106,6 @@ public class BookService {
         // 책 객체를 데이터베이스에 저장합니다.
         Book updateBook = bookRepo.save(book);
     }
-
-
-    // TODO: 도서관리 페이지를 수정해서 이 메서드는 필요없을 것 같음.(추후 결정)
-    // 모든 책을 조회하는 메서드입니다.
-//    @Transactional
-//    public Page<ResponseBookWithBookInfoDto> getAllBook(String search, int page, int size) {
-//        // 페이징 정보를 설정합니다.
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-//
-//        // Specification을 이용해 동적 쿼리를 생성합니다.
-//        Specification<Book> spec = (root, query, cb) -> {
-//            if (search == null || search.trim().isEmpty()) {
-//                return cb.conjunction(); // 모든 결과를 반환합니다.
-//            }
-//            // 검색어가 포함된 경우 해당 결과를 반환합니다.
-//            return cb.or(
-//                    cb.like(cb.lower(root.get("bookInfo").get("title")),
-//                            "%" + search.toLowerCase() + "%"),
-//                    cb.like(cb.lower(root.get("callSign")), "%" + search.toLowerCase() + "%")
-//            );
-//        };
-//
-//        // 위에서 생성한 쿼리를 실행하여 책 리스트를 얻어옵니다.
-//        Page<Book> bookList = bookRepo.findAll(spec, pageable);
-//        Page<ResponseBookWithBookInfoDto> responseBookWithBookInfoDtoList = bookList.map(ResponseBookWithBookInfoDto::from);
-//        return responseBookWithBookInfoDtoList;
-//    }
 
     /**
      * 책을 ID로 조회하는 메서드입니다.
