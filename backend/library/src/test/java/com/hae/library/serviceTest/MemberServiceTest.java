@@ -1,6 +1,5 @@
 package com.hae.library.serviceTest;
 
-import com.hae.library.domain.Enum.Role;
 import com.hae.library.domain.Member;
 import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
 import com.hae.library.dto.Member.RequestEmailDto;
@@ -11,8 +10,6 @@ import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.repository.MemberRepository;
 import com.hae.library.service.MemberService;
 import com.hae.library.util.SecurityUtil;
-import org.assertj.core.api.Assertions;
-import org.h2.value.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -227,6 +227,12 @@ public class MemberService {
     public void deleteMember(Long id) {
         // 삭제할 회원을 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member = memberRepository.findById(id).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // 대출이 있는 회원은 삭제할 수 없습니다.
+        if (member.getLendingCount() > 0) {
+            throw new RestApiException(MemberErrorCode.MEMBER_HAS_LENDING);
+        }
+
         // 회원을 삭제합니다.
         memberRepository.delete(member);
     }

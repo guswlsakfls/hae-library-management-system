@@ -44,7 +44,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -450,34 +449,6 @@ public class LendingServiceTest {
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.NOT_LENDING_BOOK);
             }
-
-//            @Test
-//            @DisplayName("반납자 회원이 존재하지 않을 때")
-//            public void returningBookTest_NoReturningMember() {
-//                // Given
-//                Book bookSpy = spy(book);
-//                Member lendingUserSpy = spy(lendingUser);
-//
-//                Lending returningLending = Lending.builder()
-//                        .lendingUser(lendingUserSpy)
-//                        .lendingLibrarian(lendingLibrarian)
-//                        .lendingCondition("Good")
-//                        .build();
-//                returningLending.addBook(bookSpy);
-//                Lending lendingSpy = spy(returningLending);
-//
-//                RequestReturningDto request = RequestReturningDto.builder()
-//                        .lendingId(lendingSpy.getId())
-//                        .returningCondition("Good")
-//                        .build();
-//
-//                when(memberRepo.findByEmail(lendingLibrarian.getEmail())).thenReturn(Optional.empty());  // 반납자 회원 정보가 없음을 설정합니다.
-//                when(lendingRepo.findById(lendingSpy.getId())).thenReturn(Optional.of(lendingSpy));
-//
-//                // When & Then
-//                assertThrows(RestApiException.class, () -> lendingService.returningBook(request), "반납자 회원이 존재하지 않아서 예외가 발생해야 합니다.");
-//            }
-
         }
     }
 
@@ -558,38 +529,6 @@ public class LendingServiceTest {
                 assertEquals(lendingPage.getTotalElements(), result.getTotalElements(), "전체 대출 기록 수는 일치해야 합니다.");
             }
         }
-
-//        @Nested
-//        @DisplayName("실패 케이스")
-//        public class Fail {
-//            // TODO: isLendingOrReturning 값이 주어 질 때, spec 값이 결정 되지 않음
-//            // TODO: 통합 테스테에서 작성해야 할 듯
-//            @Test
-//            @DisplayName("`isLendingOrReturning` 값이 예상 범위를 벗어난 경우 - 실패 케이스")
-//            public void getAllLendingHistoryTest_Fail_IsLendingOrReturningIsInvalid() {
-//                // Given
-//                int page = 0;
-//                int size = 5;
-//                String isLendingOrReturning = "대출 중";
-//                String sort = "최신순";
-//                String search = null;  // 검색어는 없음.
-//
-//                Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-//
-//                // 대출 기록을 생성합니다.
-//                List<Lending> lendingList = Arrays.asList(
-//                        lending, lending
-//                );
-//
-//                Page<Lending> lendingPage = new PageImpl<>(lendingList, pageable, lendingList.size());
-//
-//                // 페이징된 대출 기록을 반환합니다.
-//                when(lendingRepo.findAll(any(Specification.class), eq(pageable))).thenReturn(lendingPage);
-//
-//                // When
-//                Page<ResponseLendingDto> result = lendingService.getAllLendingHistory(search, page, size, isLendingOrReturning, sort);
-//            }
-//        }
     }
     @Nested
     @DisplayName("대출 기록 삭제")

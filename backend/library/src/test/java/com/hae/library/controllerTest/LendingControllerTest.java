@@ -136,9 +136,8 @@ public class LendingControllerTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("대출 정보를 생성합니다.")
+            @DisplayName("대출 정보를 생성")
             public void createLending() throws Exception {
-                // TODO: 테스트 도서를 어떻게 선정할지(실제 db에 있는 도서를 가져오는 것이 좋을지) 고민해보기
                 String content = String.format("{\"userId\":1, \"bookId\":%d, " +
                         "\"lendingCondition\":\"테스트트\"}", book1Id);
 
@@ -159,7 +158,6 @@ public class LendingControllerTest {
             @Test
             @DisplayName("도서가 존재하지 않을 때 예외 발생")
             public void createLendingWhenBookDoesNotExist() throws Exception {
-                // TODO: bookId를 실제로 존재하지 않는 값으로 설정
                 mockMvc.perform(post("/api/admin/lending/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"userId\":1, \"bookId\":10000, " +

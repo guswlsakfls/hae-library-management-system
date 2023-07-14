@@ -6,7 +6,6 @@ import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
-import com.hae.library.dto.Member.RequestSignupDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
@@ -96,7 +95,6 @@ public class BookInfoServiceTest {
                 // 테스트를 위한 mock 카테고리를 만듭니다.
                 Category mockCategory = Category.builder()
                         .categoryName(requestBookWithBookInfoDto.getCategoryName())
-//                        .bookInfoList(new ArrayList<>())
                         .build();
 
                 when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.of(mockCategory));
@@ -193,7 +191,6 @@ public class BookInfoServiceTest {
                     return cb.and(predicates.toArray(new Predicate[0]));
                 };
 
-                // TODO: 통합 테스트로 Specification 테스트를 시도 해야함.
                 // specification객체를 직접 제어하는 대신 ArugmentMatchers를 사용하여 일부 또는 모든 인수를 일치 시켯습니다.
                 when(bookInfoRepo.findAll(ArgumentMatchers.<Specification<BookInfo>>any(), ArgumentMatchers.eq(pageable))).thenReturn(pageOfBookInfo);
 
