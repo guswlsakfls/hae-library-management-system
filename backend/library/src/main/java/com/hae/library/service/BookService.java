@@ -8,22 +8,15 @@ import com.hae.library.domain.RequestBook;
 import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
 import com.hae.library.repository.CategoryRepository;
-import com.hae.library.repository.RequestBookInfoRepository;
+import com.hae.library.repository.RequestBookRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +30,7 @@ public class BookService {
     private final BookInfoRepository bookInfoRepo;
     private final BookInfoService bookInfoService;
     private final CategoryRepository categoryRepo;
-    private final RequestBookInfoRepository requestBookInfoRepo;
+    private final RequestBookRepository requestBookInfoRepo;
 
     /**
      * 새로운 책을 추가하는 메서드입니다.
@@ -72,13 +65,14 @@ public class BookService {
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
             saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         } else {
-            // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.
+            // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.(다른 곳에서 매개변수가 따로 쓰이기 때문에)
             RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
                     .isbn(requestBookWithBookInfoDto.getIsbn())
                     .title(requestBookWithBookInfoDto.getTitle())
                     .author(requestBookWithBookInfoDto.getAuthor())
                     .publisher(requestBookWithBookInfoDto.getPublisher())
                     .image(requestBookWithBookInfoDto.getImage())
+                    .categoryName(requestBookWithBookInfoDto.getCategoryName())
                     .publisher(requestBookWithBookInfoDto.getPublisher())
                     .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
                     .build();

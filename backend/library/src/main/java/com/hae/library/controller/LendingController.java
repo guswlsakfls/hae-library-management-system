@@ -51,9 +51,9 @@ public class LendingController {
     }
 
     // 반납을 위한 책 대여 기록을 조회합니다.
-    @GetMapping(value = "/admin/lending/{callsign}")
+    @GetMapping(value = "/admin/lending/callsign")
     public ResponseResultDto<Object> getLendingInfoByCallSign(
-            @PathVariable @NotBlank(message = "청구기호를 입력해주세요.") @Size(max=20,
+            @RequestParam @NotBlank(message = "청구기호를 입력해주세요.") @Size(max=20,
                     message = "20자 이하로 입력해 주세요") String callsign
     ) {
         log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", callsign);

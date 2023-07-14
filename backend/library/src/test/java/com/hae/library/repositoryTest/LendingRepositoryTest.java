@@ -14,11 +14,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -130,6 +127,9 @@ public class LendingRepositoryTest {
             @DisplayName("대출 정보를 조회")
             public void findLendingTest() {
                 //Given
+                memberRepository.save(lendingUser);
+                memberRepository.save(lendingLibrarian);
+                bookRepository.save(book);
                 Lending savedLending = lendingRepository.save(lending);
 
                 //When

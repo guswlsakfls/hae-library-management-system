@@ -7,7 +7,6 @@ import com.hae.library.dto.Category.Request.RequestUpdateCategoryDto;
 import com.hae.library.dto.Category.Response.ResponseCategoryDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
-import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import com.hae.library.service.CategoryService;

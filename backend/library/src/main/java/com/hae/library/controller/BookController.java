@@ -61,8 +61,8 @@ public class BookController {
     }
 
     // 청구기호로 책을 검색합니다
-    @GetMapping(value = "/admin/book/{callsign}") // param -> path로 수정했음
-    public ResponseResultDto getBookByCallSign(@PathVariable("callsign") @NotBlank(message =
+    @GetMapping(value = "/admin/book/callsign") // param -> path로 수정했음
+    public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
             "청구기호를 입력해 주세요.") String callSign) {
         log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", callSign);
         ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(callSign);

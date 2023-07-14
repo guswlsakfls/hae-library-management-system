@@ -6,7 +6,6 @@ import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.RequestBookApiDto;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
@@ -15,9 +14,6 @@ import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import jakarta.persistence.criteria.Predicate;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -113,6 +108,9 @@ public class BookInfoService {
         // Specification을 이용해 동적 쿼리를 생성합니다.
         Specification<BookInfo> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            // bookList 필드가 비어있지 않은 BookInfo 객체를 검색합니다.
+            predicates.add(cb.isNotEmpty(root.get("bookList")));
 
             if (search != null && !search.trim().isEmpty()) {
                 // title 필드 또는 isbn 필드가 검색어를 포함하고 있는 BookInfo 객체를 검색합니다.

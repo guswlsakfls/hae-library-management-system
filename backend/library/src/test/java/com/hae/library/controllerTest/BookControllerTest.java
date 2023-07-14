@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Transactional
 @DisplayName("BookController 통합 테스트")
 public class BookControllerTest {
@@ -68,8 +67,10 @@ public class BookControllerTest {
 
         // 테스트용 카테고리를 등록합니다.
         Category category = categoryRepository.save(Category.builder()
-                .categoryName("테스트")
+                .categoryName("테스트용")
                 .build());
+
+        System.out.println(category);
         this.categoryId = category.getId();
 
         // 테스트용 도서 정보를 등록합니다.
@@ -82,6 +83,8 @@ public class BookControllerTest {
                 .publishedAt("2023")
                 .category(category)
                 .build();
+
+//        bookInfo.addCategory(category);
         bookInfoRepository.save(bookInfo);
 
         Book book1 = bookRepository.save(Book.builder()
@@ -116,7 +119,8 @@ public class BookControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content("{\"callSign\":\"111.111-11-11.c100\", " +
                                             "\"isbn\":\"1234567890113\"," +
-                                            " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}")
+                                            " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", " +
+                                            "\"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트용\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}")
                                     .header("Authorization", "Bearer " + token))
                             .andExpect(status().isOk());
                 }
@@ -131,7 +135,8 @@ public class BookControllerTest {
                 mockMvc.perform(post("/api/admin/book/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"callSign\":\"111.111-11-11.c1\", \"isbn\":\"1234567890123\"," +
-                                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}")
+                                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", " +
+                                        "\"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트용\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}")
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message").value(BookErrorCode.DUPLICATE_BOOK.getMessage()));
@@ -148,7 +153,8 @@ public class BookControllerTest {
             @Test
             @DisplayName("청구기호로 도서 조회")
             public void getBookSuccess() throws Exception {
-                mockMvc.perform(get("/api/admin/book/{callsign}", "111.111-11-11.c1")
+                mockMvc.perform(get("/api/admin/book/callsign")
+                                .param("callsign", "111.111-11-11.c1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk())
@@ -162,7 +168,8 @@ public class BookControllerTest {
             @Test
             @DisplayName("도서 조회시 청구기호가 존재하지 않으면 예외 발생 ")
             public void getBookFailBecauseNotExistBook() throws Exception {
-                mockMvc.perform(get("/api/admin/book/{callsign}", "111.111-11-11.c100")
+                mockMvc.perform(get("/api/admin/book/callsign")
+                                .param("callsign", "111.111-11-11.c100")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isBadRequest())
@@ -180,10 +187,10 @@ public class BookControllerTest {
             @Test
             @DisplayName("도서 수정 성공")
             public void updateBookSuccess() throws Exception {
-                String content = String.format("{\"id\":\"%s\", \"callSign\":\"111.111-11-11" +
-                        ".c100\", " +
+                String content = String.format("{\"id\":\"%s\", \"callSign\":\"111.111-11-11.c100\", " +
                         "\"isbn\":\"1234567890123\"," +
-                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}", bookId);
+                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용" +
+                        " 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트용\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}", bookId);
 
                 mockMvc.perform(put("/api/admin/book/update")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -199,8 +206,7 @@ public class BookControllerTest {
             @Test
             @DisplayName("도서 수정시 이미 존재하는 청구기호로 수정하면 예외 발생")
             public void updateBookFailBecauseNotExistBook() throws Exception {
-                String content = String.format("{\"id\":\"%s\", \"callSign\":\"111.111-11-11" +
-                        ".c2\", " +
+                String content = String.format("{\"id\":\"%s\", \"callSign\":\"111.111-11-11.c2\", " +
                         "\"isbn\":\"1234567890123\"," +
                         " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", \"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\", \"status\":\"FINE\", \"donator\":\"테스트 기증자\"}", bookId);
 

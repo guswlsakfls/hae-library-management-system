@@ -3,15 +3,13 @@ package com.hae.library.service;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Member;
 import com.hae.library.domain.RequestBook;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
 import com.hae.library.dto.BookInfo.RequestBookInfoDto;
 import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.repository.MemberRepository;
-import com.hae.library.repository.RequestBookInfoRepository;
+import com.hae.library.repository.RequestBookRepository;
 import com.hae.library.util.SecurityUtil;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
@@ -27,22 +25,22 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class RequestBookInfoService {
-    private final RequestBookInfoRepository requestBookInfoRepo;
+public class RequestBookService {
+    private final RequestBookRepository requestBookRepo;
     private final BookInfoService bookInfoService;
     private final MemberRepository memberRepository;
 
     /**
      * 새로운 책 요청 정보를 저장합니다.
-     * @param requestCreateCategoryDto
+     * @param requestDto
      */
-    public void createRequestBookInfo(RequestBookInfoDto requestCreateCategoryDto) {
+    public void createRequestBook(RequestBookInfoDto requestDto) {
         // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 새로운 책 정보를 생성하고 중복되는 isbn이 존재할 시 예외처리 됩니다.
-        BookInfo newBookInfo = bookInfoService.createBookInfo(requestCreateCategoryDto);
+        BookInfo newBookInfo = bookInfoService.createBookInfo(requestDto);
 
         // 새로운 책 정보를 가지고 새로운 책 요청 정보를 생성합니다.
         RequestBook newRequestBook = RequestBook.builder()
@@ -53,7 +51,7 @@ public class RequestBookInfoService {
         newRequestBook.addMapping(member ,newBookInfo);
 
         // 새로운 책 요청 정보를 저장합니다.
-        requestBookInfoRepo.save(newRequestBook);
+        requestBookRepo.save(newRequestBook);
     }
 
     /**
@@ -67,7 +65,7 @@ public class RequestBookInfoService {
      */
 
     // 도서 구매 요청들을 조회합니다.
-    public Page<ResponseBookInfoDto> getRequestBookInfoList(String search, int page, int size,
+    public Page<ResponseBookInfoDto> getRequestBookList(String search, int page, int size,
                                                             String categoryName, String sort,
                                                             String approved) {
         // PageRequest 객체를 생성하여 페이지 번호, 페이지 크기, 정렬 방식을 설정합니다.
@@ -106,7 +104,7 @@ public class RequestBookInfoService {
         };
 
         // 구매요청 도서 정보를 페이징하여 가져온 후, 가져온 책 정보를 Response DTO로 변환합니다.
-        Page<RequestBook> requestBookList = requestBookInfoRepo.findAll(spec, pageable);
+        Page<RequestBook> requestBookList = requestBookRepo.findAll(spec, pageable);
         Page<ResponseBookInfoDto> responseBookInfoList =
                 requestBookList.map(ResponseBookInfoDto::from);
         return responseBookInfoList;
@@ -118,12 +116,12 @@ public class RequestBookInfoService {
      *
      * @throws BookErrorCode 존재하지 않는 구매 요청 도서 정보입니다.
      */
-    public void deleteRequestBookInfo(Long requestBookId) {
+    public void deleteRequestBook(Long requestBookId) {
         // 요청 도서 정보를 조회합니다.
         RequestBook requestBook =
-                requestBookInfoRepo.findById(requestBookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
+                requestBookRepo.findById(requestBookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
 
         // 요청 도서 정보를 삭제합니다.
-        requestBookInfoRepo.delete(requestBook);
+        requestBookRepo.delete(requestBook);
     }
 }

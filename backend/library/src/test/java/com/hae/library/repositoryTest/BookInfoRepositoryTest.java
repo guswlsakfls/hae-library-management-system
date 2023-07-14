@@ -297,21 +297,5 @@ public class BookInfoRepositoryTest {
                 Assertions.assertThat(bookInfoRepository.findById(bookInfo.getId()).orElse(null)).isNull();
             }
         }
-
-        @Nested
-        @DisplayName("실패 케이스")
-        public class FailCaseTest {
-            @Test
-            @DisplayName("존재하지 않는 책 정보를 삭제할 수 없다")
-            public void testDeleteNonExistingBookInfo() {
-                // Given
-                Long nonExistingId = 10000L;
-
-                // When
-//                System.out.println(bookInfoRepository.deleteById(nonExistingId));
-
-            }
-        }
     }
-
 }
