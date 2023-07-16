@@ -19,7 +19,7 @@ public class Book extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_info_id")
+    @JoinColumn(name = "book_info")
     private BookInfo bookInfo;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
