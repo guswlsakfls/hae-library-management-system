@@ -10,11 +10,13 @@ import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CategoryService {
@@ -65,9 +67,16 @@ public class CategoryService {
      *
      * @param categoryDto 카테고리 수정할 정보 DTO
      *
-     * @throws RestApiException 카테고리가 존재하지 않을 경우 예외를 발생시킵니다.
+     * @throws CategoryErrorCode 카테고리가 중복될 경우 예외를 발생시킵니다.
+     * @throws CategoryErrorCode 카테고리가 존재하지 않을 경우 예외를 발생시킵니다.
      */
     public void updateCategory(RequestUpdateCategoryDto categoryDto) {
+        // 카테고리가 중복되면 예외를 발생시킵니다.
+        if (categoryRepo.existsByCategoryName(categoryDto.getUpdatedCategoryName())) {
+            log.error("카테고리가 중복됩니다.");
+            throw new RestApiException(CategoryErrorCode.DUPLICATE_CATEGORY);
+        }
+
         // 카테고리를 조회합니다.
         Category category = categoryRepo.findById(categoryDto.getCategoryId())
                 .orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
@@ -83,6 +92,9 @@ public class CategoryService {
      * 카테고리를 삭제합니다.
      *
      * @param categoryId 카테고리 ID
+     *
+     * @throws CategoryErrorCode 카테고리가 존재하지 않을 경우 예외를 발생시킵니다.
+     * @throws CategoryErrorCode 카테고리를 참조하는 도서가 있을 경우 예외를 발생시킵니다.
      */
     public void deleteCategory(Long categoryId) {
         // 카테고리를 조회합니다.
