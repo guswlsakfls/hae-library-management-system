@@ -3,7 +3,7 @@ package com.hae.library.controller;
 import com.hae.library.dto.Category.Request.RequestCreateCategoryDto;
 import com.hae.library.dto.Category.Request.RequestUpdateCategoryDto;
 import com.hae.library.dto.Category.Response.ResponseCategoryDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class CategoryContorller {
                 .build();
     }
 
-    // 카테고리 목록을 조회합니다.
+    // 카테고리 모든 목록을 조회합니다.
     @GetMapping(value = "/category/all")
     public ResponseResultDto<Object> getAllCategory() {
         log.info("카테고리 목록 조회 요청: [GET] /category/all");

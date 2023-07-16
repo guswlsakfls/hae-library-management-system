@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+// 책 요청 정보를 저장하는 클래스입니다.
 @Entity
 @Getter
 @Table(name = "request_book")
@@ -48,6 +49,8 @@ public class RequestBook extends BaseTimeEntity {
 
     /**
      * 매핑관계를 설정합니다.
+     * @param member 책을 요청한 회원
+     * @param bookInfo 요청한 책
      */
     public void addMapping(Member member, BookInfo bookInfo) {
         this.member = member;

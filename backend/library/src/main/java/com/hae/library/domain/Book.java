@@ -7,6 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// 실물 책에 대한 정보를 담고 있는 도메인입니다.
 @Entity
 @Getter
 @NoArgsConstructor()
@@ -74,40 +75,11 @@ public class Book extends BaseTimeEntity {
     }
 
     /**
-     * 대여 정보를 추가합니다.
-     * @param lending 추가할 대여 정보
-     */
-    public void addLending(Lending lending) {
-        this.lendingList.add(lending);
-
-        // 무한루프 체크
-        if (lending.getBook() != this) {
-            lending.updateBook(this);
-        }
-    }
-
-    /**
      * 도서 상태를 업데이트합니다.
      * @param status 새로운 도서 상태
      */
     public void updateBookStatus(BookStatus status) {
         this.status = status;
-    }
-
-    /**
-     * 청구 기호를 업데이트합니다.
-     * @param callSign 새로운 청구 기호
-     */
-    public void updateCallSign(String callSign) {
-        this.callSign = callSign;
-    }
-
-    /**
-     * 테스트용으로 사용되는 ID를 업데이트합니다.
-     * @param id 새로운 ID
-     */
-    public void updateIdTest(Long id) {
-        this.id = id;
     }
 
     /**

@@ -1,9 +1,11 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.BookInfo.Request.RequestIsbnDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.BookInfoService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,12 +76,11 @@ public class BookInfoController {
     // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
 //    @RoleInterface.AdminAuthorize
     @GetMapping(value = "/admin/bookinfo/isbn")
-    public ResponseResultDto<Object> getBookInfoByIsbn(@RequestParam @NotBlank(message =
-            "ISBN값을 입력해 주세요.") String isbn) {
-        log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
-        ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
+    public ResponseResultDto<Object> getBookInfoByIsbn(@Valid RequestIsbnDto requestIsbnDto) {
+        log.info("책 정보 조회: /bookinfo/isbn - {} - ISBN으로 책 정보 조회", requestIsbnDto.getIsbn());
+        ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(requestIsbnDto);
 
-        log.info("ISBN으로 책 정보 조회에 성공하였습니다 {}", isbn);
+        log.info("ISBN으로 책 정보 조회에 성공하였습니다 {}", requestIsbnDto.getIsbn());
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("하나의 책 정보 조회에 성공하였습니다")

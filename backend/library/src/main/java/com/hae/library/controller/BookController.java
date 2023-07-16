@@ -1,29 +1,18 @@
 package com.hae.library.controller;
 
-import com.hae.library.domain.Book;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
-import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
-import com.hae.library.dto.ResponseResultDto;
-import com.hae.library.global.Exception.errorCode.BookErrorCode;
-import com.hae.library.global.Exception.errorCode.CommonErrorCode;
-import com.hae.library.global.Exception.RestApiException;
+import com.hae.library.dto.Book.Request.RequestBookWithBookInfoDto;
+import com.hae.library.dto.Book.Response.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.Common.ResponseResultDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
 import com.hae.library.service.BookService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.NumberFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -61,11 +50,10 @@ public class BookController {
     }
 
     // 청구기호로 책을 검색합니다
-    @GetMapping(value = "/admin/book/callsign") // param -> path로 수정했음
-    public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
-            "청구기호를 입력해 주세요.") String callSign) {
-        log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", callSign);
-        ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(callSign);
+    @GetMapping(value = "/admin/book/callsign")
+    public ResponseResultDto getBookByCallSign(@Valid RequestCallsignDto requestCallsignDto) {
+        log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", requestCallsignDto);
+        ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(requestCallsignDto);
 
         log.info("청구 기호로 책 조회에 성공하였습니다");
         return ResponseResultDto.builder()

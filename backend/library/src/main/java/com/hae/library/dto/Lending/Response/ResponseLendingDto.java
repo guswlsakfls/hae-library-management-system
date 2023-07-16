@@ -1,10 +1,7 @@
-package com.hae.library.dto.Lending;
+package com.hae.library.dto.Lending.Response;
 
 import com.hae.library.domain.Lending;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.time.format.DateTimeFormatter;
 
 @Getter
 public class ResponseLendingDto {

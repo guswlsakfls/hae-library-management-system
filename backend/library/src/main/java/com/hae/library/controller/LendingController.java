@@ -1,8 +1,12 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.Lending.*;
-import com.hae.library.dto.Member.ResponseMemberDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Common.ResponseResultDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
+import com.hae.library.dto.Lending.Request.RequestLendingDto;
+import com.hae.library.dto.Lending.Request.RequestReturningDto;
+import com.hae.library.dto.Lending.Response.ResponseLendingDto;
+import com.hae.library.dto.Lending.Response.ResponseLendingInfoForReturningDto;
+import com.hae.library.dto.Lending.Response.ResponseMemberLendingDto;
 import com.hae.library.service.LendingService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -52,13 +55,10 @@ public class LendingController {
 
     // 반납을 위한 책 대여 기록을 조회합니다.
     @GetMapping(value = "/admin/lending/callsign")
-    public ResponseResultDto<Object> getLendingInfoByCallSign(
-            @RequestParam @NotBlank(message = "청구기호를 입력해주세요.") @Size(max=20,
-                    message = "20자 이하로 입력해 주세요") String callsign
-    ) {
-        log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", callsign);
+    public ResponseResultDto<Object> getLendingInfoByCallSign(@Valid RequestCallsignDto requestCallsignDto) {
+        log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", requestCallsignDto.toString());
         ResponseLendingInfoForReturningDto responseLendingDto =
-                lendingService.getLendingInfoByCallSign(callsign);
+                lendingService.getLendingInfoByCallSign(requestCallsignDto);
 
         log.info("반납을 위한 책 대여 기록 조회에 성공하였습니다");
         return ResponseResultDto.builder()

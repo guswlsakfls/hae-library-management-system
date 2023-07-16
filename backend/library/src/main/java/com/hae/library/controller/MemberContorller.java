@@ -1,7 +1,11 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.Member.*;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestChangePasswordDto;
+import com.hae.library.dto.Member.Request.RequestEmailDto;
+import com.hae.library.dto.Member.Request.RequestSignupDto;
+import com.hae.library.dto.Member.Response.ResponseMemberDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -109,7 +113,7 @@ public class MemberContorller {
 
     // 회원 비밀번호를 변경합니다.
     @PutMapping(value = "/member/changePassword")
-    public ResponseResultDto<Object> updateMemberPassword(@RequestBody RequestChangePasswordDto requestChangePasswordDto) {
+    public ResponseResultDto<Object> updateMemberPassword(@RequestBody @Valid RequestChangePasswordDto requestChangePasswordDto) {
         log.info("회원 비밀번호 변경: [PUT] /member/changePassword - {}", requestChangePasswordDto.toString());
         memberService.changeMemberPassword(requestChangePasswordDto);
 

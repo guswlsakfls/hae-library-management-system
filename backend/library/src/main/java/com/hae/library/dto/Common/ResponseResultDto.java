@@ -1,4 +1,4 @@
-package com.hae.library.dto;
+package com.hae.library.dto.Common;
 
 import lombok.Builder;
 import lombok.Getter;

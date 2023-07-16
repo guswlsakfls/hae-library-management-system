@@ -1,9 +1,8 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.Book.ResponseBookDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.RequestBookService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

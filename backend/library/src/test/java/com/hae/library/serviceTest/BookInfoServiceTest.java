@@ -2,10 +2,10 @@ package com.hae.library.serviceTest;
 
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.Book.Request.RequestBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;

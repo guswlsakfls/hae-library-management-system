@@ -1,12 +1,15 @@
 package com.hae.library.service;
 
 import com.hae.library.domain.Book;
-import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.domain.Lending;
 import com.hae.library.domain.Member;
-import com.hae.library.dto.Lending.*;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
+import com.hae.library.dto.Lending.Request.RequestLendingDto;
+import com.hae.library.dto.Lending.Request.RequestReturningDto;
+import com.hae.library.dto.Lending.Response.ResponseLendingDto;
+import com.hae.library.dto.Lending.Response.ResponseLendingInfoForReturningDto;
+import com.hae.library.dto.Lending.Response.ResponseMemberLendingDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.errorCode.MemberErrorCode;
@@ -114,6 +117,7 @@ public class LendingService {
      * 대출된 책 반납을 처리합니다.
      *
      * @param requestReturningDto 반납 요청 DTO
+     *
      * @throws BookErrorCode 대출 정보가 존재하지 않을 때
      * @throws MemberErrorCode 반납해줄 사서가 회원이 존재하지 않을 때
      * @throws BookErrorCode 반납할 도서가 대출 중이 아닐 때
@@ -171,11 +175,13 @@ public class LendingService {
     /**
      * 청구기호로 책 반납을 위한 대출 정보를 조회합니다.
      *
-     * @param callsign 책 청구기호
+     * @param requestCallsignDto 청구기호 DTO
      * @return 대출 정보 DTO
      */
     @Transactional
-    public ResponseLendingInfoForReturningDto getLendingInfoByCallSign(String callsign) {
+    public ResponseLendingInfoForReturningDto getLendingInfoByCallSign(RequestCallsignDto requestCallsignDto) {
+        String callsign = requestCallsignDto.getCallsign();
+
         // 책 청구기호로 책을 조회합니다.
         Book book = bookRepo.findByCallSign(callsign)
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
@@ -204,6 +210,7 @@ public class LendingService {
         Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
+        // 검색어가 있는 경우 검색 조건을 추가합니다.
         Specification<Lending> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -249,6 +256,11 @@ public class LendingService {
     /**
      * 특정 회원의 대출 기록을 조회합니다.
      *
+     * @param search 검색어
+     * @param page   페이지 번호
+     * @param size   페이지 크기
+     * @param isLendingOrReturning 대출/반납 여부
+     * @param sort   정렬 방식
      * @return 회원의 대출 기록 리스트
      */
     @Transactional

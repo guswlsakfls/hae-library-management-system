@@ -1,7 +1,7 @@
 package com.hae.library.domain;
 
 import com.hae.library.domain.Enum.Role;
-import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// 회원 정보를 저장하는 클래스입니다.
 @Entity
 @Getter
-@NoArgsConstructor // TODO: 이 옵션에 대해 다시 알아 보기. (access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "MEMBER")
 public class Member extends BaseTimeEntity {
 
@@ -67,7 +68,7 @@ public class Member extends BaseTimeEntity {
         this.email = requestChangeMemberInfoDto.getEmail();
         this.penaltyEndDate = requestChangeMemberInfoDto.getPenaltyEndDate();
         this.role = requestChangeMemberInfoDto.getRole();
-        this.activated = requestChangeMemberInfoDto.getActivated(); // TODO: isActivated()에서 바꿨는데, 나중에 확인
+        this.activated = requestChangeMemberInfoDto.getActivated();
     }
 
     /**
