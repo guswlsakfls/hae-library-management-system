@@ -1,7 +1,11 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.Member.*;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestChangePasswordDto;
+import com.hae.library.dto.Member.Request.RequestEmailDto;
+import com.hae.library.dto.Member.Request.RequestSignupDto;
+import com.hae.library.dto.Member.Response.ResponseMemberDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,7 +24,12 @@ import java.util.Map;
 public class MemberContorller {
     private final MemberService memberService;
 
-    // 회원가입 요청을 합니다
+    /**
+     * 회원가입 요청을 받아 처리합니다.
+     *
+     * @param requestSignupDto
+     * @return "회원가입에 성공하였습니다" 메시지
+     */
     @PostMapping(value = "/signup")
     public ResponseResultDto<Object> signUp(@RequestBody @Valid RequestSignupDto requestSignupDto) {
         log.info("회원가입 요청: [POST] /member/signup - {}", requestSignupDto.toString());
@@ -33,7 +42,16 @@ public class MemberContorller {
                 .build();
     }
 
-    // 회원 정보 전체를 조회합니다.
+    /**
+     * 검색 조건을 통해 회원 목록을 조회합니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param role
+     * @param sort
+     * @return 회원 정보 목록과 페이지 네이션 정보
+     */
     @GetMapping(value = "/admin/memberinfo/all")
     public ResponseResultDto<Object> getAllMember(
             @RequestParam(required = false) String search,
@@ -64,7 +82,11 @@ public class MemberContorller {
                 .build();
     }
 
-    // 내 프로필 정보를 조회합니다.
+    /**
+     * 내 정보를 조회합니다.
+     *
+     * @return 내 정보
+     */
     @GetMapping(value = "/member/memberinfo/me")
     public ResponseResultDto<Object> getMemberMe() {
         log.info("내 정보 조회: [GET] /memberInfo/me");
@@ -78,7 +100,12 @@ public class MemberContorller {
                 .build();
     }
 
-    // 회원 정보를 조회합니다.
+    /**
+     * 이메일을 통해 회원 정보를 조회합니다.
+     *
+     * @param requestEmailDto
+     * @return 회원 정보
+     */
     @PostMapping(value = "/admin/memberinfo")
     public ResponseResultDto<Object> getMemberByEmail(@RequestBody @Valid RequestEmailDto requestEmailDto) {
         log.info("회원 정보 조회: [POST] /memberInfo - {}", requestEmailDto.toString());
@@ -92,7 +119,12 @@ public class MemberContorller {
                 .build();
     }
 
-    // 회원 정보를 수정합니다.
+    /**
+     * 회원 정보를 수정합니다.
+     *
+     * @param requestChangeMemberInfoDto
+     * @return 수정된 회원 정보
+     */
     @PutMapping(value = "/admin/member/update")
     public ResponseResultDto<Object> modifyMemberInfo(@RequestBody @Valid RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         log.info("회원 정보 수정: [PUT] /member/update - {}", requestChangeMemberInfoDto.toString());
@@ -107,9 +139,14 @@ public class MemberContorller {
                 .build();
     }
 
-    // 회원 비밀번호를 변경합니다.
+    /**
+     * 회원 비밀번호를 변경합니다.
+     *
+     * @param requestChangePasswordDto
+     * @return "회원 비밀번호 변경에 성공하였습니다" 메시지
+     */
     @PutMapping(value = "/member/changePassword")
-    public ResponseResultDto<Object> updateMemberPassword(@RequestBody RequestChangePasswordDto requestChangePasswordDto) {
+    public ResponseResultDto<Object> updateMemberPassword(@RequestBody @Valid RequestChangePasswordDto requestChangePasswordDto) {
         log.info("회원 비밀번호 변경: [PUT] /member/changePassword - {}", requestChangePasswordDto.toString());
         memberService.changeMemberPassword(requestChangePasswordDto);
 
@@ -121,7 +158,11 @@ public class MemberContorller {
     }
 
 
-    // 회원을 휴면계정으로 전환 합니다.
+    /**
+     * 회원을 휴면계정으로 전환합니다.
+     *
+     * @return "회원이 휴면계정 전환에 성공하였습니다" 메시지
+     */
     @PutMapping(value = "/member/withdrawal/me")
     public ResponseResultDto<Object> memberWithdrawal() {
         log.info("회원 휴면계정 전환: [PUT] /member/withdrawal");
@@ -134,7 +175,12 @@ public class MemberContorller {
                 .build();
     }
 
-    // 회원을 삭제합니다.
+    /**
+     * 회원을 삭제합니다.
+     *
+     * @param memberId
+     * @return "회원 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/member/{memberId}/delete")
     public ResponseResultDto<Object> deleteMember(@PathVariable Long memberId) {
         log.info("회원 삭제: [DELETE] /member/delete - {}", memberId);
@@ -146,5 +192,4 @@ public class MemberContorller {
                 .message("회원 삭제에 성공하였습니다")
                 .build();
     }
-
 }

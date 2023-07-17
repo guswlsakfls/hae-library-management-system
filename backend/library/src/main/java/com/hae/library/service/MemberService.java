@@ -1,10 +1,11 @@
 package com.hae.library.service;
 
-import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Enum.Role;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.Lending.ResponseLendingDto;
-import com.hae.library.dto.Member.*;
+import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestChangePasswordDto;
+import com.hae.library.dto.Member.Request.RequestEmailDto;
+import com.hae.library.dto.Member.Request.RequestSignupDto;
+import com.hae.library.dto.Member.Response.ResponseMemberDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.util.SecurityUtil;
@@ -22,10 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -204,12 +203,19 @@ public class MemberService {
      * 회원을 휴면계정 처리 합니다. 회원의 activated 상태를 false로 변경합니다.
      *
      * @throws MemberErrorCode 이메일로 회원을 찾지 못했을 때
+     * @throws MemberErrorCode 회원의 대출이 남아있을 때
      */
     @Transactional
     public void memberWithdrawal() {
         // 현재 보안 컨텍스트에서 인증된 사용자의 이메일로 회원 정보를 찾습니다. 없다면, 예외를 발생시킵니다.
         Member member =
                 memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // 대출이 있는 회원은 탈퇴할 수 없습니다.
+        if (member.getLendingCount() > 0) {
+            throw new RestApiException(MemberErrorCode.MEMBER_HAS_LENDING);
+        }
+
         // 회원의 activated 상태를 false로 변경합니다.
         member.updateActivated(false);
         // 변경된 회원 정보를 저장합니다.
@@ -221,7 +227,8 @@ public class MemberService {
      *
      * @param id 삭제할 회원의 ID
      *
-     * Throws MemberErrorCode id로 회원을 찾지 못했을 때
+     * @throws MemberErrorCode id로 회원을 찾지 못했을 때
+     * @throws MemberErrorCode 회원의 대출이 남아있을 때
      */
     @Transactional
     public void deleteMember(Long id) {

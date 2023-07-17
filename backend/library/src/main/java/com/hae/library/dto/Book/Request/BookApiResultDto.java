@@ -1,4 +1,4 @@
-package com.hae.library.dto.Book;
+package com.hae.library.dto.Book.Request;
 
 import lombok.Getter;
 import lombok.Setter;

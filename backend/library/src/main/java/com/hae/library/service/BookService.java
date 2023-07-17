@@ -5,9 +5,10 @@ import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.domain.RequestBook;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
-import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
+import com.hae.library.dto.Book.Request.RequestBookWithBookInfoDto;
+import com.hae.library.dto.Book.Response.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.CategoryErrorCode;
@@ -119,13 +120,15 @@ public class BookService {
     /**
      * 책을 청구기호로 조회하는 메서드입니다.
      *
-     * @param callSign 청구기호
+     * @param requestCallsignDto 청구기호 요청 DTO
      * @return ResponseBookWithBookInfoDto 책 정보 응답 DTO
      *
      * @throws BookErrorCode 책을 찾을 수 없는 경우
      */
     @Transactional
-    public ResponseBookWithBookInfoDto getBookByCallSign(String callSign) {
+    public ResponseBookWithBookInfoDto getBookByCallSign(RequestCallsignDto requestCallsignDto) {
+        String callSign = requestCallsignDto.getCallsign();
+
         // 청구기호를 사용하여 도서를 검색합니다.
         // 만약 도서를 찾을 수 없다면 예외를 발생시킵니다.
         Book book = bookRepo.findByCallSign(callSign).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));

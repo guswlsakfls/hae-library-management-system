@@ -9,11 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ErrorHandlerController implements ErrorController {
-//     @Override
-//     public String getErrorPath() {
-//         return null;
-//     }
-
     @GetMapping("/error")
     public String handleError(HttpServletRequest request) {
 

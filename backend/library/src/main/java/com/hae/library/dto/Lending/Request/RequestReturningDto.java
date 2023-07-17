@@ -1,4 +1,4 @@
-package com.hae.library.dto.Lending;
+package com.hae.library.dto.Lending.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

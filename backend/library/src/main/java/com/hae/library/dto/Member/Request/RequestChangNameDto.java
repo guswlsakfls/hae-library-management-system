@@ -1,4 +1,4 @@
-package com.hae.library.dto.Member;
+package com.hae.library.dto.Member.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

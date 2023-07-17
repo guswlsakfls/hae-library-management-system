@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
-import com.hae.library.dto.Book.RequestBookApiDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.Book.Request.RequestBookApiDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.BookInfo.Request.RequestIsbnDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
 import com.hae.library.repository.BookInfoRepository;
@@ -156,11 +157,12 @@ public class BookInfoService {
     /**
      * ISBN으로 책 정보를 가져옵니다.
      *
-     * @param isbn ISBN
+     * @param requestIsbnDto ISBN 정보 요청 DTO
      * @return 책 정보와 관련된 책 응답 DTO
      */
     @Transactional
-    public ResponseBookInfoWithBookDto getBookInfoByIsbn(String isbn) {
+    public ResponseBookInfoWithBookDto getBookInfoByIsbn(RequestIsbnDto requestIsbnDto) {
+        String isbn = requestIsbnDto.getIsbn();
         // isbn이 null이거나 공백이라면
         if (isbn == null || isbn.trim().isEmpty()) {
             throw new RestApiException(BookErrorCode.NOTHING_REQUEST_INPUT);

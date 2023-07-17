@@ -1,7 +1,6 @@
-package com.hae.library.dto.Book;
+package com.hae.library.dto.Book.Request;
 
-import com.hae.library.domain.BookInfo;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
 import lombok.*;
 
 import java.util.List;

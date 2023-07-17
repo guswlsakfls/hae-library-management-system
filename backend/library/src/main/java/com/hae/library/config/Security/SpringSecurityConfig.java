@@ -44,13 +44,14 @@ public class SpringSecurityConfig {
             "/api/signup",
             "/api/login",
             "/api/auth",
+            "/api/category/all",
+            "/manifest.json",
 
             /* 도서 */
             "/api/bookinfo/**",
 
             /* 기타 등등 */
             "/error",
-//            "/api/**"
 
     };
 

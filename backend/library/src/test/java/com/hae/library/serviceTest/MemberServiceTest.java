@@ -1,10 +1,10 @@
 package com.hae.library.serviceTest;
 
 import com.hae.library.domain.Member;
-import com.hae.library.dto.Member.RequestChangeMemberInfoDto;
-import com.hae.library.dto.Member.RequestEmailDto;
-import com.hae.library.dto.Member.RequestSignupDto;
-import com.hae.library.dto.Member.ResponseMemberDto;
+import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestEmailDto;
+import com.hae.library.dto.Member.Request.RequestSignupDto;
+import com.hae.library.dto.Member.Response.ResponseMemberDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.repository.MemberRepository;
@@ -122,7 +122,12 @@ public class MemberServiceTest {
                         .checkPassword("1234")
                         .build();
 
-                when(memberRepository.findByEmail(requestSignupDto.getEmail())).thenReturn(Optional.of(new Member()));
+                Member member = Member.builder()
+                        .email(requestSignupDto.getEmail())
+                        .password(requestSignupDto.getPassword())
+                        .build();
+
+                when(memberRepository.findByEmail(requestSignupDto.getEmail())).thenReturn(Optional.of(member));
 
                 // When & Then
                 Exception exception = assertThrows(RestApiException.class, () -> memberService.signup(requestSignupDto));

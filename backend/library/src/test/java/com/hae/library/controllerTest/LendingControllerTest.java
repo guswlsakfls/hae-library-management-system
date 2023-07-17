@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Optional;
 
@@ -138,18 +139,28 @@ public class LendingControllerTest {
             @Test
             @DisplayName("대출 정보를 생성")
             public void createLending() throws Exception {
-                String content = String.format("{\"userId\":1, \"bookId\":%d, " +
-                        "\"lendingCondition\":\"테스트트\"}", book1Id);
+                // Given
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 대출할 도서의 ID를 적절히 설정해주세요.
+                String lendingCondition = "테스트트";
 
-                mockMvc.perform(post("/api/admin/lending/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(content)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
 
         @Nested
@@ -158,12 +169,23 @@ public class LendingControllerTest {
             @Test
             @DisplayName("도서가 존재하지 않을 때 예외 발생")
             public void createLendingWhenBookDoesNotExist() throws Exception {
-                mockMvc.perform(post("/api/admin/lending/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"userId\":1, \"bookId\":10000, " +
-                                        "\"lendingCondition\":\"테스트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+                // Given
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long nonExistentBookId = 10000; // 존재하지 않는 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트";
+
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, nonExistentBookId, lendingCondition);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
@@ -172,55 +194,93 @@ public class LendingControllerTest {
             @Test
             @DisplayName("도서가 대출 중일 때 예외 발생")
             public void createLendingWhenBookIsLending() throws Exception {
-                String content = String.format("{\"userId\":1, \"bookId\":%d, " +
-                        "\"lendingCondition\":\"테스트트\"}", book1Id);
+                // Given
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 대출 중인 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트중";
 
-                mockMvc.perform(post("/api/admin/lending/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(content)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
+
+                // When
+                ResultActions resultActions1 = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+                ResultActions resultActions2 = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions1.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
-
-                mockMvc.perform(post("/api/admin/lending/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(content)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+                resultActions2.andExpect(status().isBadRequest())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
 
+
             @Test
-            @DisplayName("도서가 분실 상태일 때 예외발생")
+            @DisplayName("도서가 분실 상태일 때 예외 발생")
             public void createLendingWhenBookIsLost() throws Exception {
-                book1.updateBookStatus(BookStatus.valueOf("LOST"));
+                // Given
+                book1.updateBookStatus(BookStatus.LOST);
 
-                String content = String.format("{\"userId\":1, \"bookId\":%d, " +
-                        "\"lendingCondition\":\"테스트트\"}", book1Id);
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 분실된 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트";
 
-                mockMvc.perform(post("/api/admin/lending/create")
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
+
+                // When
+                mockMvc.perform(post(requsetUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(content)
-                                .header("Authorization", "Bearer " + token));
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isBadRequest());
             }
 
+
+
             @Test
-            @DisplayName("회원이 정지 상태일 때 예외발생")
+            @DisplayName("회원이 정지 상태일 때 예외 발생")
             public void createLendingWhenUserIsSuspended() throws Exception {
+                // Given
                 Member member = memberRepository.findById(1L).get();
                 member.updateActivated(false);
 
-                String content = String.format("{\"userId\":1, \"bookId\":%d, " +
-                        "\"lendingCondition\":\"테스트트\"}", book1Id);
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 대출할 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트 중";
+
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requsetUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(content)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isForbidden())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
             }
 
             @Test
             @DisplayName("회원이 대출 가능한 권수를 초과했을 때 예외발생")
             public void createLendingWhenUserExceedsLendingLimit() throws Exception {
+                // Given
                 String content1 = String.format("{\"userId\":1, \"bookId\":%d, " +
                         "\"lendingCondition\":\"테스트트\"}", book1Id);
                 String content2 = String.format("{\"userId\":1, \"bookId\":%d, " +
@@ -230,6 +290,7 @@ public class LendingControllerTest {
                 String content4 = String.format("{\"userId\":1, \"bookId\":%d, " +
                         "\"lendingCondition\":\"테스트트\"}", book4Id);
 
+                // When
                 mockMvc.perform(post("/api/admin/lending/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(content1)
@@ -245,11 +306,16 @@ public class LendingControllerTest {
                         .content(content3)
                         .header("Authorization", "Bearer " + token));
 
-                mockMvc.perform(post("/api/admin/lending/create")
+                ResultActions resultActions = mockMvc.perform(post("/api/admin/lending/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content4)
-                        .header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadRequest());
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
             }
         }
     }
@@ -263,30 +329,41 @@ public class LendingControllerTest {
             @Test
             @DisplayName("대출된 도서를 반납 처리합니다.")
             public void returnLending() throws Exception {
-                String content1 = String.format("{\"userId\":1, \"bookId\":%d, " +
-                        "\"lendingCondition\":\"테스트트\"}", book1Id);
+                // Given
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 대출된 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트중";
+
+                String lendingContent = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
 
                 // 대출 처리
                 mockMvc.perform(post("/api/admin/lending/create")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(content1)
-                                .header("Authorization", "Bearer " + token));
+                                .content(lendingContent)
+                                .header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk());
 
-                // 청구기호로 대출 정보 조회
-                Optional<Lending> lending =
-                        lendingRepository.findByBookIdAndReturningLibrarianIsNull(book1Id);
+                // When
+                Optional<Lending> lending = lendingRepository.findByBookIdAndReturningLibrarianIsNull(bookId);
+                long lendingId = lending.get().getId(); // 대출 ID
+
+                String returnContent = String.format("{\"lendingId\":%d, \"returningCondition\":\"%s\"}",
+                        lendingId, lendingCondition);
 
                 // 반납 처리
-                mockMvc.perform(put("/api/admin/lending/returning")
+                ResultActions resultActions = mockMvc.perform(put("/api/admin/lending/returning")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"lendingId\":" + lending.get().getId() + ", " +
-                                        "\"returningCondition\":\"테스트트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                                .content(returnContent)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
 
         @Nested
@@ -294,13 +371,21 @@ public class LendingControllerTest {
         public class Fail {
             @Test
             @DisplayName("반납하는 도서가 대출 중이 아닐 때 예외처리")
-            public void returnLendingWhenBookDoesNotExist() throws Exception {
-                mockMvc.perform(put("/api/admin/lending/returning")
+            public void returnLendingWhenBookIsNotLent() throws Exception {
+                // Given
+                long lendingId = 100; // 대출 ID를 적절히 설정해주세요.
+                String returningCondition = "테스트트";
+                String returnContent = String.format("{\"lendingId\":%d, \"returningCondition\":\"%s\"}",
+                        lendingId, returningCondition);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(put("/api/admin/lending/returning")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"lendingId\":100, " +
-                                        "\"returningCondition\":\"테스트트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+                                .content(returnContent)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
@@ -317,14 +402,24 @@ public class LendingControllerTest {
             @Test
             @DisplayName("대출 전체 목록을 조회합니다.")
             public void getCategoryList() throws Exception {
-                mockMvc.perform(get("/api/admin/lending/all")
+                // Given
+                String requestUrl = "/api/admin/lending/all";
+                int page = 0;
+                int size = 10;
+                String sort = "최신도서";
+                String role = "전체";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .param("page", "0")
-                                .param("size", "10")
-                                .param("sort", "최신도서")
-                                .param("role", "전체")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                                .param("page", String.valueOf(page))
+                                .param("size", String.valueOf(size))
+                                .param("sort", sort)
+                                .param("role", role)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();

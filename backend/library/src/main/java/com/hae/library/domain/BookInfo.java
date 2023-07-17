@@ -19,17 +19,17 @@ public class BookInfo extends BaseTimeEntity{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category")
     private Category category;
 
     @OneToMany(mappedBy = "bookInfo", cascade = CascadeType.REMOVE)
     private List<Book> bookList = new ArrayList<>();
 
-    @Column(name = "isbn", nullable = false)
-    private String isbn;
-
     @Column(name = "title", nullable = false, length = 300)
     private String title;
+
+    @Column(name = "isbn", nullable = false)
+    private String isbn;
 
     @Column(name = "author", nullable = false, length = 300)
     private String author;

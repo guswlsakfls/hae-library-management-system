@@ -1,12 +1,9 @@
-package com.hae.library.dto.Book;
+package com.hae.library.dto.Book.Response;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.Enum.BookStatus;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class ResponseBookDto {

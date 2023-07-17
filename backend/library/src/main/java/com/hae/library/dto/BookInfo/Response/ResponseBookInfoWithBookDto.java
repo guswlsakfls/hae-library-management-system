@@ -1,7 +1,7 @@
-package com.hae.library.dto.BookInfo;
+package com.hae.library.dto.BookInfo.Response;
 
 import com.hae.library.domain.BookInfo;
-import com.hae.library.dto.Book.ResponseBookDto;
+import com.hae.library.dto.Book.Response.ResponseBookDto;
 import lombok.Builder;
 import lombok.Getter;
 

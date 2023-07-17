@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+// 책 구매 요청 정보를 저장하는 클래스입니다.
 @Entity
 @Getter
-@Table(name = "request_book")
+@Table(name = "REQUEST_BOOK")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestBook extends BaseTimeEntity {
     @Id
@@ -19,11 +20,11 @@ public class RequestBook extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member")
     private Member member;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_info_id")
+    @JoinColumn(name = "book_info")
     private BookInfo bookInfo;
 
     @Column(name = "is_approved")
@@ -48,6 +49,8 @@ public class RequestBook extends BaseTimeEntity {
 
     /**
      * 매핑관계를 설정합니다.
+     * @param member 책을 요청한 회원
+     * @param bookInfo 요청한 책
      */
     public void addMapping(Member member, BookInfo bookInfo) {
         this.member = member;

@@ -1,13 +1,10 @@
-package com.hae.library.dto.Lending;
+package com.hae.library.dto.Lending.Response;
 
 import com.hae.library.domain.Lending;
-import com.hae.library.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 // 반납을 위한 대출 정보를 반환하는 DTO
 @Getter

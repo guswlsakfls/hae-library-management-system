@@ -1,10 +1,8 @@
-package com.hae.library.dto.Lending;
+package com.hae.library.dto.Lending.Response;
 
 import com.hae.library.domain.Lending;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor

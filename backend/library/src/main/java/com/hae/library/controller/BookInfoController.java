@@ -1,9 +1,11 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoWithBookDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.BookInfo.Request.RequestIsbnDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.BookInfoService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,16 @@ import java.util.Map;
 public class BookInfoController {
     private final BookInfoService bookInfoService;
 
-    // 모든 책 정보를 조회하는 요청을 처리합니다.
+    /**
+     * 검색어를 통해 책 리스트를 가져옵니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param category
+     * @param sort
+     * @return 모든 책 정보 리스트
+     */
     @GetMapping(value = "/bookinfo/all")
     public ResponseResultDto getAllBookInfoByOptions(
             @RequestParam(required = false) String search,
@@ -57,7 +68,12 @@ public class BookInfoController {
                 .build();
     }
 
-    // 책 정보를 조회하는 요청을 처리합니다.
+    /**
+     * id로 책 정보를 등록합니다.
+     *
+     * @param bookInfoId
+     * @return 책 정보
+     */
     @GetMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> getBookInfoById(@PathVariable(required = false) Long bookInfoId) {
         log.info("책 정보 조회: [GET] /bookinfo/{} - ID로 책 정보 조회", bookInfoId);
@@ -71,15 +87,18 @@ public class BookInfoController {
                 .build();
     }
 
-    // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
-//    @RoleInterface.AdminAuthorize
+    /**
+     * isbn으로 책 정보를 등록합니다.
+     *
+     * @param requestIsbnDto
+     * @return 책 정보
+     */
     @GetMapping(value = "/admin/bookinfo/isbn")
-    public ResponseResultDto<Object> getBookInfoByIsbn(@RequestParam @NotBlank(message =
-            "ISBN값을 입력해 주세요.") String isbn) {
-        log.info("책 정보 조회: /bookinfo/isbn/{} - ISBN으로 책 정보 조회", isbn);
-        ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(isbn);
+    public ResponseResultDto<Object> getBookInfoByIsbn(@Valid RequestIsbnDto requestIsbnDto) {
+        log.info("책 정보 조회: /bookinfo/isbn - {} - ISBN으로 책 정보 조회", requestIsbnDto.getIsbn());
+        ResponseBookInfoWithBookDto responseBookInfoDto = bookInfoService.getBookInfoByIsbn(requestIsbnDto);
 
-        log.info("ISBN으로 책 정보 조회에 성공하였습니다 {}", isbn);
+        log.info("ISBN으로 책 정보 조회에 성공하였습니다 {}", requestIsbnDto.getIsbn());
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("하나의 책 정보 조회에 성공하였습니다")
@@ -87,7 +106,12 @@ public class BookInfoController {
                 .build();
     }
 
-    // 특정 책 정보를 삭제하는 요청을 처리합니다.
+    /**
+     * id로 책 정보를 삭제합니다.
+     *
+     * @param bookInfoId
+     * @return "책 정보 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/bookinfo/{bookInfoId}/delete")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
         log.info("책 삭제: [DELETE] /bookinfo/{}/delete - ID로 책 정보 삭제", bookInfoId);
@@ -97,7 +121,6 @@ public class BookInfoController {
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 정보 삭제에 성공하였습니다")
-                .data(null)
                 .build();
     }
 }

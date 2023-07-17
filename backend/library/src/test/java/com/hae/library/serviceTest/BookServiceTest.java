@@ -4,9 +4,10 @@ import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
-import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
+import com.hae.library.dto.Book.Request.RequestBookWithBookInfoDto;
+import com.hae.library.dto.Book.Response.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
@@ -234,11 +235,14 @@ public class BookServiceTest {
             @DisplayName("청구기호로 도서 조회")
             public void getBookByValidCallSignTest() {
                 // Given
-                String validCallSign = "12345";  // 존재하는 청구기호로 가정
+                RequestCallsignDto requestCallsignDto = RequestCallsignDto.builder()
+                        .callsign("12345")
+                        .build();
+
 
                 Book mockBook = Book.builder()
                         .id(1L)
-                        .callSign(validCallSign)
+                        .callSign(requestCallsignDto.getCallsign())
                         .status(BookStatus.valueOf("FINE"))
                         .donator("John Doe")
                         .lendingStatus(false)
@@ -257,10 +261,10 @@ public class BookServiceTest {
 
                 ResponseBookWithBookInfoDto expectedResponse = ResponseBookWithBookInfoDto.from(mockBook);
 
-                when(bookRepo.findByCallSign(validCallSign)).thenReturn(Optional.of(mockBook));
+                when(bookRepo.findByCallSign(requestCallsignDto.getCallsign())).thenReturn(Optional.of(mockBook));
 
                 // When
-                ResponseBookWithBookInfoDto actualResponse = bookService.getBookByCallSign(validCallSign);
+                ResponseBookWithBookInfoDto actualResponse = bookService.getBookByCallSign(requestCallsignDto);
 
                 // Then
                 assertThat(actualResponse).isNotNull();
@@ -294,12 +298,14 @@ public class BookServiceTest {
             @DisplayName("잘못된 청구기호로 도서 조회")
             public void getBookByInvalidCallSignTest() {
                 // Given
-                String invalidCallSign = "nonexistent";  // 존재하지 않는 청구기호로 가정
+                RequestCallsignDto requestCallsignDto = RequestCallsignDto.builder()
+                        .callsign("invalidCallSign")
+                        .build();
 
-                when(bookRepo.findByCallSign(invalidCallSign)).thenReturn(Optional.empty());
+                when(bookRepo.findByCallSign(requestCallsignDto.getCallsign())).thenReturn(Optional.empty());
 
                 // When & Then
-                assertThrows(RestApiException.class, () -> bookService.getBookByCallSign(invalidCallSign));
+                assertThrows(RestApiException.class, () -> bookService.getBookByCallSign(requestCallsignDto));
             }
         }
     }

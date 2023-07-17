@@ -1,29 +1,18 @@
 package com.hae.library.controller;
 
-import com.hae.library.domain.Book;
-import com.hae.library.dto.Book.RequestBookWithBookInfoDto;
-import com.hae.library.dto.Book.ResponseBookWithBookInfoDto;
-import com.hae.library.dto.ResponseResultDto;
-import com.hae.library.global.Exception.errorCode.BookErrorCode;
-import com.hae.library.global.Exception.errorCode.CommonErrorCode;
-import com.hae.library.global.Exception.RestApiException;
+import com.hae.library.dto.Book.Request.RequestBookWithBookInfoDto;
+import com.hae.library.dto.Book.Response.ResponseBookWithBookInfoDto;
+import com.hae.library.dto.Common.ResponseResultDto;
+import com.hae.library.dto.Lending.Request.RequestCallsignDto;
 import com.hae.library.service.BookService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.NumberFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,7 +22,12 @@ import java.util.Optional;
 public class BookController {
     private final BookService bookService;
 
-    // 새 도서를 추가합니다
+    /**
+     * 책 추가 요청 정보를 받아 저장합니다.
+     *
+     * @param requestBookWithBookInfoDto
+     * @return "도서를 성공적으로 등록하였습니다" 메시지
+     */
     @PostMapping(value = "/admin/book/create")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("도서 추가 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
@@ -46,7 +40,12 @@ public class BookController {
                 .build();
     }
 
-    // 지정된 ID를 가진 책을 검색합니다
+    /**
+     * 책 ID로 책을 조회합니다.
+     *
+     * @param bookId
+     * @return 책 정보
+     */
     @GetMapping(value = "/member/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") @Positive Long bookId) {
         log.info("ID로 책 조회 요청: [GET] /book/{bookId}/info - 책 ID {}", bookId);
@@ -60,12 +59,16 @@ public class BookController {
                 .build();
     }
 
-    // 청구기호로 책을 검색합니다
-    @GetMapping(value = "/admin/book/callsign") // param -> path로 수정했음
-    public ResponseResultDto getBookByCallSign(@RequestParam("callsign") @NotBlank(message =
-            "청구기호를 입력해 주세요.") String callSign) {
-        log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", callSign);
-        ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(callSign);
+    /**
+     * 책 제목으로 책을 조회합니다.
+     *
+     * @param requestCallsignDto
+     * @return 책 정보
+     */
+    @GetMapping(value = "/admin/book/callsign")
+    public ResponseResultDto getBookByCallSign(@Valid RequestCallsignDto requestCallsignDto) {
+        log.info("청구 기호로 책 조회 요청: [GET] /book/callsign - 청구 기호 {}", requestCallsignDto);
+        ResponseBookWithBookInfoDto bookWithBookInfoDto = bookService.getBookByCallSign(requestCallsignDto);
 
         log.info("청구 기호로 책 조회에 성공하였습니다");
         return ResponseResultDto.builder()
@@ -75,7 +78,12 @@ public class BookController {
                 .build();
     }
 
-    // 책 정보를 업데이트 합니다
+    /**
+     * 책 정보를 수정합니다.
+     *
+     * @param requestBookWithBookInfoDto
+     * @return 수정된 책 정보
+     */
     @PutMapping(value = "/admin/book/update")
     public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("책 정보 업데이트 요청: [PUT] /book/update - {}", requestBookWithBookInfoDto.toString());
@@ -89,7 +97,12 @@ public class BookController {
                 .build();
     }
 
-    // 지정된 ID를 가진 책을 삭제합니다
+    /**
+     * 책 ID로 책을 삭제합니다.
+     *
+     * @param bookId
+     * @return "책 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/book/{bookId}/delete")
     public ResponseResultDto<Object> deleteBookById(@PathVariable("bookId") Long bookId) {
         log.info("책 삭제 요청: [DELETE] /book/{bookId}/delete - 책 ID {}", bookId);

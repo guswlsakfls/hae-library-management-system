@@ -1,4 +1,4 @@
-package com.hae.library.dto.Member;
+package com.hae.library.dto.Member.Request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

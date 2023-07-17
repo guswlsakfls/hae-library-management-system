@@ -19,13 +19,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -104,105 +103,138 @@ public class BookInfoControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/bookInfo/all")
+    @DisplayName("도서 정보 조회")
     public class GetAllBookInfo {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
             @DisplayName("모든 도서 정보를 조회합니다.")
-            public void getAllBookInfo() throws Exception {
-                mockMvc.perform(get("/api/bookinfo/all")
-                                .param("page", "0")
-                                .param("size", "10")
-                                .param("sort", "최신도서")
-                                .param("role", "전체")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-            }
-        }
-    }
+            public void testGetAllBookInfo() throws Exception {
+                // Given
+                String requestUrl = "/api/bookinfo/all";
 
-    @Nested
-    @DisplayName("GET /api/bookInfo/{bookId}")
-    public class GetBookInfo {
-        @Nested
-        @DisplayName("성공 케이스")
-        public class SuccessCaseTest {
+                int page = 0;
+                int size = 10;
+                String sort = "최신도서";
+                String role = "전체";
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .param("sort", sort)
+                        .param("role", role)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+            }
+
+
             @Test
-            @DisplayName("도서 정보를 조회합니다.")
-            public void getBookInfo() throws Exception {
-                mockMvc.perform(get("/api/bookinfo/" + bookId)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+            @DisplayName("도서 정보를 id로 조회합니다.")
+            public void testGetBookInfoById() throws Exception {
+                // Given
+                String requestUrl = "/api/bookinfo/" + bookId;
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
         }
+
+        @Test
+        @DisplayName("ISBN으로 도서 정보를 조회합니다.")
+        public void testGetBookInfoByIsbn() throws Exception {
+            // Given
+            String requestUrl = "/api/admin/bookinfo/isbn";
+            String isbn = "1234567890123"; // 조회할 도서의 ISBN을 적절히 설정해주세요.
+            String authorizationHeader = "Bearer " + token;
+
+            // When
+            ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("isbn", isbn)
+                    .header("Authorization", authorizationHeader));
+
+            // Then
+            resultActions.andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.data.title", is("테스트용 책 제목")));
+        }
+
 
         @Nested
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("존재하지 않는 도서 정보를 조회합니다.")
-            public void getBookInfo() throws Exception {
-                mockMvc.perform(get("/api/bookinfo/1000")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+            @DisplayName("id가 존재하지 않는 도서 정보를 조회합니다.")
+            public void testNotGetBookInfoById() throws Exception {
+                // Given
+                String requestUrl = "/api/bookinfo/";
+                long nonExistentBookId = 1000L; // 존재하지 않는 도서의 ID를 설정해주세요.
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl + nonExistentBookId)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(jsonPath("$.message", is("존재하지 않는 책 정보입니다.")));
             }
-        }
-    }
 
-    @Nested
-    @DisplayName("POST /api/admin/bookInfo/isbn")
-    public class GetBookInfoByIsbn {
-        @Nested
-        @DisplayName("성공 케이스")
-        public class SuccessCaseTest {
-            @Test
-            @DisplayName("ISBN으로 도서 정보를 조회합니다.")
-            public void getBookInfoByIsbn() throws Exception {
-                mockMvc.perform(get("/api/admin/bookinfo/isbn")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .param("isbn", "1234567890123")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(jsonPath("$.data.title", is("테스트용 책 제목")));
-            }
-        }
-
-        @Nested
-        @DisplayName("실패 케이스")
-        public class FailCaseTest {
             @Test
             @DisplayName("존재하지 않는 ISBN으로 도서 정보를 조회합니다.")
-            public void getBookInfoByIsbn() throws Exception {
-                mockMvc.perform(get("/api/admin/bookinfo/isbn")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .param("isbn", "1221507890123")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+            public void testGetBookInfoByNonExistentIsbn() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/bookinfo/isbn";
+                String nonExistentIsbn = "1221507890123"; // 존재하지 않는 도서의 ISBN을 설정해주세요.
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("isbn", nonExistentIsbn)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(jsonPath("$.message", is("존재하지 않는 책 정보입니다.")));
             }
+
         }
     }
 
     @Nested
-    @DisplayName("DELETE /api/admin/bookinfo/{bookInfoId}/delete")
+    @DisplayName("도서 정보를 삭제")
     public class DeleteBookInfo {
         @Nested
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
-            @DisplayName("도서 정보를 삭제합니다.")
-            public void deleteBookInfo() throws Exception {
-                mockMvc.perform(delete("/api/admin/bookinfo/" + bookId + "/delete")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+            @DisplayName("도서 정보를 ID로 삭제합니다.")
+            public void deleteBookInfoById() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/bookinfo/" + bookId + "/delete";
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(jsonPath("$.message", is("책 정보 삭제에 성공하였습니다")));
             }
@@ -213,10 +245,17 @@ public class BookInfoControllerTest {
         public class FailCaseTest {
             @Test
             @DisplayName("존재하지 않는 도서 정보를 삭제합니다.")
-            public void deleteBookInfo() throws Exception {
-                mockMvc.perform(delete("/api/admin/bookinfo/1000/delete")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+            public void deleteNonExistentBookInfo() throws Exception {
+                // Given
+                long nonExistentBookId = 1000L; // 존재하지 않는 도서의 ID를 설정해주세요.
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete("/api/admin/bookinfo/{bookId}/delete", nonExistentBookId)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(jsonPath("$.message", is("존재하지 않는 책입니다.")));
             }

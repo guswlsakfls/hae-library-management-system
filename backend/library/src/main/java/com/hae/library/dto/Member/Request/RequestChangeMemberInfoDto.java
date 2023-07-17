@@ -1,4 +1,4 @@
-package com.hae.library.dto.Member;
+package com.hae.library.dto.Member.Request;
 
 import com.hae.library.domain.Enum.Role;
 import jakarta.validation.Valid;

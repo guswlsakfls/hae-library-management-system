@@ -1,13 +1,10 @@
-package com.hae.library.dto.Book;
+package com.hae.library.dto.Book.Response;
 
 import com.hae.library.domain.Book;
 import com.hae.library.domain.Enum.BookStatus;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.Lending.ResponseLendingDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class ResponseBookWithBookInfoDto {

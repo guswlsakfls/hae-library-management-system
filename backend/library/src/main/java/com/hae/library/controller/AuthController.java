@@ -5,8 +5,8 @@ import com.hae.library.global.Exception.errorCode.MemberErrorCode;
 import com.hae.library.jwt.JwtFilter;
 import com.hae.library.jwt.TokenProvider;
 import com.hae.library.dto.Jwt.TokenDto;
-import com.hae.library.dto.Member.RequestLoginDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Member.Request.RequestLoginDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.repository.MemberRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,12 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberRepository memberRepo;
 
+    /**
+     * 로그인 인증 요청을 처리합니다.
+     *
+     * @param loginDto
+     * @return jwt 토큰
+     */
     @PostMapping("/auth")
     public ResponseResultDto<Object> authorize(@RequestBody @Valid RequestLoginDto loginDto) {
 

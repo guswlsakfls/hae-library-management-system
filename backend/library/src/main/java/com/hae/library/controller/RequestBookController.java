@@ -1,9 +1,8 @@
 package com.hae.library.controller;
 
-import com.hae.library.dto.Book.ResponseBookDto;
-import com.hae.library.dto.BookInfo.RequestBookInfoDto;
-import com.hae.library.dto.BookInfo.ResponseBookInfoDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
+import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.RequestBookService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -24,7 +23,12 @@ import java.util.Map;
 public class RequestBookController {
     private final RequestBookService requestBookService;
 
-    // 도서 구매 요청들을 추가합니다.
+    /**
+     * 도서 구매 요청을 생성합니다.
+     *
+     * @param requestBookInfoDto
+     * @return 도서 구매 요청 성공 여부
+     */
     @PostMapping(value = "/admin/request-book/create")
     public ResponseResultDto<Object> createRequestBook(@RequestBody @Valid RequestBookInfoDto requestBookInfoDto) {
         log.info("도서 구매 요청: [POST] /request-book/create");
@@ -37,7 +41,17 @@ public class RequestBookController {
                 .build();
     }
 
-    // 도서 구매 요청들을 조회합니다.
+    /**
+     * 검색 조건을 통해 도서 구매 요청을 조회합니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param category
+     * @param sort
+     * @param approved
+     * @return 도서 구매 요청 정보 리스트
+     */
     @GetMapping(value = "/admin/request-book/all")
     public ResponseResultDto<Object> getRequestBook(
             @RequestParam(required = false) String search,
@@ -75,7 +89,12 @@ public class RequestBookController {
                 .build();
     }
 
-    // 도서 구매 요청을 삭제합니다.
+    /**
+     * 도서 구매 요청을 승인합니다.
+     *
+     * @param requestBookId
+     * @return "도서 구매 요청 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/request-book/{requestBookId}/delete")
     public ResponseResultDto<Object> deleteRequestBook(@PathVariable Long requestBookId) {
         log.info("도서 구매 요청 삭제: [DELETE] /request-book/delete/{}", requestBookId);

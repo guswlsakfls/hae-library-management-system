@@ -3,7 +3,7 @@ package com.hae.library.controller;
 import com.hae.library.dto.Category.Request.RequestCreateCategoryDto;
 import com.hae.library.dto.Category.Request.RequestUpdateCategoryDto;
 import com.hae.library.dto.Category.Response.ResponseCategoryDto;
-import com.hae.library.dto.ResponseResultDto;
+import com.hae.library.dto.Common.ResponseResultDto;
 import com.hae.library.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,12 @@ import java.util.List;
 public class CategoryContorller {
     private final CategoryService categoryService;
 
-    // 카테고리를 생성합니다.
+    /**
+     * 카테고리를 생성합니다.
+     *
+     * @param requestCreateCategoryDto
+     * @return "카테고리 생성에 성공하였습니다" 메시지
+     */
     @PostMapping(value = "/admin/category/create")
     public ResponseResultDto<Object> createCategory(@RequestBody @Valid RequestCreateCategoryDto requestCreateCategoryDto) {
         log.info("카테고리 생성 요청: [POST] /category/create");
@@ -34,7 +39,11 @@ public class CategoryContorller {
                 .build();
     }
 
-    // 카테고리 목록을 조회합니다.
+    /**
+     * 카테고리 목록을 조회합니다.
+     *
+     * @return 카테고리 목록
+     */
     @GetMapping(value = "/category/all")
     public ResponseResultDto<Object> getAllCategory() {
         log.info("카테고리 목록 조회 요청: [GET] /category/all");
@@ -48,7 +57,12 @@ public class CategoryContorller {
                 .build();
     }
 
-    // 카테고리를 수정합니다.
+    /**
+     * 카테고리를 수정합니다.
+     *
+     * @param requestUpdateCategoryDto
+     * @return "카테고리 수정에 성공하였습니다" 메시지
+     */
     @PutMapping(value = "/admin/category/update")
     public ResponseResultDto<Object> updateCategory(@RequestBody @Valid RequestUpdateCategoryDto requestUpdateCategoryDto) {
         log.info("카테고리 수정 요청: [PUT] /category/update - {}, {}", requestUpdateCategoryDto.getCategoryId(), requestUpdateCategoryDto.getUpdatedCategoryName());
@@ -61,7 +75,12 @@ public class CategoryContorller {
                 .build();
     }
 
-    // 카테고리를 삭제합니다.
+    /**
+     * 카테고리를 삭제합니다.
+     *
+     * @param categoryId
+     * @return "카테고리 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/category/{categoryId}/delete")
     public ResponseResultDto<Object> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         log.info("카테고리 삭제 요청: [DELETE] /category/delete - {}", categoryId);
