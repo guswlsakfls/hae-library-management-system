@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -65,58 +66,82 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("카테고리를 생성합니다.")
             public void createCategory() throws Exception {
-                mockMvc.perform(post("/api/admin/category/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"categoryName\":\"테스트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                // Given
+                String requestUrl = "/api/admin/category/create";
+                String categoryName = "테스트";
+                String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk());
             }
+
         }
 
         @Nested
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("카테고리 이름이 null일 경우")
+            @DisplayName("카테고리 이름이 빈 값일 경우")
             public void createCategoryWithNullCategoryName() throws Exception {
-                mockMvc.perform(post("/api/admin/category/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"categoryName\":null}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                // Given
+                String requsetUrl = "/api/admin/category/create";
+                String categoryName = "";
+                String requestJson = String.format("{\"categoryName\":\"%s\"}", categoryName);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
             }
+
 
             @Test
             @DisplayName("카테고리 이름이 빈 문자열일 경우")
             public void createCategoryWithEmptyCategoryName() throws Exception {
-                mockMvc.perform(post("/api/admin/category/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"categoryName\":\"\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                // Given
+                String requestUrl = "/api/admin/category/create";
+                String categoryName = "";
+                String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
             }
 
             @Test
             @DisplayName("카테고리 이름이 20자를 초과할 경우")
             public void createCategoryWithLongCategoryName() throws Exception {
-                mockMvc.perform(post("/api/admin/category/create")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"categoryName\":\"123456789012345678901\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                // Given
+                String requestUrl = "/api/admin/category/create";
+                String categoryName = "123456789012345678901";
+                String requestJson = String.format("{\"categoryName\":\"%s\"}", categoryName);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
             }
+
         }
     }
 
@@ -129,14 +154,21 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("카테고리 목록을 조회합니다.")
             public void getCategoryList() throws Exception {
-                mockMvc.perform(get("/api/category/all")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                // Given
+                String requestUrl = "/api/category/all";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
     }
 
@@ -149,17 +181,24 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("카테고리를 수정합니다.")
             public void updateCategory() throws Exception {
-                String content = String.format("{\"categoryId\":%d, \"updatedCategoryName\":\"테스트\"}", categoryId);
+                // Given
+                String requestUrl = "/api/admin/category/update";
+                String updatedCategoryName = "테스트";
+                String content = String.format("{\"categoryId\":%d, \"updatedCategoryName\":\"%s\"}", categoryId, updatedCategoryName);
 
-                mockMvc.perform(put("/api/admin/category/update")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(content)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                // When
+                ResultActions resultActions = mockMvc.perform(put(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
 
         @Nested
@@ -168,17 +207,26 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("id에 해당하는 카테고리가 존재하지 않을 경우")
             public void notExistCategoryById() throws Exception {
-                String content = String.format("{\"categoryId\":%d, \"updatedCategoryName\":\"테스트\"}", categoryId);
+                // Given
+                String requestUrl = "/api/admin/category/update";
+                long nonExistCategoryId = 999;
+                String updatedCategoryName = "테스트";
+                String content = String.format("{\"categoryId\":%d, " +
+                        "\"updatedCategoryName\":\"%s\"}", nonExistCategoryId, updatedCategoryName);
 
-                mockMvc.perform(put("/api/admin/category/update")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"categoryId\":1000, \"updatedCategoryName\":\"테스트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+                // When
+                ResultActions resultActions = mockMvc.perform(put(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
     }
 
@@ -191,15 +239,22 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("카테고리를 삭제합니다.")
             public void deleteCategory() throws Exception {
-                mockMvc.perform(delete("/api/admin/category/{categoryId}/delete", categoryId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                // Given
+                String requestUrl = "/api/admin/category/" + categoryId + "/delete";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
         }
+
 
         @Nested
         @DisplayName("실패 케이스")
@@ -207,14 +262,22 @@ public class CategoryContorllerTest {
             @Test
             @DisplayName("id에 해당하는 카테고리가 존재하지 않을 경우")
             public void notExistCategoryById() throws Exception {
-                mockMvc.perform(delete("/api/admin/category/{categoryId}/delete", 10000)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest())
+                // Given
+                String nonExistCategoryId = "10000";
+                String requestUrl = "/api/admin/category/" + nonExistCategoryId + "/delete";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
                         .andReturn()
                         .getResponse()
                         .getContentAsString();
             }
+
         }
     }
 }

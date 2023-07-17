@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RequestIsbnDto {
-    @Pattern(regexp = "^[0-9]{13}$", message = "ISBN은 9~13자의 숫자로 이루어져야 합니다.")
+    @Pattern(regexp = "^[0-9]{13}$", message = "ISBN은 13자의 숫자로 이루어져야 합니다.")
     private String isbn;
 }

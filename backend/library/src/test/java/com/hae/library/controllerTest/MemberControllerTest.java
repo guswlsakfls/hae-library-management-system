@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -45,7 +46,7 @@ public class MemberControllerTest {
     @BeforeEach
     public void setup() throws Exception {
         // 테스트용 회원 데이터를 생성합니다.
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 2; i++) {
             RequestSignupDto requestSignupDto = RequestSignupDto.builder()
                     .email("tes" + i + "@gmail.com")
                     .password("test1234")
@@ -82,19 +83,23 @@ public class MemberControllerTest {
                 @Test
                 public void signUpTest() throws Exception {
                     // Given
-                    RequestSignupDto requestSignupDto = RequestSignupDto.builder()
-                            .email("test1234@gmail.com")
-                            .password("test1234")
-                            .checkPassword("test1234")
-                            .build();
+                    String requestUrl = "/api/signup";
+                    String email = "test1234@gmail.com";
+                    String password = "test1234";
+                    String checkPassword = "test1234";
 
-                    // When & Then
-                    mockMvc.perform(post("/api/signup")
+                    String content = String.format("{\"email\":\"%s\", \"password\":\"%s\", \"checkPassword\":\"%s\"}",
+                            email, password, checkPassword);
+
+                    // When
+                    ResultActions resultActions = mockMvc.perform(post(requestUrl)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(new ObjectMapper().writeValueAsString(requestSignupDto)))
-                            .andExpect(status().isOk())
-                            .andDo(print());
+                                    .content(content));
+
+                    // Then
+                    resultActions.andExpect(status().isOk());
                 }
+
             }
         }
 
@@ -135,11 +140,14 @@ public class MemberControllerTest {
                         .checkPassword("test123423")
                         .build();
 
-                // Then: 같은 이메일로 다시 회원가입 요청을 보내면 이미 존재하는 이메일이므로 예외가 발생해야 한다.
-                mockMvc.perform(post("/api/signup")
+                // when
+                ResultActions resultActions = mockMvc.perform(post("/api/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(requestSignupDto)))
-                        .andExpect(status().isBadRequest())
+                                .content(new ObjectMapper().writeValueAsString(requestSignupDto)));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message", is("비밀번호가 일치하지 않습니다")))
                         .andDo(print());
             }
         }
@@ -154,36 +162,64 @@ public class MemberControllerTest {
             @Test
             @DisplayName("모든 회원 조회 시 정보 반환")
             public void findAllMemberTest() throws Exception {
-                mockMvc.perform(get("/api/admin/memberinfo/all")
-                                .param("page", "0")
-                                .param("size", "10")
-                                .param("sort", "최신순")
-                                .param("role", "전체")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.memberList", hasSize(10)))
+                // Given
+                String requestUrl = "/api/admin/memberinfo/all";
+                String page = "0";
+                String size = "10";
+                String sort = "최신순";
+                String role = "전체";
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .param("page", page)
+                        .param("size", size)
+                        .param("sort", sort)
+                        .param("role", role)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.memberList", hasSize(3)))
                         .andDo(print());
             }
 
             @Test
             @DisplayName("내 프로필 정보를 조회 시 내 정보 반환")
             public void findMyProfileTest() throws Exception {
-                mockMvc.perform(get("/api/member/memberinfo/me")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.email", is("admin@gmail.com")))
+                // Given
+                String requestUrl = "/api/member/memberinfo/me";
+                String authorizationHeader = "Bearer " + token;
+                String expectedEmail = "admin@gmail.com";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.email", is(expectedEmail)))
                         .andDo(print());
             }
 
             @Test
             @DisplayName("특정 회원 조회 시 정보 반환")
             public void findMemberTest() throws Exception {
-                mockMvc.perform(post("/api/admin/memberinfo")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"email\":\"admin@gmail.com\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.email", is("admin@gmail.com")))
+                // Given
+                String requestUrl = "/api/admin/memberinfo";
+                String authorizationHeader = "Bearer " + token;
+                String requestBody = "{\"email\":\"admin@gmail.com\"}";
+                String expectedEmail = "admin@gmail.com";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.email", is(expectedEmail)))
                         .andDo(print());
             }
         }
@@ -194,12 +230,21 @@ public class MemberControllerTest {
             @Test
             @DisplayName("존재하지 않는 회원 조회 시 예외 발생")
             public void notExistMemberTest() throws Exception {
-                mockMvc.perform(post("/api/admin/memberinfo")
+                // Given
+                String requestUrl = "/api/admin/memberinfo";
+                String email = "notExisted@gmail.com";
+                String requestBody = String.format("{\"email\":\"%s\"}", email);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"email\":\"notExisted@gmail.com\"}")
+                                .content(requestBody)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isBadRequest())
                         .andDo(print());
+
+                // Then
+                resultActions.andExpect(jsonPath("$.message", is("회원을 찾을 수 없습니다")));
             }
         }
     }
@@ -213,22 +258,23 @@ public class MemberControllerTest {
             @Test
             @DisplayName("회원 정보 수정 시 정보 수정")
             public void updateMemberTest() throws Exception {
-                // 테스트 데이터 생성
+                // Given
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("change@gmail.com")
                         .activated(true)
                         .role(Role.valueOf("ROLE_USER"))
                         .build();
-
                 String requestChangeMemberInfoDtoJson = new ObjectMapper().writeValueAsString(requestChangeMemberInfoDto);
 
-                // PUT 요청 실행
-                mockMvc.perform(put("/api/admin/member/update")
+                // When
+                ResultActions resultActions = mockMvc.perform(put("/api/admin/member/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestChangeMemberInfoDtoJson)
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk())
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
                         .andExpect(jsonPath("$.data.email", is("change@gmail.com"))) // 응답 데이터 검증
                         .andDo(print());
             }
@@ -240,7 +286,7 @@ public class MemberControllerTest {
             @Test
             @DisplayName("변경하려는 이메일이 중복되는 경우 예외 발생")
             public void duplicateEmailTest() throws Exception {
-                // 테스트 데이터 생성
+                // Given
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("tes1@gmail.com")
@@ -250,13 +296,17 @@ public class MemberControllerTest {
 
                 String requestChangeMemberInfoDtoJson = new ObjectMapper().writeValueAsString(requestChangeMemberInfoDto);
 
-                // PUT 요청 실행
-                mockMvc.perform(put("/api/admin/member/update")
+                // When
+                ResultActions resultActions = mockMvc.perform(put("/api/admin/member/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestChangeMemberInfoDtoJson)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isBadRequest())
                         .andDo(print());
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message", is("이미 존재하는 이메일입니다")));
             }
         }
     }
