@@ -29,6 +29,12 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberRepository memberRepo;
 
+    /**
+     * 로그인 인증 요청을 처리합니다.
+     *
+     * @param loginDto
+     * @return jwt 토큰
+     */
     @PostMapping("/auth")
     public ResponseResultDto<Object> authorize(@RequestBody @Valid RequestLoginDto loginDto) {
 

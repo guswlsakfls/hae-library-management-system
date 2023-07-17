@@ -27,7 +27,12 @@ import java.util.Map;
 public class LendingController {
     private final LendingService lendingService;
 
-    // 책 대여 요청 정보를 받아 저장합니다.
+    /**
+     * 책 대여 요청을 받아 처리합니다.
+     *
+     * @param requestLendingDto
+     * @return "책 대여에 성공하였습니다" 메시지
+     */
     @PostMapping(value = "/admin/lending/create")
     public ResponseResultDto<Object> LendingBook(@RequestBody @Valid RequestLendingDto requestLendingDto) {
         log.info("책 대여 요청: [POST] /lending/create - {}", requestLendingDto.toString());
@@ -40,7 +45,12 @@ public class LendingController {
                 .build();
     }
 
-    // 책 반납 요청을 받아 처리합니다.
+    /**
+     * 책 반납 요청을 받아 처리합니다.
+     *
+     * @param requestReturningDto
+     * @return "책 반납에 성공하였습니다" 메시지
+     */
     @PutMapping(value = "/admin/lending/returning")
     public ResponseResultDto<Object> ReturningBook(@RequestBody @Valid RequestReturningDto requestReturningDto) {
         log.info("책 반납 요청: [PUT] /lending/returning - {}", requestReturningDto.toString());
@@ -53,7 +63,12 @@ public class LendingController {
                 .build();
     }
 
-    // 반납을 위한 책 대여 기록을 조회합니다.
+    /**
+     * 청구기호를 통해 책 대여 기록을 조회합니다.
+     *
+     * @param requestCallsignDto
+     * @return 책 대여 기록
+     */
     @GetMapping(value = "/admin/lending/callsign")
     public ResponseResultDto<Object> getLendingInfoByCallSign(@Valid RequestCallsignDto requestCallsignDto) {
         log.info("반납을 위한 책 대여 기록 조회: [GET] /lending/callsign - callSign: {}", requestCallsignDto.toString());
@@ -68,7 +83,16 @@ public class LendingController {
                 .build();
     }
 
-    // 모든 책 대여 기록을 조회합니다.
+    /**
+     * 검색조건을 통해 책 대여 기록을 조회합니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param isLendingOrReturning
+     * @param sort
+     * @return 책 대여 기록
+     */
     @GetMapping(value = "/admin/lending/all")
     public ResponseResultDto<Object> getAllLendingHistory(
             @RequestParam(required = false) String search,
@@ -97,7 +121,16 @@ public class LendingController {
                 .build();
     }
 
-    // 자신의 책 대여 기록을 조회합니다.
+    /**
+     * 검색조건을 통해 내 대여 기록을 조회합니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param isLendingOrReturning
+     * @param sort
+     * @return 내 대여 기록
+     */
     @GetMapping(value = "/member/lending-history/me")
     public ResponseResultDto<Object> getMemberLendingHistory(
             @RequestParam(required = false) String search,
@@ -106,7 +139,8 @@ public class LendingController {
             @RequestParam(required = false) String isLendingOrReturning,
             @RequestParam(required = false) String sort
     ) {
-        log.info("책 대여 기록 조회: [GET] /lending/me - search: {}, page: {}, size: {}, :isRenderingOrReturning: {}, sort: {}",
+        log.info("책 대여 기록 조회: [GET] /lending-history/me - search: {}, page: {}, size: {}, " +
+                        ":isRenderingOrReturning: {}, sort: {}",
                 search, page, size, isLendingOrReturning, sort);
         Page<ResponseMemberLendingDto> responseMemberLendingDtoList =
                 lendingService.getMemberLendingHistory(search, page, size, isLendingOrReturning, sort);
@@ -126,7 +160,12 @@ public class LendingController {
                 .build();
     }
 
-    // 책 대여 기록을 삭제합니다.
+    /**
+     * 책 대여 기록을 삭제합니다.
+     *
+     * @param lendingId
+     * @return 책 대여 기록 삭제
+     */
     @DeleteMapping(value = "/admin/lending/{lendingId}/delete")
     public ResponseResultDto<Object> deleteLending(@PathVariable Long lendingId) {
         log.info("책 대여 기록 삭제: [DELETE] /lending/{lendingId}/delete - lendingId: {}", lendingId);

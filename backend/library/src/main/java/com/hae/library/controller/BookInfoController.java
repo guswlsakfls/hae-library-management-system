@@ -25,7 +25,16 @@ import java.util.Map;
 public class BookInfoController {
     private final BookInfoService bookInfoService;
 
-    // 모든 책 정보를 조회하는 요청을 처리합니다.
+    /**
+     * 검색어를 통해 책 리스트를 가져옵니다.
+     *
+     * @param search
+     * @param page
+     * @param size
+     * @param category
+     * @param sort
+     * @return 모든 책 정보 리스트
+     */
     @GetMapping(value = "/bookinfo/all")
     public ResponseResultDto getAllBookInfoByOptions(
             @RequestParam(required = false) String search,
@@ -59,7 +68,12 @@ public class BookInfoController {
                 .build();
     }
 
-    // 책 정보를 조회하는 요청을 처리합니다.
+    /**
+     * id로 책 정보를 등록합니다.
+     *
+     * @param bookInfoId
+     * @return 책 정보
+     */
     @GetMapping(value = "/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> getBookInfoById(@PathVariable(required = false) Long bookInfoId) {
         log.info("책 정보 조회: [GET] /bookinfo/{} - ID로 책 정보 조회", bookInfoId);
@@ -73,8 +87,12 @@ public class BookInfoController {
                 .build();
     }
 
-    // ISBN에 해당하는 책 정보를 조회하는 요청을 처리합니다.
-//    @RoleInterface.AdminAuthorize
+    /**
+     * isbn으로 책 정보를 등록합니다.
+     *
+     * @param requestIsbnDto
+     * @return 책 정보
+     */
     @GetMapping(value = "/admin/bookinfo/isbn")
     public ResponseResultDto<Object> getBookInfoByIsbn(@Valid RequestIsbnDto requestIsbnDto) {
         log.info("책 정보 조회: /bookinfo/isbn - {} - ISBN으로 책 정보 조회", requestIsbnDto.getIsbn());
@@ -88,7 +106,12 @@ public class BookInfoController {
                 .build();
     }
 
-    // 특정 책 정보를 삭제하는 요청을 처리합니다.
+    /**
+     * id로 책 정보를 삭제합니다.
+     *
+     * @param bookInfoId
+     * @return "책 정보 삭제에 성공하였습니다" 메시지
+     */
     @DeleteMapping(value = "/admin/bookinfo/{bookInfoId}/delete")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
         log.info("책 삭제: [DELETE] /bookinfo/{}/delete - ID로 책 정보 삭제", bookInfoId);
@@ -98,7 +121,6 @@ public class BookInfoController {
         return ResponseResultDto.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("책 정보 삭제에 성공하였습니다")
-                .data(null)
                 .build();
     }
 }

@@ -90,7 +90,6 @@ public class GlobalExceptionHandler {
 
     // ErrorCode를 이용해 ResponseEntity를 생성합니다.
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
-        log.info("ErrorCode : {}", errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(errorCode));
@@ -107,7 +106,6 @@ public class GlobalExceptionHandler {
 
     // ErrorCode와 메세지를 이용해 ResponseEntity를 생성합니다.
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
-        log.info("ErrorCode : {}", errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(errorCode, message));
