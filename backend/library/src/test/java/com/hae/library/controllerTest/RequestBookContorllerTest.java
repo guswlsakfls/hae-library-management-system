@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hae.library.domain.*;
 import com.hae.library.domain.Enum.BookStatus;
+import com.hae.library.dto.BookInfo.Request.RequestBookInfoDto;
 import com.hae.library.repository.*;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -107,14 +109,37 @@ public class RequestBookContorllerTest {
             @Test
             @DisplayName("도서 구매 요청을 저장")
             void saveRequestBook() throws Exception {
-                // when & then
-                mockMvc.perform(post("/api/admin/request-book/create")
-                                .contentType("application/json")
-                        .content("{\"isbn\":\"1234567890113\"," +
-                                " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", " +
-                                "\"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\"}")
-                        .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk());
+                // Given
+                String requestUrl = "/api/admin/request-book/create";
+
+                String isbn = "1234567890113";
+                String title = "테스트용 책 제목";
+                String author = "테스트용 책 저자";
+                String publisher = "테스트용 출판사";
+                String image = "http://example.com/test.jpg";
+                String publishedAt = "2023";
+                String categoryName = "테스트";
+
+                RequestBookInfoDto requestDto = RequestBookInfoDto.builder()
+                        .isbn(isbn)
+                        .title(title)
+                        .author(author)
+                        .publisher(publisher)
+                        .image(image)
+                        .publishedAt(publishedAt)
+                        .categoryName(categoryName)
+                        .build();
+
+                String requestJson = new ObjectMapper().writeValueAsString(requestDto);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk());
             }
         }
 
@@ -123,24 +148,48 @@ public class RequestBookContorllerTest {
         class Fail {
             @Test
             @DisplayName("중복되는 isbn으로 도서 구매 요청시 예외 발생")
-            void saveRequestBook() throws Exception {
-                // when & then
-                mockMvc.perform(post("/api/admin/request-book/create")
-                                .contentType("application/json")
-                                .content("{\"isbn\":\"1234567890113\"," +
-                                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", " +
-                                        "\"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\"}")
+            void saveRequestBookWithDuplicateIsbn() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/request-book/create";
+
+                String isbn = "1234567890113";
+                String title = "테스트용 책 제목";
+                String author = "테스트용 책 저자";
+                String publisher = "테스트용 출판사";
+                String image = "http://example.com/test.jpg";
+                String publishedAt = "2023";
+                String categoryName = "테스트";
+
+                RequestBookInfoDto requestDto = RequestBookInfoDto.builder()
+                        .isbn(isbn)
+                        .title(title)
+                        .author(author)
+                        .publisher(publisher)
+                        .image(image)
+                        .publishedAt(publishedAt)
+                        .categoryName(categoryName)
+                        .build();
+
+                String requestJson = new ObjectMapper().writeValueAsString(requestDto);
+
+                // 처음 도서 구매 요청을 저장합니다.
+                mockMvc.perform(post(requestUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson)
                                 .header("Authorization", "Bearer " + token))
                         .andExpect(status().isOk());
 
-                mockMvc.perform(post("/api/admin/request-book/create")
-                                .contentType("application/json")
-                                .content("{\"isbn\":\"1234567890113\"," +
-                                        " \"title\":\"테스트용 책 제목\", \"author\":\"테스트용 책 저자\", " +
-                                        "\"publisher\":\"테스트용 출판사\", \"image\":\"http://example.com/test.jpg\", \"publishedAt\":\"2023\", \"categoryName\":\"테스트\"}")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest());
+                // When
+                // 중복된 도서를 구매 요청합니다.
+                ResultActions resultActions = mockMvc.perform(post("/api/admin/request-book/create")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
             }
+
         }
     }
 
@@ -154,16 +203,24 @@ public class RequestBookContorllerTest {
             @DisplayName("도서 구매 요청 목록을 조회")
             void getRequestBookList() throws Exception {
                 // Given
+                String requestUrl = "/api/admin/request-book/all";
 
-                // When & Then
-                mockMvc.perform(get("/api/admin/request-book/all")
-                                .param("page", "0")
-                                .param("size", "10")
-                                .param("sort", "최신도서")
-                                .param("role", "전체")
-                                .contentType("application/json")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk());
+                int page = 0;
+                int size = 10;
+                String sort = "최신도서";
+                String role = "전체";
+
+                // When
+                ResultActions resultActions = mockMvc.perform(get(requestUrl)
+                                .param("page", String.valueOf(page))
+                                .param("size", String.valueOf(size))
+                                .param("sort", sort)
+                                .param("role", role)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk());
             }
         }
     }
@@ -183,13 +240,15 @@ public class RequestBookContorllerTest {
                         .member(member)
                         .isApproved(false)
                         .build());
+                String requestUrl = "/api/admin/request-book/" + requestBook.getId() + "/delete";
 
-                // When & Then
-                mockMvc.perform(delete("/api/admin/request-book/{requestBookId}/delete",
-                                requestBook.getId())
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
                                 .contentType("application/json")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isOk());
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk());
             }
         }
 
@@ -200,12 +259,16 @@ public class RequestBookContorllerTest {
             @DisplayName("존재하지 않는 도서 구매 요청 삭제시 예외 발생")
             void deleteRequestBook() throws Exception {
                 // Given
+                long nonExistRequestBookId = 1000L;
+                String requestUrl = "/api/admin/request-book/" + nonExistRequestBookId + "/delete";
 
-                // When & Then
-                mockMvc.perform(delete("/api/admin/request-book/{requestBookId}/delete", 1000L)
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
                                 .contentType("application/json")
-                                .header("Authorization", "Bearer " + token))
-                        .andExpect(status().isBadRequest());
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
             }
         }
     }
