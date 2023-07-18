@@ -76,6 +76,7 @@ $ npm run develop
 ![Java](https://img.shields.io/badge/Java-3766AB?style=for-the-badge&logo=Java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=Spring&logoColor=white)
 ![Maria DB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![JPA](https://img.shields.io/badge/JPA-000000?style=for-the-badge&logo=&logoColor=white)
 
 ---
 ## 🗒 ERD (Updated at 2023.06.12)
