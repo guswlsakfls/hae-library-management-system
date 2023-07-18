@@ -59,23 +59,22 @@ $ npm run develop
 ## 🐈 기술스택
 
 ### 환경
+![Vscode](https://img.shields.io/badge/VSCODE-%23007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)
 ![Intellij](https://img.shields.io/badge/INTELLIJ-000000?style=for-the-badge&logo=IntelliJ%20IDEA&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white)
 ![Github](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)             
-
-### 구성
-![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)        
 
 ### 개발
 #### 프론트
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=Bootstrap&logoColor=white)
-![Material UI](https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=MUI&logoColor=white)
+![TailWindCSS](https://img.shields.io/badge/TailwindCSS-%23008000?style=for-the-badge&logo=tailwindcss&logoColor=61DAFB)
+
+
 
 #### 백엔드
-![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=Spring&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-3766AB?style=for-the-badge&logo=Java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=Spring&logoColor=white)
 ![Maria DB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 
 ---
