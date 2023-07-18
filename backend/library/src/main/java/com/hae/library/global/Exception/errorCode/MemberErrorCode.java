@@ -28,6 +28,8 @@ public enum MemberErrorCode implements ErrorCode {
 
     // 검색어
     MEMBER_ROLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 권한입니다"),
+    NOT_EXIST_ROLE(HttpStatus.BAD_REQUEST, "존재하지 않는 권한 옵션선택입니다"),
+    NOT_EXIST_SEARCH_OPTION(HttpStatus.BAD_REQUEST, "존재하지 않는 검색 옵션입니다"),
     ;
 
     private final HttpStatus httpStatus;

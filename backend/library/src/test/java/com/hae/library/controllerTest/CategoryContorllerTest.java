@@ -2,7 +2,9 @@ package com.hae.library.controllerTest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
+import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +32,13 @@ public class CategoryContorllerTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private BookInfoRepository bookInfoRepository;
+
     private String token;
 
     private Long categoryId;
+    private Category category;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -50,11 +56,10 @@ public class CategoryContorllerTest {
         this.token = responseJson.get("data").get("accessToken").asText();
 
         // 테스트용 카테고리를 등록합니다.
-        Category category = categoryRepository.save(Category.builder()
+        category = categoryRepository.save(Category.builder()
                 .categoryName("테스트용입니다")
                 .build());
         this.categoryId = category.getId();
-
     }
 
     @Nested
@@ -88,7 +93,30 @@ public class CategoryContorllerTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("카테고리 이름이 빈 값일 경우")
+            @DisplayName("중복된 카테고리 이름일 경우 예외 발생")
+            public void createCategoryWithDuplicatedCategoryName() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/category/create";
+                String categoryName = "테스트용입니다";
+                String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
+
+                mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest());
+            }
+
+            @Test
+            @DisplayName("카테고리 이름이 빈 값일 경우 예외 발생")
             public void createCategoryWithNullCategoryName() throws Exception {
                 // Given
                 String requsetUrl = "/api/admin/category/create";
@@ -107,7 +135,7 @@ public class CategoryContorllerTest {
 
 
             @Test
-            @DisplayName("카테고리 이름이 빈 문자열일 경우")
+            @DisplayName("카테고리 이름이 빈 문자열일 경우 예외 발생")
             public void createCategoryWithEmptyCategoryName() throws Exception {
                 // Given
                 String requestUrl = "/api/admin/category/create";
@@ -125,7 +153,7 @@ public class CategoryContorllerTest {
             }
 
             @Test
-            @DisplayName("카테고리 이름이 20자를 초과할 경우")
+            @DisplayName("카테고리 이름이 20자를 초과할 경우 예외 발생")
             public void createCategoryWithLongCategoryName() throws Exception {
                 // Given
                 String requestUrl = "/api/admin/category/create";
@@ -260,7 +288,7 @@ public class CategoryContorllerTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("id에 해당하는 카테고리가 존재하지 않을 경우")
+            @DisplayName("id에 해당하는 카테고리가 존재하지 않을 경우 예외 발생")
             public void notExistCategoryById() throws Exception {
                 // Given
                 String nonExistCategoryId = "10000";
@@ -278,6 +306,35 @@ public class CategoryContorllerTest {
                         .getContentAsString();
             }
 
+            @Test
+            @DisplayName("카테고리에 속한 상품이 존재할 경우 예외 발생")
+            public void existProductInCategory() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/category/" + categoryId + "/delete";
+
+                // 테스트용 책 정보를 등록합니다.(카테고리 설정)
+                BookInfo bookInfo = BookInfo.builder()
+                        .title("테스트용 책입니다.")
+                        .author("테스트")
+                        .publisher("테스트")
+                        .isbn("1234567890123")
+                        .category(category)
+                        .build();
+                bookInfo.addCategory(category);
+
+                bookInfoRepository.save(bookInfo);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+            }
         }
     }
 }

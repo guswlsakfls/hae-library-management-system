@@ -2,11 +2,11 @@ package com.hae.library.dto.Member.Request;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class RequestChangePasswordDto {
     @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
@@ -14,4 +14,10 @@ public class RequestChangePasswordDto {
 
     @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
     private String newPassword;
+
+    @Builder
+    public RequestChangePasswordDto(String nowPassword, String newPassword) {
+        this.nowPassword = nowPassword;
+        this.newPassword = newPassword;
+    }
 }

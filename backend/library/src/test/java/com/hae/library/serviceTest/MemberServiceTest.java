@@ -1,7 +1,9 @@
 package com.hae.library.serviceTest;
 
+import com.hae.library.domain.Enum.Role;
 import com.hae.library.domain.Member;
 import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
+import com.hae.library.dto.Member.Request.RequestChangePasswordDto;
 import com.hae.library.dto.Member.Request.RequestEmailDto;
 import com.hae.library.dto.Member.Request.RequestSignupDto;
 import com.hae.library.dto.Member.Response.ResponseMemberDto;
@@ -17,12 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -79,7 +83,6 @@ public class MemberServiceTest {
                         .checkPassword("1234")
                         .build();
 
-                // 아래 두 줄은 테스트 중에 발생할 수 있는 예외 상황에 대비하기 위한 Mockito 설정입니다.
                 // 이미 존재하는 이메일을 찾지 못하도록 설정하고, 새로 생성된 회원을 저장하도록 설정합니다.
                 when(memberRepository.findByEmail(requestSignupDto.getEmail())).thenReturn(Optional.empty());
                 when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -88,8 +91,6 @@ public class MemberServiceTest {
                 memberService.signup(requestSignupDto);
 
                 // Then
-                // 이메일을 사용하여 방금 생성한 회원을 찾아봅니다.
-                // 저장되었다면, 이 메서드는 null이 아닌 값을 반환 합니다.
                 verify(memberRepository).save(any(Member.class));
             }
 
@@ -143,7 +144,7 @@ public class MemberServiceTest {
         @DisplayName("성공 케이스")
         public class SuccessCaseTest {
             @Test
-            @DisplayName("모든 회원 목록을 검색어와 페이징하여 조회")
+            @DisplayName("회원 목록을 검색어와 페이징조건으로 조회")
             public void getAllMemberTest() {
                 // Given
                 String search = "test";
@@ -166,13 +167,20 @@ public class MemberServiceTest {
                         .id(2L)
                         .email("test2@gmai.com")
                         .build();
-                test2.setCreatedAt(LocalDateTime.now());
-                test2.setUpdatedAt(LocalDateTime.now());
+                test2.setCreatedAt(LocalDateTime.now().minusDays(2));
+                test2.setUpdatedAt(LocalDateTime.now().minusDays(2));
                 memberList.add(test2);
+
+                Member test3 = Member.builder()
+                        .id(3L)
+                        .email("admin@gmai.com")
+                        .build();
+                test3.setCreatedAt(LocalDateTime.now());
+                test3.setUpdatedAt(LocalDateTime.now());
+                memberList.add(test3);
 
                 Page<Member> memberPage = new PageImpl<>(memberList);
 
-                // Mockito를 이용하여 MemberRepository의 findAll 메서드가 예상되는 회원 목록을 반환하도록 설정합니다.
                 when(memberRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(memberPage);
 
                 // When
@@ -283,12 +291,11 @@ public class MemberServiceTest {
             }
         }
 
-        // TODO: 실패 케이스 다시 작성
         @Nested
         @DisplayName("실패 케이스")
         class FailCaseTest {
             @Test
-            @DisplayName("회원을 찾지 못했을 경우 예외 발생")
+            @DisplayName("이메일로 회원을 찾지 못했을 경우 예외 발생")
             public void getMemberByEmailNotFoundTest() {
                 // Given
                 String email = "notfound@gmail.com";
@@ -302,24 +309,39 @@ public class MemberServiceTest {
                     memberService.getMemberByEmail(requestEmailDto);
                 });
             }
-        }
 
-//        public class FailCaseTest {
-//            @Test
-//            @DisplayName("역할 필터가 올바르지 않을 때 예외를 던짐")
-//            public void getAllMemberTest_WithException() {
-//                // Given
-//                String search = "test";
-//                int page = 0;
-//                int size = 10;
-//                String role = "FAIL_ROLE"; // 올바르지 않은 역할 값
-//                String sort = "최신순";
-//
-//                // When & Then
-//                assertThrows(RestApiException.class, () -> memberService.getAllMember(search, page, size, role,
-//                        sort));
-//            }
-//        }
+            @Test
+            @DisplayName("잘못된 회원 역할을 입력했을 때 예외 발생")
+            void throwExceptionWhenInvalidRole() {
+                // Given
+                String search = null;
+                int page = 0;
+                int size = 10;
+                String role = "잘못된 역할";
+                String sort = "최신순";
+
+                // When & Then
+                assertThrows(RestApiException.class, () -> {
+                    memberService.getAllMember(search, page, size, role, sort);
+                });
+            }
+
+            @Test
+            @DisplayName("잘못된 정렬 조건을 입력했을 때 예외 발생")
+            void throwExceptionWhenInvalidSort() {
+                // Given
+                String search = null;
+                int page = 0;
+                int size = 10;
+                String role = "전체";
+                String sort = "잘못된 정렬";
+
+                // When & Then
+                assertThrows(RestApiException.class, () -> {
+                    memberService.getAllMember(search, page, size, role, sort);
+                });
+            }
+        }
     }
 
     @Nested
@@ -362,7 +384,102 @@ public class MemberServiceTest {
                 assertEquals(newEmail, result.getEmail());
             }
         }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailCaseTest {
+            @Test
+            @DisplayName("이메일이 중복될 경우 예외 발생")
+            public void modifyMemberInfoThrowExceptionWhenEmailIsDuplicated() {
+                // Given
+                Long memberId = 1L;
+                String newEmail = "test@gmail.com";
+
+                RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
+                        .id(memberId)
+                        .email(newEmail)
+                        .activated(true)
+                        .build();
+
+                when(memberRepository.existsByEmailAndIdIsNot(newEmail, memberId)).thenReturn(true);
+
+                // When & Then
+                assertThrows(RestApiException.class, () -> {
+                    memberService.modifyMemberInfo(requestChangeMemberInfoDto);
+                });
+            }
+
+            @Test
+            @DisplayName("회원을 찾지 못했을 경우 예외 발생")
+            public void modifyMemberInfoThrowExceptionWhenMemberNotFound() {
+                // Given
+                Long memberId = 1L;
+                String newEmail = "test@gmail.com";
+
+                RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
+                        .id(memberId)
+                        .email(newEmail)
+                        .activated(true)
+                        .build();
+
+                Mockito.when(memberRepository.findById(requestChangeMemberInfoDto.getId())).thenReturn(Optional.empty());
+
+                // When & Then
+                assertThrows(RestApiException.class, () -> {
+                    memberService.modifyMemberInfo(requestChangeMemberInfoDto);
+                });
+            }
+        }
     }
+
+    @Nested
+    @DisplayName("회원 비밀번호 변경")
+    class ChangePasswordTest {
+//        @Nested
+//        @DisplayName("성공 케이스")
+//        class SuccessCaseTest {
+//            @Test
+//            @DisplayName("회원 비밀번호 변경")
+//            public void changePasswordTest() {
+//                // Given
+//                Long memberId = 1L;
+//                String email = "test1@gmail.com";
+//                String password = "password123";
+//                String newPassword = "newPassword";
+//
+//                Member member = Member.builder()
+//                        .id(memberId)
+//                        .email(email)
+//                        .role(Role.ROLE_ADMIN)
+//                        .password(password)
+//                        .activated(true)
+//                        .build();
+//
+//                RequestChangePasswordDto requestChangePasswordDto = RequestChangePasswordDto.builder()
+//                        .nowPassword(password)
+//                        .newPassword(newPassword)
+//                        .build();
+//
+//                // Authentication 객체를 생성하고 SecurityContext에 설정하여
+//                // 자신이 로그인한 것처럼 만들어줍니다.
+//                Authentication authentication =
+//                        new UsernamePasswordAuthenticationToken(email, password);
+//                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+//                securityContext.setAuthentication(authentication);
+//                SecurityContextHolder.setContext(securityContext);
+//
+//                when(memberRepository.findByEmail(email)).thenReturn(Optional.ofNullable(member));
+//                when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//                // When
+//                memberService.changeMemberPassword(requestChangePasswordDto);
+//
+//                // Then
+//                assertEquals(newPassword, member.getPassword());
+//            }
+//        }
+    }
+
 
     @Nested
     @DisplayName("회원 탈퇴")
