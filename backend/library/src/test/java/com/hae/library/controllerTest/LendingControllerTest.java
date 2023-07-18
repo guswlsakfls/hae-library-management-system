@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -309,6 +310,34 @@ public class LendingControllerTest {
                 ResultActions resultActions = mockMvc.perform(post("/api/admin/lending/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content4)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+            }
+
+            @Test
+            @DisplayName("회원이 연체일이 있을 때 예외 발생")
+            public void createLendingWhenUserHasOverdue() throws Exception {
+                // Given
+                Member member = memberRepository.findById(1L).get();
+                member.updatePenaltyEndDate(LocalDateTime.now().plusDays(10));
+
+                String requsetUrl = "/api/admin/lending/create";
+                long userId = 1; // 사용자 ID를 적절히 설정해주세요.
+                long bookId = book1Id; // 대출할 도서의 ID를 설정해주세요.
+                String lendingCondition = "테스트 중";
+
+                String content = String.format("{\"userId\":%d, \"bookId\":%d, \"lendingCondition\":\"%s\"}",
+                        userId, bookId, lendingCondition);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requsetUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
                         .header("Authorization", "Bearer " + token));
 
                 // Then

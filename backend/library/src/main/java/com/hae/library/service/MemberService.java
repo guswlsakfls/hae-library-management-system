@@ -38,8 +38,8 @@ public class MemberService {
      * @param requestSignupDto 회원 가입 정보 DTO
      * @return responseMemberDto 회원 정보 DTO
      *
-     * @throws MemberErrorCode 패스워드와 패스워드 재확인이 일치하지 않을 때
-     * @throws MemberErrorCode 이미 존재하는 이메일일 때
+     * @throws MemberErrorCode 패스워드와 패스워드 재확인이 일치하지 않음
+     * @throws MemberErrorCode 이미 존재하는 이메일
      */
     public void signup(RequestSignupDto requestSignupDto) {
         // 입력받은 패스워드와 패스워드 재확인이 일치하지 않으면 예외를 발생시킵니다.
@@ -75,10 +75,21 @@ public class MemberService {
      */
     public Page<ResponseMemberDto> getAllMember(String search, int page, int size, String role,
                                                 String sort) {
+        // role 값이 null이거나 "전체", "관리자", "일반회원" 중 하나가 아닌 경우 예외를 발생시킵니다.
+        if (role == null || (!"전체".equals(role) && !"관리자".equals(role) && !"일반회원".equals(role))) {
+            throw new RestApiException(MemberErrorCode.NOT_EXIST_ROLE);
+        }
+
+        // sort 값이 null이거나 "최신순", "오래된순" 중 하나가 아닌 경우 예외를 발생시킵니다.
+        if (sort == null || (!"최신순".equals(sort) && !"오래된순".equals(sort))) {
+            throw new RestApiException(MemberErrorCode.NOT_EXIST_SEARCH_OPTION);
+        }
+
         // 페이지 정보를 설정합니다. 페이지는 0부터 시작하며, 정렬은 'createdAt' 컬럼을 기준으로 최신순, 오래된순으로 정렬합니다.
         Sort.Direction direction = sort.equals("최신순") ?  Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
 
+        // 검색어, 역할에 따라 동적 쿼리를 생성합니다.
         Specification<Member> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -103,12 +114,19 @@ public class MemberService {
 
         // 검색어에 따른 동적 쿼리로 회원 정보를 페이지 단위로 가져옵니다.
         Page<Member> memberList = memberRepository.findAll(spec, pageable);
-        // 가져온 회원 정보를 DTO로 변환합니다.
-        Page<ResponseMemberDto> responseMemberDtoList = memberList.map(member -> {
-            // 각 Member 객체를 ResponseMemberDto로 변환합니다.
-            ResponseMemberDto dto = ResponseMemberDto.from(member);
-            return dto;
-        });
+
+        Page<ResponseMemberDto> responseMemberDtoList;
+        // 가져온 회원 정보가 없으면 null 처리합니다.
+        if (memberList == null) {
+            responseMemberDtoList = null;
+        } else {
+            // 가져온 회원 정보를 DTO로 변환합니다.
+            responseMemberDtoList = memberList.map(member -> {
+                // 각 Member 객체를 ResponseMemberDto로 변환합니다.
+                ResponseMemberDto dto = ResponseMemberDto.from(member);
+                return dto;
+            });
+        }
 
         // DTO로 변환된 회원 정보 페이지를 반환합니다.
         return responseMemberDtoList;
@@ -131,8 +149,8 @@ public class MemberService {
      * 이메일을 기준으로 회원 정보를 조회합니다.
      *
      * @param requestEmailDto 이메일 정보 DTO
-     * @return ResponseMemberDto 회원 정보 DT
-     * O
+     * @return ResponseMemberDto 회원 정보 DTO
+     *
      * @throws MemberErrorCode 회원을 찾지 못했을 때
      */
     public ResponseMemberDto getMemberByEmail(RequestEmailDto requestEmailDto) {

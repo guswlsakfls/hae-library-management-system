@@ -259,6 +259,7 @@ public class MemberControllerTest {
             @DisplayName("회원 정보 수정 시 정보 수정")
             public void updateMemberTest() throws Exception {
                 // Given
+                String requestUrl = "/api/member/update";
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("change@gmail.com")
@@ -268,7 +269,7 @@ public class MemberControllerTest {
                 String requestChangeMemberInfoDtoJson = new ObjectMapper().writeValueAsString(requestChangeMemberInfoDto);
 
                 // When
-                ResultActions resultActions = mockMvc.perform(put("/api/admin/member/update")
+                ResultActions resultActions = mockMvc.perform(put(requestUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestChangeMemberInfoDtoJson)
                                 .header("Authorization", "Bearer " + token));
@@ -287,6 +288,7 @@ public class MemberControllerTest {
             @DisplayName("변경하려는 이메일이 중복되는 경우 예외 발생")
             public void duplicateEmailTest() throws Exception {
                 // Given
+                String requestUrl = "/api/admin/member/update";
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("tes1@gmail.com")
@@ -297,7 +299,7 @@ public class MemberControllerTest {
                 String requestChangeMemberInfoDtoJson = new ObjectMapper().writeValueAsString(requestChangeMemberInfoDto);
 
                 // When
-                ResultActions resultActions = mockMvc.perform(put("/api/admin/member/update")
+                ResultActions resultActions = mockMvc.perform(put(requestUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestChangeMemberInfoDtoJson)
                                 .header("Authorization", "Bearer " + token))
