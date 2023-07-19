@@ -72,7 +72,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리를 생성합니다.")
             public void createCategory() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/create";
+                String requestUrl = "/api/admin/category";
                 String categoryName = "테스트";
                 String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
                 String authorizationHeader = "Bearer " + token;
@@ -96,7 +96,7 @@ public class CategoryContorllerTest {
             @DisplayName("중복된 카테고리 이름일 경우 예외 발생")
             public void createCategoryWithDuplicatedCategoryName() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/create";
+                String requestUrl = "/api/admin/category";
                 String categoryName = "테스트용입니다";
                 String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
 
@@ -119,7 +119,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리 이름이 빈 값일 경우 예외 발생")
             public void createCategoryWithNullCategoryName() throws Exception {
                 // Given
-                String requsetUrl = "/api/admin/category/create";
+                String requsetUrl = "/api/admin/category";
                 String categoryName = "";
                 String requestJson = String.format("{\"categoryName\":\"%s\"}", categoryName);
 
@@ -138,7 +138,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리 이름이 빈 문자열일 경우 예외 발생")
             public void createCategoryWithEmptyCategoryName() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/create";
+                String requestUrl = "/api/admin/category";
                 String categoryName = "";
                 String content = String.format("{\"categoryName\":\"%s\"}", categoryName);
 
@@ -156,7 +156,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리 이름이 20자를 초과할 경우 예외 발생")
             public void createCategoryWithLongCategoryName() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/create";
+                String requestUrl = "/api/admin/category";
                 String categoryName = "123456789012345678901";
                 String requestJson = String.format("{\"categoryName\":\"%s\"}", categoryName);
 
@@ -210,7 +210,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리를 수정합니다.")
             public void updateCategory() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/update";
+                String requestUrl = "/api/admin/category";
                 String updatedCategoryName = "테스트";
                 String content = String.format("{\"categoryId\":%d, \"updatedCategoryName\":\"%s\"}", categoryId, updatedCategoryName);
 
@@ -236,7 +236,7 @@ public class CategoryContorllerTest {
             @DisplayName("id에 해당하는 카테고리가 존재하지 않을 경우")
             public void notExistCategoryById() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/update";
+                String requestUrl = "/api/admin/category";
                 long nonExistCategoryId = 999;
                 String updatedCategoryName = "테스트";
                 String content = String.format("{\"categoryId\":%d, " +
@@ -268,7 +268,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리를 삭제합니다.")
             public void deleteCategory() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/" + categoryId + "/delete";
+                String requestUrl = "/api/admin/category/" + categoryId;
 
                 // When
                 ResultActions resultActions = mockMvc.perform(delete(requestUrl)
@@ -292,7 +292,7 @@ public class CategoryContorllerTest {
             public void notExistCategoryById() throws Exception {
                 // Given
                 String nonExistCategoryId = "10000";
-                String requestUrl = "/api/admin/category/" + nonExistCategoryId + "/delete";
+                String requestUrl = "/api/admin/category/" + nonExistCategoryId;
 
                 // When
                 ResultActions resultActions = mockMvc.perform(delete(requestUrl)
@@ -310,7 +310,7 @@ public class CategoryContorllerTest {
             @DisplayName("카테고리에 속한 상품이 존재할 경우 예외 발생")
             public void existProductInCategory() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/category/" + categoryId + "/delete";
+                String requestUrl = "/api/admin/category/" + categoryId;
 
                 // 테스트용 책 정보를 등록합니다.(카테고리 설정)
                 BookInfo bookInfo = BookInfo.builder()

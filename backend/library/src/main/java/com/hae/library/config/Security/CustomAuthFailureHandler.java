@@ -40,8 +40,5 @@ class CustomAuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
         request.setAttribute("errorMessage", errorMessage);
         request.getRequestDispatcher("/login?error=true").forward(request, response);
-
-
-//        super.onAuthenticationFailure(request, response, exception);
     }
 }

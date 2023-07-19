@@ -28,14 +28,14 @@ public class BookController {
      * @param requestBookWithBookInfoDto
      * @return "도서를 성공적으로 등록하였습니다" 메시지
      */
-    @PostMapping(value = "/admin/book/create")
+    @PostMapping(value = "/admin/book")
     public ResponseResultDto createBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
-        log.info("도서 추가 요청: [POST] /book/create - {}", requestBookWithBookInfoDto.toString());
+        log.info("도서 추가 요청: [POST] /book - {}", requestBookWithBookInfoDto.toString());
         bookService.createBook(requestBookWithBookInfoDto);
 
         log.info("도서를 성공적으로 등록하였습니다");
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.CREATED.value())
                 .message("도서를 성공적으로 등록하였습니다")
                 .build();
     }
@@ -44,7 +44,7 @@ public class BookController {
      * 책 ID로 책을 조회합니다.
      *
      * @param bookId
-     * @return 책 정보
+     * @return bookWithBookInfoDto 책 과 책 정보
      */
     @GetMapping(value = "/member/book/{bookId}/info")
     public ResponseResultDto getBookById(@PathVariable("bookId") @Positive Long bookId) {
@@ -84,7 +84,7 @@ public class BookController {
      * @param requestBookWithBookInfoDto
      * @return 수정된 책 정보
      */
-    @PutMapping(value = "/admin/book/update")
+    @PutMapping(value = "/admin/book")
     public ResponseResultDto<Object> updateBook(@RequestBody @Valid RequestBookWithBookInfoDto requestBookWithBookInfoDto) {
         log.info("책 정보 업데이트 요청: [PUT] /book/update - {}", requestBookWithBookInfoDto.toString());
         ResponseBookWithBookInfoDto bookWithBookInfo = bookService.updateBook(requestBookWithBookInfoDto);
@@ -103,14 +103,14 @@ public class BookController {
      * @param bookId
      * @return "책 삭제에 성공하였습니다" 메시지
      */
-    @DeleteMapping(value = "/admin/book/{bookId}/delete")
+    @DeleteMapping(value = "/admin/book/{bookId}")
     public ResponseResultDto<Object> deleteBookById(@PathVariable("bookId") Long bookId) {
         log.info("책 삭제 요청: [DELETE] /book/{bookId}/delete - 책 ID {}", bookId);
         bookService.deleteBookById(bookId);
 
         log.info("책 삭제에 성공하였습니다");
         return ResponseResultDto.builder()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.NO_CONTENT.value())
                 .message("책 삭제에 성공하였습니다")
                 .build();
     }

@@ -16,7 +16,7 @@ const postAddBook = async (
   status
 ) => {
   const res = await axios.post(
-    serverIp + '/admin/book/create',
+    serverIp + '/admin/book',
     {
       title: title,
       image: image,
@@ -46,7 +46,7 @@ const postRequestBookApi = async (
   category
 ) => {
   const res = await axios.post(
-    serverIp + '/admin/request-book/create',
+    serverIp + '/admin/request-book',
     {
       title: title,
       image: image,
@@ -149,7 +149,7 @@ const addBookByIsbnApi = async isbn => {
 
 const lendingBookApi = async (bookId, userId, lendingCondition) => {
   const res = await axios.post(
-    serverIp + '/admin/lending/create',
+    serverIp + '/admin/lending',
     {
       bookId: bookId,
       userId: userId,
@@ -232,19 +232,16 @@ const getLendgingInfoApi = async callsign => {
 };
 
 const deleteBookApi = async id => {
-  const res = await axios.delete(serverIp + `/admin/book/${id}/delete`, {
+  const res = await axios.delete(serverIp + `/admin/book/${id}`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
 
 const deleteRequestBookApi = async id => {
-  const res = await axios.delete(
-    serverIp + `/admin/request-book/${id}/delete`,
-    {
-      headers: { authorization: `Bearer ${accessToken}` },
-    }
-  );
+  const res = await axios.delete(serverIp + `/admin/request-book/${id}`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
   return res.data;
 };
 

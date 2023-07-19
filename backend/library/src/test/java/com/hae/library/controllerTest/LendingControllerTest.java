@@ -141,7 +141,7 @@ public class LendingControllerTest {
             @DisplayName("대출 정보를 생성")
             public void createLending() throws Exception {
                 // Given
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long bookId = book1Id; // 대출할 도서의 ID를 적절히 설정해주세요.
                 String lendingCondition = "테스트트";
@@ -171,7 +171,7 @@ public class LendingControllerTest {
             @DisplayName("도서가 존재하지 않을 때 예외 발생")
             public void createLendingWhenBookDoesNotExist() throws Exception {
                 // Given
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long nonExistentBookId = 10000; // 존재하지 않는 도서의 ID를 설정해주세요.
                 String lendingCondition = "테스트";
@@ -196,7 +196,7 @@ public class LendingControllerTest {
             @DisplayName("도서가 대출 중일 때 예외 발생")
             public void createLendingWhenBookIsLending() throws Exception {
                 // Given
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long bookId = book1Id; // 대출 중인 도서의 ID를 설정해주세요.
                 String lendingCondition = "테스트중";
@@ -232,7 +232,7 @@ public class LendingControllerTest {
                 // Given
                 book1.updateBookStatus(BookStatus.LOST);
 
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long bookId = book1Id; // 분실된 도서의 ID를 설정해주세요.
                 String lendingCondition = "테스트";
@@ -257,7 +257,7 @@ public class LendingControllerTest {
                 Member member = memberRepository.findById(1L).get();
                 member.updateActivated(false);
 
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long bookId = book1Id; // 대출할 도서의 ID를 설정해주세요.
                 String lendingCondition = "테스트 중";
@@ -291,23 +291,24 @@ public class LendingControllerTest {
                 String content4 = String.format("{\"userId\":1, \"bookId\":%d, " +
                         "\"lendingCondition\":\"테스트트\"}", book4Id);
 
-                // When
-                mockMvc.perform(post("/api/admin/lending/create")
+                mockMvc.perform(post("/api/admin/lending")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(content1)
                                 .header("Authorization", "Bearer " + token));
 
-                mockMvc.perform(post("/api/admin/lending/create")
+                mockMvc.perform(post("/api/admin/lending")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(content2)
                                 .header("Authorization", "Bearer " + token));
 
-                mockMvc.perform(post("/api/admin/lending/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content3)
-                        .header("Authorization", "Bearer " + token));
+                mockMvc.perform(post("/api/admin/lending")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(content3)
+                                .header("Authorization", "Bearer " + token));
 
-                ResultActions resultActions = mockMvc.perform(post("/api/admin/lending/create")
+                // When
+
+                ResultActions resultActions = mockMvc.perform(post("/api/admin/lending")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content4)
                         .header("Authorization", "Bearer " + token));
@@ -326,7 +327,7 @@ public class LendingControllerTest {
                 Member member = memberRepository.findById(1L).get();
                 member.updatePenaltyEndDate(LocalDateTime.now().plusDays(10));
 
-                String requsetUrl = "/api/admin/lending/create";
+                String requsetUrl = "/api/admin/lending";
                 long userId = 1; // 사용자 ID를 적절히 설정해주세요.
                 long bookId = book1Id; // 대출할 도서의 ID를 설정해주세요.
                 String lendingCondition = "테스트 중";
@@ -367,7 +368,7 @@ public class LendingControllerTest {
                         userId, bookId, lendingCondition);
 
                 // 대출 처리
-                mockMvc.perform(post("/api/admin/lending/create")
+                mockMvc.perform(post("/api/admin/lending")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(lendingContent)
                                 .header("Authorization", "Bearer " + token))

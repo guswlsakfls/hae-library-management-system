@@ -27,6 +27,7 @@ export default function Lending() {
       .catch(err => {
         setBook({});
         setUser({});
+        setReturningAt('');
         alert(err.response.data.message);
         let errors = err.response.data.errors;
         if (!errors) {

@@ -89,7 +89,7 @@ const putMemberWidthdrawalApi = async () => {
 };
 
 const deleteMemberApi = async id => {
-  const res = await axios.delete(serverIp + `/admin/member/${id}/delete`, {
+  const res = await axios.delete(serverIp + `/admin/member/${id}`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;

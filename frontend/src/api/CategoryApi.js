@@ -34,7 +34,7 @@ const updateCategoryApi = async (id, name) => {
 };
 
 const deleteCategoryApi = async id => {
-  const res = await axios.delete(serverIp + `/admin/category/${id}/delete`, {
+  const res = await axios.delete(serverIp + `/admin/category/${id}`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;

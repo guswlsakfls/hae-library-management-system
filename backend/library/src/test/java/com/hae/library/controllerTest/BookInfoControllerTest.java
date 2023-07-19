@@ -133,7 +133,6 @@ public class BookInfoControllerTest {
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
 
-
             @Test
             @DisplayName("도서 정보를 id로 조회합니다.")
             public void testGetBookInfoById() throws Exception {
@@ -170,7 +169,6 @@ public class BookInfoControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.data.title", is("테스트용 책 제목")));
         }
-
 
         @Nested
         @DisplayName("실패 케이스")
@@ -226,7 +224,7 @@ public class BookInfoControllerTest {
             @DisplayName("도서 정보를 ID로 삭제합니다.")
             public void deleteBookInfoById() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/bookinfo/" + bookId + "/delete";
+                String requestUrl = "/api/admin/bookinfo/" + bookId;
                 String authorizationHeader = "Bearer " + token;
 
                 // When
@@ -247,11 +245,12 @@ public class BookInfoControllerTest {
             @DisplayName("존재하지 않는 도서 정보를 삭제합니다.")
             public void deleteNonExistentBookInfo() throws Exception {
                 // Given
+                String requestUrl = "/api/admin/bookinfo/";
                 long nonExistentBookId = 1000L; // 존재하지 않는 도서의 ID를 설정해주세요.
                 String authorizationHeader = "Bearer " + token;
 
                 // When
-                ResultActions resultActions = mockMvc.perform(delete("/api/admin/bookinfo/{bookId}/delete", nonExistentBookId)
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl + nonExistentBookId)
                         .header("Authorization", authorizationHeader));
 
                 // Then

@@ -103,7 +103,7 @@ export default function LendingHistory() {
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
       <div className="flex justify-center items-center my-10 mx-24">
-        <h1 className="text-4xl font-bold">대출/반납 기록</h1>
+        <h1 className="text-4xl font-bold">대출/반납 현황</h1>
       </div>
       <div className="flex justify-between items-center my-10 mx-32">
         <h1 className="text-2xl font-bold mr-2">대출/반납 검색</h1>
