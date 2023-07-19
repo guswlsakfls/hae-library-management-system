@@ -162,9 +162,10 @@ public class LendingService {
             } else { // 연체일이 있으면 현재 연체일에 부과합니다.
                 newPenaltyEndDate = newPenaltyEndDate.plusDays(daysOverdue);
             }
-            // 연체일을 부과하고 저장합니다.
+            // 연체일을 부과합니다.
             user.updatePenaltyEndDate(newPenaltyEndDate);
         }
+        // 업데이트된 유저 정보를 저장합니다.
         memberRepo.save(user);
 
         // 반납 처리정보를 업데이트 합니다.
@@ -218,7 +219,8 @@ public class LendingService {
             if (search != null && !search.trim().isEmpty()) {
                 predicates.add(cb.or(
                         cb.like(cb.lower(root.get("book").get("bookInfo").get("title")), "%" + search.toLowerCase() + "%"),
-                        cb.like(cb.lower(root.get("user").get("email")), "%" + search.toLowerCase() + "%"))
+                        cb.like(cb.lower(root.get("lendingUser").get("email")),
+                                "%" + search.toLowerCase() + "%"))
                 );
             }
 
@@ -332,7 +334,7 @@ public class LendingService {
      */
     @Transactional
     public void deleteLending(Long lendingId) {
-        // 대출Id로 대출 정보를 조회합니다.
+        // 대출id로 대출 정보를 조회합니다.
         Lending lending = lendingRepo.findById(lendingId)
                 .orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_LENDING));
 

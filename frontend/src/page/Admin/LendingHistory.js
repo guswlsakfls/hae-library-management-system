@@ -71,7 +71,7 @@ export default function LendingHistory() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 2);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
   const [total, setTotal] = useState(0);
   // 옵션 선택
   const [isLendingOrReturning, setIsLendingOrReturning] = useState('전체');
@@ -189,22 +189,31 @@ export default function LendingHistory() {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {lendingList.map((item, index) => (
-            <TableRow
-              key={index}
-              email={item.userEmail}
-              bookTitle={item.bookTitle}
-              bookCallSign={item.bookCallSign}
-              lendingLibrarianEmail={item.lendingLibrarianEmail}
-              lendingCondition={item.lendingCondition}
-              lendingDate={item.createdAt}
-              returningLibraryEmail={item.returningLibrarianEmail}
-              returningCondition={item.returningCondition}
-              returningDate={item.returningAt}
-              status={item.returningAt != null ? '반납완료' : '대출 중'}
-            />
-          ))}
+          {lendingList.length === 0 ? (
+            <tr>
+              <td colSpan="9" className="text-center py-4">
+                대출/반납 기록이 없습니다
+              </td>
+            </tr>
+          ) : (
+            lendingList.map((item, index) => (
+              <TableRow
+                key={index}
+                email={item.userEmail}
+                bookTitle={item.bookTitle}
+                bookCallSign={item.bookCallSign}
+                lendingLibrarianEmail={item.lendingLibrarianEmail}
+                lendingCondition={item.lendingCondition}
+                lendingDate={item.createdAt}
+                returningLibraryEmail={item.returningLibrarianEmail}
+                returningCondition={item.returningCondition}
+                returningDate={item.returningAt}
+                status={item.returningAt != null ? '반납완료' : '대출 중'}
+              />
+            ))
+          )}
         </tbody>
+
         <tfoot className="bg-white divide-y divide-gray-200">
           <tr>
             <td colSpan={6}>

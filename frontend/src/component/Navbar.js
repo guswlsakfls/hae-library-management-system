@@ -2,6 +2,7 @@ import { Disclosure } from '@headlessui/react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import jwt_decode from 'jwt-decode';
+import logo from '../assets/typea-logo.png';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -59,9 +60,10 @@ export default function Navbar() {
                 >
                   <img
                     className="h-8 w-auto lg:block"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                    src={logo}
                     alt="Your Company"
                   />
+                  <p className="font-semibold">도서관</p>
                 </button>
               </div>
             </div>

@@ -14,11 +14,9 @@ export default function ManagingCategory() {
     // 카테고리를 로드하는 API 호출
     getCategoryListApi()
       .then(res => {
-        console.log(res);
         setCategories(res.data);
       })
       .catch(err => {
-        console.log(err);
         alert(err.message);
       });
   }, []);
@@ -28,19 +26,23 @@ export default function ManagingCategory() {
     if (window.confirm('정말로 카테고리를 추가하시겠습니까?')) {
       createCategoryApi(inputValue)
         .then(res => {
-          console.log(res);
           alert('카테고리를 성공적으로 추가했습니다.');
           window.location.reload();
         })
         .catch(err => {
-          console.log(err);
-          alert('카테고리를 추가하는데 실패했습니다.');
+          console.log(err.response);
+          alert(err.response.data.message);
+
+          let errors = err.response.data.errors;
+          if (!errors) {
+            return;
+          }
+          let errorMessages = errors
+            .map((error, index) => `${index + 1}. ${error.message}`)
+            .join('\n\n');
+          alert(errorMessages);
         });
     }
-  };
-
-  const readCategory = id => {
-    alert('아직 구현되지 않았습니다.');
   };
 
   // 카테고리를 수정하는 함수
@@ -55,8 +57,11 @@ export default function ManagingCategory() {
           window.location.reload();
         })
         .catch(err => {
-          console.log(err);
-          alert('카테고리를 수정하는데 실패했습니다.');
+          if (err.response) {
+            alert(err.response.data.message);
+          } else {
+            alert('카테고리를 수정하는데 실패했습니다.');
+          }
         });
     }
   };
@@ -66,13 +71,15 @@ export default function ManagingCategory() {
     if (window.confirm('정말로 카테고리를 삭제하시겠습니까?')) {
       deleteCategoryApi(id)
         .then(res => {
-          console.log(res);
           alert('카테고리를 성공적으로 삭제했습니다.');
           window.location.reload();
         })
         .catch(err => {
-          console.log(err);
-          alert('카테고리를 삭제하는데 실패했습니다.');
+          if (err.response) {
+            alert(err.response.data.message + '\n삭제할 수 없습니다.');
+          } else {
+            alert('카테고리를 삭제하는데 실패했습니다.');
+          }
         });
     }
   };
@@ -108,12 +115,6 @@ export default function ManagingCategory() {
             >
               <span>{category.categoryName}</span>
               <div>
-                <button
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
-                  onClick={() => readCategory(index)}
-                >
-                  조회
-                </button>
                 <button
                   className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
                   onClick={() => editCategory(category.id)}

@@ -169,8 +169,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'존재하지 않는 책 정보입니다'라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.BAD_REQUEST_BOOKINFO);
@@ -190,15 +189,14 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'이미 대출된 책입니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.BOOK_ALREADY_LENT);
             }
 
             @Test
-            @DisplayName("분실 도서 대출할 때 예외 처리")
+            @DisplayName("분실 책을 대출할 때 예외 처리")
             public void lendingBookTest_BookLost() {
                 // Given
                 RequestLendingDto request = RequestLendingDto.builder()
@@ -211,8 +209,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'분실된 책은 대출할 수 없습니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.BOOK_LOST);
@@ -233,8 +230,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'존재하지 않는 회원입니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.USER_NOT_FOUND);
@@ -255,8 +251,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'비활성화된 회원입니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.INACTIVE_MEMBER);
@@ -282,8 +277,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'대출 권수를 초과하였습니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.OVER_LENDING_COUNT);
@@ -304,8 +298,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.lendingBook(request),
-                        "'연체 중인 회원입니다' 라는 메시지가 발생해야 합니다.");
+                        () -> lendingService.lendingBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.USER_OVERDUE);
@@ -388,7 +381,7 @@ public class LendingServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("대출 정보가 존재하지 않을 때")
+            @DisplayName("대출 정보가 존재하지 않은 경우 예외 발생")
             public void returningBookTest_NoBook() {
                 // Given
                 // 반납 요청 정보를 생성합니다.
@@ -400,14 +393,14 @@ public class LendingServiceTest {
                 // When
                 // 반납 처리를 시도하면서 예외가 발생해야 합니다.
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.returningBook(request), "존재하지 않는 대출 정보로 인해 예외가 발생해야 합니다.");
+                        () -> lendingService.returningBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.BAD_REQUEST_LENDING);
             }
 
             @Test
-            @DisplayName("도서가 이미 반납된 상태일 때")
+            @DisplayName("도서가 대출 중이 아닌 경우 예외 발생")
             public void returningBookTest_NotLending() {
                 // Given
                 Book bookSpy = spy(book);
@@ -440,8 +433,7 @@ public class LendingServiceTest {
 
                 // When
                 RestApiException exception = assertThrows(RestApiException.class,
-                        () -> lendingService.returningBook(request)
-                         , "도서가 이미 반납 처리된 상태에서 예외가 발생해야 합니다.");
+                        () -> lendingService.returningBook(request));
 
                 // Then
                 Assertions.assertThat(exception.getErrorCode()).isEqualTo(BookErrorCode.NOT_LENDING_BOOK);
@@ -481,7 +473,7 @@ public class LendingServiceTest {
                 Page<ResponseLendingDto> result = lendingService.getAllLendingHistory(search, page, size, isLendingOrReturning, sort);
 
                 // Then
-                assertEquals(lendingPage.getTotalElements(), result.getTotalElements(), "전체 대출 기록 수는 일치해야 합니다.");
+                assertEquals(lendingPage.getTotalElements(), result.getTotalElements());
             }
 
             @Test
@@ -534,7 +526,7 @@ public class LendingServiceTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("특정 ID의 대출 기록을 찾아 삭제하는 작업")
+            @DisplayName("id에 해당하는 대출 기록을 찾아 삭제")
             public void deleteLendingHistoryTest_Success() {
                 // Given
                 // 대출 기록을 생성합니다.
@@ -563,13 +555,13 @@ public class LendingServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("삭제할 특정 ID의 대출 기록을 찾지 못하는 경우")
+            @DisplayName("삭제할 id의 대출 기록을 찾지 못하는 경우")
             public void deleteLendingHistoryTest_Fail_LendingHistoryNotFound() {
                 // Given
                 Long lendingId = 1L;
 
                 // When & Then
-                assertThrows(RestApiException.class, () -> lendingService.deleteLending(lendingId), "존재하지 않는 대출 기록이므로 예외가 발생해야 합니다.");
+                assertThrows(RestApiException.class, () -> lendingService.deleteLending(lendingId));
             }
         }
     }

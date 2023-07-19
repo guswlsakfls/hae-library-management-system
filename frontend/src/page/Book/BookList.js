@@ -14,7 +14,7 @@ export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const [page, setPage] = useState(parseInt(searchParams.get('page')) - 1 || 0);
-  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 2);
+  const [size, setSize] = useState(parseInt(searchParams.get('size')) || 10);
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
   const [category, setCategory] = useState('전체');
@@ -30,11 +30,9 @@ export default function BookList() {
     // 카테고리 목록을 불러오는 함수
     getCategoryListApi()
       .then(res => {
-        console.log('selecti: ', res);
         setCategoryList([{ value: 0, categoryName: '전체' }, ...res.data]);
       })
       .catch(err => {
-        console.log(err);
         alert('카테고리 목록을 불러오는데 실패했습니다.');
       });
 
@@ -45,12 +43,9 @@ export default function BookList() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
       })
       .catch(err => {
-        console.log(err);
-        console.log(err.response);
-        alert(err.response.data.message);
+        alert('도서 목록을 불러오는데 실패했습니다.');
       });
   }, [search, page, size, category, sort]);
 

@@ -100,7 +100,7 @@ public class MemberServiceTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("비밀번호와 비밀번호 재확인이 일치하지 않을 때 회원가입이 실패한다")
+            @DisplayName("비밀번호와 비밀번호 재확인이 일치하지 않을 때 회원가입이 실패 예외 발")
             public void signupFailTestPasswordNotMatch() {
                 // Given
                 RequestSignupDto requestSignupDto = RequestSignupDto.builder()
@@ -150,7 +150,7 @@ public class MemberServiceTest {
                 String search = "test";
                 int page = 0;
                 int size = 10;
-                String role = "사용자";
+                String role = "전체";
                 String sort = "최신순";
 
                 // 예상되는 반환 값인 회원 목록

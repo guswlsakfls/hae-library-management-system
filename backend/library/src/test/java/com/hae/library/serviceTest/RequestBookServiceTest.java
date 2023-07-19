@@ -124,7 +124,7 @@ public class RequestBookServiceTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("이미 존재하는 도서인 경우")
+            @DisplayName("이미 존재하는 도서인 경우 예외 발생")
             public void requestBook() {
                 // Given
                 RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
@@ -156,8 +156,7 @@ public class RequestBookServiceTest {
                 assertThrows(RestApiException.class, () -> {
                     // when
                     requestBookService.createRequestBook(requestBookInfoDto);
-                }, "이미 존재하는 도서입니다 예외가 발생해야 합니다.");
-
+                });
             }
         }
     }
@@ -222,7 +221,6 @@ public class RequestBookServiceTest {
 
                 when(requestBookRepo.findById(id)).thenReturn(Optional.of(requestBook));
 
-
                 // when
                 requestBookService.deleteRequestBook(id);
 
@@ -246,7 +244,7 @@ public class RequestBookServiceTest {
                 assertThrows(RestApiException.class, () -> {
                     // when
                     requestBookService.deleteRequestBook(id);
-                }, "존재하지 않는 구매 요청 도서 삭제 예외가 발생해야 합니다.");
+                });
             }
         }
     }

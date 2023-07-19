@@ -17,10 +17,8 @@ export default function BookInfo() {
     getBookInfoByIdApi(bookId)
       .then(res => {
         setBookInfo(res.data);
-        console.log(res.data);
       })
       .catch(err => {
-        console.log(err.response);
         if (err.response.status === 401 || err.response.status === 403) {
           alert('로그인이 필요합니다.');
           window.location.href = '/login';
@@ -35,20 +33,11 @@ export default function BookInfo() {
           .map((error, index) => `${index + 1}. ${error.message}`)
           .join('\n\n');
         alert(errorMessages);
-        // window.location.href = '/error';
       });
   }, []);
 
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white">
-        <body class="h-full">
-        ```
-      */}
       <div className="sm:mx-auto sm:w-full border-b-2">
         <h2 className="mt-10 pb-10 text-center text-4xl font-bold leading-9 tracking-tight text-gray-900">
           도서정보
@@ -65,12 +54,11 @@ export default function BookInfo() {
           />
         </div>
         <div className="sm:col-span-8 lg:col-span-7">
-          <h1 className="text-5xl font-bold text-gray-900 sm:pr-12 border-b pb-2">
+          <h1 className="text-3xl font-bold text-gray-900 sm:pr-12 border-b pb-2">
             {bookInfo.title}
           </h1>
 
           <section aria-labelledby="options-heading" className="mt-5">
-            {/* Colors */}
             <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-xl font-medium leading-6 text-gray-900">
                 저자
@@ -143,14 +131,6 @@ export default function BookInfo() {
             </div>
           </section>
         </div>
-      </div>
-      <div className="justify-center flex">
-        <button
-          type="submit"
-          className="mt-6 flex w-1/3 items-center justify-center rounded-md border border-transparent bg-blue-500 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          예약하기
-        </button>
       </div>
       <Footer />
     </>

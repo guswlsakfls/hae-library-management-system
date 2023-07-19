@@ -23,13 +23,11 @@ export default function Lending() {
     getUserByEmailApi(searchEmail)
       .then(res => {
         setUser(res.data);
-        console.log(res);
       })
       .catch(err => {
         setBook({});
         setUser({});
         alert(err.response.data.message);
-        console.log(err.response.data);
         let errors = err.response.data.errors;
         if (!errors) {
           return;
@@ -60,13 +58,12 @@ export default function Lending() {
             return returnDate;
           })()
         );
-        console.log(res);
       })
       .catch(err => {
         setBook({});
         setUser({});
+        setReturningAt('');
         alert(err.response.data.message);
-        console.log(err.response.data);
         let errors = err.response.data.errors;
         if (!errors) {
           return;
@@ -110,7 +107,6 @@ export default function Lending() {
       .catch(err => {
         alert(err.response.data.message);
         window.location.reload();
-        console.log(err.response.data);
         let errors = err.response.data.errors;
         if (!errors) {
           return;
@@ -147,7 +143,6 @@ export default function Lending() {
         })
         .catch(err => {
           alert(err.response.data.message);
-          console.log(err.response.data);
           let errors = err.response.data.errors;
           if (!errors) {
             return;
@@ -299,7 +294,8 @@ export default function Lending() {
                   : lendingInfo.createdAt
                   ? new Date(
                       new Date(lendingInfo.createdAt.split('T')[0]).getTime() +
-                        14 * 24 * 60 * 60 * 1000
+                        14 * 24 * 60 * 60 * 1000 -
+                        24 * 60 * 60 * 1000 // 하루를 뺍니다
                     )
                       .toISOString()
                       .split('T')[0]

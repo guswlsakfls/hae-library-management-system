@@ -112,7 +112,7 @@ public class BookInfoServiceTest {
         }
 
         @Test
-        @DisplayName("책 정보 생성 실패 - 카테고리 없음")
+        @DisplayName("카테고리가 없으면 책 정보를 생성하지 못해 예외 발생")
         void createBookInfoFail_NoCategory() {
             // Given
             // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
@@ -227,11 +227,7 @@ public class BookInfoServiceTest {
                 Assertions.assertThat(bookInfoDto).isNotNull();
                 Assertions.assertThat(bookInfoDto.getTitle()).isEqualTo(bookInfo.getTitle());
             }
-        }
 
-        @Nested
-        @DisplayName("실패 케이스")
-        public class Fail {
             @Test
             @DisplayName("책 정보가 한 개도 없을 경우")
             void getAllBookInfoEmptyTest() {
@@ -258,6 +254,11 @@ public class BookInfoServiceTest {
                 // 빈 페이지가 반환되는지 확인합니다.
                 Assertions.assertThat(bookInfoList.getContent()).isEmpty();
             }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        public class Fail {
         }
     }
 
@@ -295,7 +296,7 @@ public class BookInfoServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("책 정보가 없을 때")
+            @DisplayName("id에 해당하는 책 정보가 없을 때 예외 발생")
             void deleteBookInfoFail() {
                 // Given
                 when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.empty());

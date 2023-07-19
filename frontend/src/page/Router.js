@@ -16,6 +16,7 @@ import NotFound from '../component/NotFound';
 import LendingPage from './LendingPage';
 import LendingHistoryPage from './LendingHistoryPage';
 import AddBookPage from './AddBookPage';
+import RequestBookPage from './RequestBookPage';
 import ManagingBookPage from './ManagingBookPage';
 import ManageingMemeberPage from './ManagingMemeberPage';
 import ManagingCategoryPage from './ManagingCategoryPage';
@@ -44,6 +45,7 @@ function AdminRoutes() {
       <Route path="" element={<LendingPage />} />
       <Route path="lending" element={<LendingPage />} />
       <Route path="addbook" element={<AddBookPage />} />
+      <Route path="requestbook" element={<RequestBookPage />} />
       <Route path="lending-history" element={<LendingHistoryPage />} />
       <Route path="book-stock" element={<ManagingBookPage />} />
       <Route path="category" element={<ManagingCategoryPage />} />
