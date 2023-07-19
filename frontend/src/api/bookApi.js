@@ -15,7 +15,6 @@ const postAddBook = async (
   donator,
   status
 ) => {
-  console.log('category:', category);
   const res = await axios.post(
     serverIp + '/admin/book/create',
     {
@@ -37,6 +36,33 @@ const postAddBook = async (
   return res.data;
 };
 
+const postRequestBookApi = async (
+  title,
+  image,
+  author,
+  publisher,
+  publishedAt,
+  isbn,
+  category
+) => {
+  const res = await axios.post(
+    serverIp + '/admin/request-book/create',
+    {
+      title: title,
+      image: image,
+      author: author,
+      publisher: publisher,
+      publishedAt: publishedAt,
+      isbn: isbn,
+      categoryName: category,
+    },
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return res.data;
+};
+
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
 const getBookListApi = async (search, page, size, category, sort) => {
   console.log(search, page, size, category, sort);
@@ -44,13 +70,37 @@ const getBookListApi = async (search, page, size, category, sort) => {
     params: {
       search: search,
       page: page === null ? 0 : page,
-      size: size === null ? 2 : size,
+      size: size === null ? 10 : size,
       category: category,
       sort: sort,
     },
   });
 
-  return res.data; // 최신화 위해 역순으로 정렬.
+  return res.data;
+};
+
+const getRequestBookListApi = async (
+  search,
+  page,
+  size,
+  category,
+  sort,
+  approved
+) => {
+  console.log(search, page, size, category, sort);
+  const res = await axios.get(serverIp + '/admin/request-book/all', {
+    params: {
+      search: search,
+      page: page === null ? 0 : page,
+      size: size === null ? 10 : size,
+      approved: approved,
+      category: category,
+      sort: sort,
+    },
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+
+  return res.data;
 };
 
 const getLendingListApi = async (
@@ -75,10 +125,10 @@ const getLendingListApi = async (
   return res.data; // 최신화 위해 역순으로 정렬.
 };
 
-const getBookByCallSignApi = async callSign => {
-  const res = await axios.get(serverIp + '/admin/book/callsign', {
+const getBookByCallSignApi = async callsign => {
+  const res = await axios.get(serverIp + `/admin/book/callsign`, {
     params: {
-      callsign: callSign,
+      callsign: callsign,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });
@@ -91,7 +141,7 @@ const getBookInfoByIdApi = async id => {
 };
 
 const addBookByIsbnApi = async isbn => {
-  const res = await axios.get(serverIp + '/admin/bookinfo/isbn', {
+  const res = await axios.get(serverIp + `/admin/bookinfo/isbn`, {
     params: {
       isbn: isbn,
     },
@@ -175,10 +225,10 @@ const getMeLendingHistoryListApi = async (
   return res.data;
 };
 
-const getLendgingInfoApi = async callSign => {
-  const res = await axios.get(serverIp + '/admin/lending/callsign', {
+const getLendgingInfoApi = async callsign => {
+  const res = await axios.get(serverIp + `/admin/lending/callsign`, {
     params: {
-      callSign: callSign,
+      callsign: callsign,
     },
     headers: { authorization: `Bearer ${accessToken}` },
   });
@@ -189,6 +239,16 @@ const deleteBookApi = async id => {
   const res = await axios.delete(serverIp + `/admin/book/${id}/delete`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
+  return res.data;
+};
+
+const deleteRequestBookApi = async id => {
+  const res = await axios.delete(
+    serverIp + `/admin/request-book/${id}/delete`,
+    {
+      headers: { authorization: `Bearer ${accessToken}` },
+    }
+  );
   return res.data;
 };
 
@@ -206,4 +266,7 @@ export {
   getMeLendingHistoryListApi,
   getLendgingInfoApi,
   deleteBookApi,
+  postRequestBookApi,
+  getRequestBookListApi,
+  deleteRequestBookApi,
 };

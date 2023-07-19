@@ -84,7 +84,7 @@ public class BookServiceTest {
     }
 
     @Nested
-    @DisplayName("도서 추가")
+    @DisplayName("책 추가")
     public class CreateBookTest {
         @Nested
         @DisplayName("성공 케이스")
@@ -156,33 +156,16 @@ public class BookServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("callSign이 이미 존재하는 경우")
+            @DisplayName("청구기호가 이미 존재하는 경우 예외 발생")
             public void createBookWithExistingCallSignTest() {
                 // Given
                 // callSign이 존재하는 경우
                 when(bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())).thenReturn(true);
 
-                // When
-                // Then
+                // When & Then
                 assertThrows(RestApiException.class, () -> {
                     bookService.createBook(requestBookWithBookInfoDto);
                 });
-            }
-
-            @Test
-            @DisplayName("청구기호가 중복되는 경우 예외처리")
-            public void createBookWithDuplicateCallSignTest() {
-                // Given
-                RequestBookWithBookInfoDto requestBookWithBookInfoDto = new RequestBookWithBookInfoDto();
-                requestBookWithBookInfoDto.updateCallSign("duplicateCallSign");
-
-                when(bookRepo.existsByCallSign(requestBookWithBookInfoDto.getCallSign())).thenReturn(true);
-
-                // Then
-                assertThrows(RestApiException.class, () -> {
-                    // When
-                    bookService.createBook(requestBookWithBookInfoDto);
-                }, "청구기호가 중복되는 경우 예외를 던져야 합니다.");
             }
         }
     }
@@ -194,7 +177,7 @@ public class BookServiceTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("ID로 도서 조회")
+            @DisplayName("ID로 책 조회")
             public void getBookByValidIdTest() {
                 // Given
                 Long validBookId = 1L;  // 존재하는 책 ID로 가정
@@ -232,7 +215,7 @@ public class BookServiceTest {
             }
 
             @Test
-            @DisplayName("청구기호로 도서 조회")
+            @DisplayName("청구기호로 책 조회")
             public void getBookByValidCallSignTest() {
                 // Given
                 RequestCallsignDto requestCallsignDto = RequestCallsignDto.builder()
@@ -287,11 +270,10 @@ public class BookServiceTest {
 
                 when(bookRepo.findById(invalidBookId)).thenReturn(Optional.empty());
 
-                // Then
+                // When & Then
                 assertThrows(RestApiException.class, () -> {
-                    // When
                     bookService.getBookById(invalidBookId);
-                }, "존재하지 않는 책 ID로 조회하면 RestApiException을 던져야 합니다.");
+                });
             }
 
             @Test
@@ -311,13 +293,13 @@ public class BookServiceTest {
     }
 
     @Nested
-    @DisplayName("도서 수정")
+    @DisplayName("책 수정")
     public class UpdateBookTest {
         @Nested
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("도서 정보 수정")
+            @DisplayName("책 및 책 정보 수정")
             public void updateBookTest() {
                 // Given
                 Long existingBookId = 1L;  // 존재하는 책 ID로 가정
@@ -328,7 +310,7 @@ public class BookServiceTest {
                 RequestBookWithBookInfoDto requestDto = requestBookWithBookInfoDto;
                 // 기타 필요한 BookInfo 정보를 requestDto에 설정
 
-                Book mockBook = Book.builder()
+                Book book = Book.builder()
                         .id(existingBookId)
                         .callSign(callSign)
                         .status(BookStatus.valueOf(status))
@@ -336,14 +318,14 @@ public class BookServiceTest {
                         .lendingStatus(false)
                         .bookInfo(new BookInfo())  // 기타 필요한 BookInfo 정보 설정
                         .build();
-                mockBook.setCreatedAt(LocalDateTime.now());
-                mockBook.setUpdatedAt(LocalDateTime.now());
+                book.setCreatedAt(LocalDateTime.now());
+                book.setUpdatedAt(LocalDateTime.now());
 
-                when(bookRepo.findById(existingBookId)).thenReturn(Optional.of(mockBook));
+                when(bookRepo.findById(existingBookId)).thenReturn(Optional.of(book));
                 when(bookRepo.existsByCallSignAndIdIsNot(callSign, existingBookId)).thenReturn(false);
                 when(categoryRepo.findByCategoryName(any())).thenReturn(Optional.of(Category.builder().categoryName("총류").build()));
-                when(bookRepo.save(any(Book.class))).thenReturn(mockBook);
-                when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(mockBook.getBookInfo());
+                when(bookRepo.save(any(Book.class))).thenReturn(book);
+                when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(book.getBookInfo());
 
                 // When
                 ResponseBookWithBookInfoDto actualResponse = bookService.updateBook(requestDto);
@@ -402,13 +384,13 @@ public class BookServiceTest {
     }
 
     @Nested
-    @DisplayName("도서 삭제")
+    @DisplayName("책 삭제")
     public class DeleteBookTest {
         @Nested
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("도서 삭제")
+            @DisplayName("id로 책 삭제")
             public void deleteBookTest() {
                 // Given
                 Long existingBookId = 1L;  // 존재하는 책 ID로 가정
@@ -438,7 +420,7 @@ public class BookServiceTest {
         @DisplayName("실패 케이스")
         public class Fail {
             @Test
-            @DisplayName("책을 찾을 수 없는 경우 예외를 반환")
+            @DisplayName("id에 해당하는 책을 찾을 수 없는 경우 예외를 반환")
             public void deleteBookNotFoundTest() {
                 // Given
                 when(bookRepo.findById(anyLong())).thenReturn(Optional.empty());
@@ -451,7 +433,7 @@ public class BookServiceTest {
             }
 
             @Test
-            @DisplayName("대여 중인 책을 삭제하려는 경우 예외를 반환")
+            @DisplayName("책이 대여중울 때 삭제하려는 경우 예외를 반환")
             public void deleteBookInUseTest() {
                 // Given
                 Long existingBookId = 1L;  // 존재하는 책 ID로 가정

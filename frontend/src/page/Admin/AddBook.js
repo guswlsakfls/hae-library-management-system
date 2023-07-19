@@ -1,7 +1,11 @@
 import DefaultButton from '../../component/common/DefaultButton';
 import InputBar from '../../component/common/InputBar';
 import { useEffect, useState } from 'react';
-import { addBookByIsbnApi, postAddBook } from '../../api/BookApi';
+import {
+  addBookByIsbnApi,
+  postAddBook,
+  postRequestBookApi,
+} from '../../api/BookApi';
 import PostInputBar from '../../component/common/PostInputBar';
 import SelectBar from '../../component/common/SelectBar';
 import { getCategoryListApi } from '../../api/CategoryApi';
@@ -28,6 +32,7 @@ export default function AddBook() {
   const [donator, setDonator] = useState('');
   const [status, setStatus] = useState('FINE');
   const [categoryList, setCategoryList] = useState([]);
+  const [transactionType, setTransactionType] = useState('add'); // 'add', 'order'
 
   // ISBN을 가지고 도서 정보를 요청하는 함수
   const handleSearch = async isbn => {
@@ -60,7 +65,6 @@ export default function AddBook() {
       });
     } catch (err) {
       alert(err.response.data.message);
-      console.log(err.response.data);
       let errors = err.response.data.errors;
       if (!errors) {
         setTitle('');
@@ -125,6 +129,42 @@ export default function AddBook() {
       });
   };
 
+  const handleRequestBook = () => {
+    postRequestBookApi(
+      title,
+      image,
+      author,
+      publisher,
+      publishedAt,
+      isbn,
+      category
+    )
+      .then(res => {
+        console.log(res);
+        alert(res.message);
+        window.location.reload();
+      })
+      .catch(err => {
+        alert(err.response.data.message);
+        setTitle('');
+        setImage('');
+        setAuthor('');
+        setPublisher('');
+        setPublishedAt('');
+        setIsbn('');
+        setBookList([]);
+
+        let errors = err.response.data.errors;
+        if (!errors) {
+          return;
+        }
+        let errorMessages = errors
+          .map((error, index) => `${index + 1}. ${error.message}`)
+          .join('\n\n');
+        alert(errorMessages);
+      });
+  };
+
   console.log(category);
   console.log(status);
 
@@ -143,7 +183,29 @@ export default function AddBook() {
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
       <div className="flex justify-center items-center my-10 mx-48">
-        <h1 className="text-4xl font-bold">도서 추가</h1>
+        <h1 className="text-4xl font-bold">도서 추가 / 구매 요청</h1>
+      </div>
+      <div className="flex justify-center items-center my-10 mx-48 text-2xl">
+        <select
+          value={transactionType}
+          onChange={e => {
+            setTransactionType(e.target.value);
+            setTitle('');
+            setImage('');
+            setAuthor('');
+            setPublisher('');
+            setPublishedAt('');
+            setIsbn('');
+            setCategory('');
+            setCallSign('');
+            setDonator('');
+            setBookList([]);
+            setStatus('');
+          }}
+        >
+          <option value="add">도서 추가</option>
+          <option value="order">도서 구매 요청</option>
+        </select>
       </div>
       <div className="flex justify-center items-center mt-10 mx-48">
         <h1 className="text-2xl font-bold mr-6">도서 검색</h1>
@@ -259,41 +321,53 @@ export default function AddBook() {
               items={categoryList.map(cat => cat.categoryName)}
             ></SelectBar>
           </div>
-          <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-xl font-medium leading-6 text-gray-900">
-              도서 상태
-            </dt>
-            <SelectBar
-              value={status}
-              onChange={e => setStatus(e.target.value)}
-              items={bookStatus}
-            ></SelectBar>
-          </div>
-          <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-xl font-medium leading-6 text-gray-900">
-              청구기호
-            </dt>
-            <InputBar
-              value={callSign}
-              onChange={e => setCallSign(e.target.value)}
-            />
-          </div>
-          <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-xl font-medium leading-6 text-gray-900">
-              기부자
-            </dt>
-            <InputBar
-              value={donator}
-              onChange={e => setDonator(e.target.value)}
-            />
-          </div>
+          {transactionType === 'add' ? (
+            <>
+              <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-xl font-medium leading-6 text-gray-900">
+                  도서 상태
+                </dt>
+                <SelectBar
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                  items={bookStatus}
+                ></SelectBar>
+              </div>
+              <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-xl font-medium leading-6 text-gray-900">
+                  청구기호
+                </dt>
+                <InputBar
+                  value={callSign}
+                  onChange={e => setCallSign(e.target.value)}
+                />
+              </div>
+              <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-xl font-medium leading-6 text-gray-900">
+                  기부자
+                </dt>
+                <InputBar
+                  value={donator}
+                  onChange={e => setDonator(e.target.value)}
+                />
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
-      <div className="flex justify-center items-center my-10 mx-48">
-        <DefaultButton size="large" click={handleAddBook}>
-          도서 추가
-        </DefaultButton>
-      </div>
+      {transactionType === 'add' ? (
+        <div className="flex justify-center items-center my-10 mx-48">
+          <DefaultButton color={'blue'} size="large" click={handleAddBook}>
+            도서 추가
+          </DefaultButton>
+        </div>
+      ) : (
+        <div className="flex justify-center items-center my-10 mx-48">
+          <DefaultButton color={'blue'} size="large" click={handleRequestBook}>
+            도서 구매 요청
+          </DefaultButton>
+        </div>
+      )}
     </main>
   );
 }

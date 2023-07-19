@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Dropdown from '../../component/common/Dropdown';
 import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
@@ -32,7 +31,7 @@ export default function ManagingBook() {
   const [bookStockList, setBookStockList] = useState([]); // 도서 목록을 저장하는 state
   const [bookInfoList, setBookInfoList] = useState([]);
   const [total, setTotal] = useState(0);
-  const [category, setCategory] = useState('전체');
+  const [category, setCategory] = useState('');
   const [sort, setSort] = useState('최신도서');
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
@@ -514,7 +513,7 @@ export default function ManagingBook() {
                       카테고리
                     </label>
                     <select
-                      id="categoryName"
+                      id="category"
                       name="category"
                       className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md text-gray-500"
                       value={editBook.category}

@@ -53,7 +53,7 @@ export default function ManagingMember() {
   const checkToggleModal = id => {
     if (
       window.confirm(
-        '삭제하시겠습니까?\n주위! 관련된 데이터가 모두 삭제되고 복수할 수 없습니다.'
+        '삭제하시겠습니까?\n주위! 관련된 데이터가 모두 삭제되고 복구할 수 없습니다.'
       )
     ) {
       // '확인' 버튼을 눌렀을 때의 로직을 여기에 작성하세요.
@@ -177,7 +177,7 @@ export default function ManagingMember() {
           : '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
-        {member.lendingCount === 0 ? '-' : member.lendingCount + ' / 3'}
+        {member.lendingCount === 0 ? '-' : member.lendingCount + ' / 3' + ' 권'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {member.createdAt}
