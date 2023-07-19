@@ -66,7 +66,9 @@ export default function AddBook() {
                 res.data.bookList[0].callSign.slice(0, -1);
               return callSignWithoutLastChar;
             } else {
-              return categorySet[category] + '.' + isbn.slice(-3) + '.c';
+              return (
+                categorySet[res.data.category] + '.' + isbn.slice(-3) + '.c'
+              );
             }
           }
           return res.data.callSign + '.c';

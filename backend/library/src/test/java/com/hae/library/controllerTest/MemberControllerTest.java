@@ -259,7 +259,7 @@ public class MemberControllerTest {
             @DisplayName("회원 정보 수정 시 정보 수정")
             public void updateMemberTest() throws Exception {
                 // Given
-                String requestUrl = "/api/member/update";
+                String requestUrl = "/api/admin/member/update";
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("change@gmail.com")

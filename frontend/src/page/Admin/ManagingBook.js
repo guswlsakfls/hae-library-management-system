@@ -36,6 +36,7 @@ export default function ManagingBook() {
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
   const [categoryList, setCategoryList] = useState([]);
+  const [modifyCategoryList, setModifyCategoryList] = useState([]);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
@@ -158,6 +159,7 @@ export default function ManagingBook() {
     getCategoryListApi()
       .then(res => {
         setCategoryList([{ value: 0, categoryName: '전체' }, ...res.data]);
+        setModifyCategoryList([...res.data]);
       })
       .catch(err => {
         alert('카테고리 목록을 불러오는데 실패했습니다.');
@@ -502,7 +504,7 @@ export default function ManagingBook() {
                       value={editBook.category}
                       onChange={handleInputChange}
                     >
-                      {categoryList.map((category, index) => (
+                      {modifyCategoryList.map((category, index) => (
                         <option key={index} value={category.categoryName}>
                           {category.categoryName}
                         </option>

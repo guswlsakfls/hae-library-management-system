@@ -111,32 +111,35 @@ public class BookInfoServiceTest {
 
         }
 
-        @Test
-        @DisplayName("카테고리가 없으면 책 정보를 생성하지 못해 예외 발생")
-        void createBookInfoFail_NoCategory() {
-            // Given
-            // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
-            RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
-                    .title(requestBookWithBookInfoDto.getTitle())
-                    .author(requestBookWithBookInfoDto.getAuthor())
-                    .isbn(requestBookWithBookInfoDto.getIsbn())
-                    .image(requestBookWithBookInfoDto.getImage())
-                    .publisher(requestBookWithBookInfoDto.getPublisher())
-                    .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
-                    .build();
+        @Nested
+        @DisplayName("실패 케이스")
+        public class Fail {
+            @Test
+            @DisplayName("카테고리가 없으면 책 정보를 생성하지 못해 예외 발생")
+            void createBookInfoFail_NoCategory() {
+                // Given
+                // 카테고리가 없을 경우, Optional.empty()를 반환합니다.
+                RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
+                        .title(requestBookWithBookInfoDto.getTitle())
+                        .author(requestBookWithBookInfoDto.getAuthor())
+                        .isbn(requestBookWithBookInfoDto.getIsbn())
+                        .image(requestBookWithBookInfoDto.getImage())
+                        .publisher(requestBookWithBookInfoDto.getPublisher())
+                        .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
+                        .build();
 
-            when(categoryRepo.findByCategoryName(requestBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
+                when(categoryRepo.findByCategoryName(requestBookInfoDto.getCategoryName())).thenReturn(Optional.empty());
 
-            // When
-            Exception exception = assertThrows(RestApiException.class, () -> {
-                bookInfoService.createBookInfo(requestBookInfoDto);
-            });
+                // When
+                Exception exception = assertThrows(RestApiException.class, () -> {
+                    bookInfoService.createBookInfo(requestBookInfoDto);
+                });
 
-            // Then
-            // 출력되는 에러코드가 맞는지 확인합니다.
-            Assertions.assertThat(((RestApiException) exception).getErrorCode().getMessage()).contains(BookErrorCode.CATEGORY_NOT_FOUND.getMessage());
+                // Then
+                // 출력되는 에러코드가 맞는지 확인합니다.
+                Assertions.assertThat(((RestApiException) exception).getErrorCode().getMessage()).contains(BookErrorCode.CATEGORY_NOT_FOUND.getMessage());
+            }
         }
-
     }
 
     @Nested
