@@ -44,8 +44,6 @@ const memberLoginApi = async (email, password) => {
 };
 
 const updateMemberApi = async editMember => {
-  console.log(editMember);
-
   const res = await axios.put(
     serverIp + `/admin/member/update`,
     {

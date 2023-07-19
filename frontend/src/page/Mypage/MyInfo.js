@@ -43,7 +43,6 @@ export default function MyInfo() {
     }
     updateNewPasswordApi(nowPassword, newPassword)
       .then(res => {
-        console.log(res);
         alert('비밀번호가 변경되었습니다.');
         modifyToggleModal();
       })
@@ -56,7 +55,6 @@ export default function MyInfo() {
     if (window.confirm('회원탈퇴 하시겠습니까?')) {
       putMemberWidthdrawalApi()
         .then(res => {
-          console.log(res);
           alert('회원탈퇴가 완료되었습니다.');
           localStorage.removeItem('accessToken');
           window.location.href = '/';
@@ -70,11 +68,9 @@ export default function MyInfo() {
   useEffect(() => {
     getMyInfoApi()
       .then(res => {
-        console.log(res);
         setMyInfo(res.data);
       })
       .catch(err => {
-        console.log(err);
         alert('로그인이 필요합니다.');
         window.location.href = '/login';
       });

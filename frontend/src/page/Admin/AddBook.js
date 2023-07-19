@@ -19,6 +19,19 @@ const statusText = {
 const bookStatus = ['FINE', 'BREAK', 'LOST'];
 
 export default function AddBook() {
+  const categorySet = {
+    총류: '000',
+    철학: '100',
+    종교: '200',
+    사회과학: '300',
+    순수과학: '400',
+    기술과학: '500',
+    예술: '600',
+    언어: '700',
+    문학: '800',
+    역사: '900',
+  };
+
   const [bookList, setBookList] = useState([]);
 
   const [title, setTitle] = useState('');
@@ -39,7 +52,6 @@ export default function AddBook() {
     try {
       await addBookByIsbnApi(isbn).then(res => {
         console.log(res.data);
-
         setTitle(res.data.title);
         setImage(res.data.image);
         setAuthor(res.data.author);
@@ -54,7 +66,7 @@ export default function AddBook() {
                 res.data.bookList[0].callSign.slice(0, -1);
               return callSignWithoutLastChar;
             } else {
-              return ''; // or any default value
+              return categorySet[category] + '.' + isbn.slice(-3) + '.c';
             }
           }
           return res.data.callSign + '.c';
@@ -140,7 +152,6 @@ export default function AddBook() {
       category
     )
       .then(res => {
-        console.log(res);
         alert(res.message);
         window.location.reload();
       })
@@ -165,17 +176,12 @@ export default function AddBook() {
       });
   };
 
-  console.log(category);
-  console.log(status);
-
   useEffect(() => {
     getCategoryListApi()
       .then(res => {
-        console.log(res);
         setCategoryList(res.data);
       })
       .catch(err => {
-        console.log(err);
         alert('카테고리 목록을 불러오는데 실패했습니다.');
       });
   }, []);

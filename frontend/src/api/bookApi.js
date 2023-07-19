@@ -65,7 +65,6 @@ const postRequestBookApi = async (
 
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
 const getBookListApi = async (search, page, size, category, sort) => {
-  console.log(search, page, size, category, sort);
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
       search: search,
@@ -87,7 +86,6 @@ const getRequestBookListApi = async (
   sort,
   approved
 ) => {
-  console.log(search, page, size, category, sort);
   const res = await axios.get(serverIp + '/admin/request-book/all', {
     params: {
       search: search,
@@ -110,7 +108,6 @@ const getLendingListApi = async (
   isLendingOrReturning,
   sort
 ) => {
-  console.log(search, page, size, isLendingOrReturning, sort);
   const res = await axios.get(serverIp + '/admin/lending/all', {
     params: {
       search: search,
@@ -184,7 +181,6 @@ const getBookStockListApi = async id => {
 };
 
 const updateBookStockApi = async editBook => {
-  console.log(editBook);
   const res = await axios.put(
     serverIp + '/admin/book/update',
     {

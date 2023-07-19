@@ -1,5 +1,4 @@
 export default function SelectBar(props) {
-  console.log(props.items);
   let width = props.width ? props.width : '100'; // 기본값을 '40'으로 설정
   return (
     <div className="flex justify-center">

@@ -36,16 +36,15 @@ export default function MyLendingHistory() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
       })
       .catch(err => {
         if (err.response.status === 401 || err.response.status === 403) {
           alert('로그인이 필요합니다.');
           window.location.href = '/login';
           return;
+
+          alert(err.response.data.message);
         }
-        console.log(err.response);
-        alert(err.response.data.message);
       });
   }, [search, page, size, isLendingOrReturning, sort]);
 

@@ -4,7 +4,6 @@ const serverIp = 'http://localhost:8080/api';
 const accessToken = localStorage.getItem('accessToken');
 
 const createCategoryApi = async name => {
-  console.log(name);
   const res = await axios.post(
     serverIp + '/admin/category/create',
     {

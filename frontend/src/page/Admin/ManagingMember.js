@@ -47,7 +47,6 @@ export default function ManagingMember() {
   const handleEditClick = member => {
     setEditMember(member);
     modifyToggleModal();
-    console.log(member);
   };
 
   const checkToggleModal = id => {
@@ -59,12 +58,10 @@ export default function ManagingMember() {
       // '확인' 버튼을 눌렀을 때의 로직을 여기에 작성하세요.
       deleteMemberApi(id)
         .then(res => {
-          console.log(res);
           alert(res.message);
           window.location.reload();
         })
         .catch(err => {
-          console.log(err.response);
           if (err.response.status === 401 || err.response.status === 403) {
             alert('로그인이 필요합니다.');
             window.location.href = '/login';
@@ -88,7 +85,6 @@ export default function ManagingMember() {
     setSearchParams({ search, page: page, size, role, sort });
   };
   const handleInputChange = event => {
-    console.log(event.target.name, event.target.value);
     const { name } = event.target;
     let value = event.target.value; // 'let' 키워드 사용
 
@@ -106,20 +102,17 @@ export default function ManagingMember() {
         };
       }
     });
-    console.log(editMember);
   };
 
   const onSubmit = e => {
     if (window.confirm('수정하시겠습니까?')) {
       updateMemberApi(editMember)
         .then(res => {
-          console.log(res);
           alert(res.message);
           modifyToggleModal();
           window.location.reload();
         })
         .catch(err => {
-          console.log(err.response);
           if (err.response.status === 401 || err.response.status === 403) {
             alert('로그인이 필요합니다.');
             window.location.href = '/login';
@@ -145,7 +138,6 @@ export default function ManagingMember() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
       })
       .catch(err => {
         if (err.response.status === 401 || err.response.status === 403) {
@@ -153,7 +145,6 @@ export default function ManagingMember() {
           window.location.href = '/login';
           return;
         }
-        console.log(err.response);
         alert(err.response.data.message);
       });
   }, [search, page, size, role, sort]);
