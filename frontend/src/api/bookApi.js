@@ -182,7 +182,7 @@ const getBookStockListApi = async id => {
 
 const updateBookStockApi = async editBook => {
   const res = await axios.put(
-    serverIp + '/admin/book/update',
+    serverIp + '/admin/book',
     {
       id: editBook.id,
       title: editBook.title,

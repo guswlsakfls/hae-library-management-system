@@ -58,10 +58,7 @@ export default function BookList() {
       </div>
       <div className="flex flex-wrap items-center my-10 mx-72">
         <h1 className="sm:text-sm lg:text-2xl font-bold mx-4">도서 검색</h1>
-        <SearchBar
-          text="제목 또는 저자를 입력해 주세요."
-          url="booklist"
-        ></SearchBar>
+        <SearchBar text="제목을 입력해 주세요." url="booklist"></SearchBar>
         <div className="flex mx-4 mt-2">
           <SelectBar
             value={category}
