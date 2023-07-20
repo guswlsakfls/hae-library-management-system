@@ -14,7 +14,6 @@ export default function Login() {
         window.location.href = '/login';
       })
       .catch(err => {
-        console.log(err.response);
         alert(err.response.data.message);
         let errors = err.response.data.errors;
         if (!errors) {

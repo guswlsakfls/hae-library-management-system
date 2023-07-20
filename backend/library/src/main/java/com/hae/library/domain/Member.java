@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// 회원 정보를 저장하는 클래스입니다.
+// 회원 정보를 저장하는 클래스입니다
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 30)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String password;
 
     @Column(name = "penalty_end_date")

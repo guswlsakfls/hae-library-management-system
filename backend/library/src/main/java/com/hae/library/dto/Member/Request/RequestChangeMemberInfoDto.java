@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+// 회원 정보 변경에 대한 요청 DTO입니다
 @Getter
 @NoArgsConstructor
 public class RequestChangeMemberInfoDto {

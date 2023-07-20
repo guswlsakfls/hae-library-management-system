@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 비밀번호 변경에 대한 요청 DTO입니다
 @Getter
 @NoArgsConstructor
 public class RequestChangePasswordDto {

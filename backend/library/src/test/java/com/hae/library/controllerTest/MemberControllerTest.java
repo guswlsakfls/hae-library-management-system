@@ -259,7 +259,7 @@ public class MemberControllerTest {
             @DisplayName("회원 정보 수정 시 정보 수정")
             public void updateMemberTest() throws Exception {
                 // Given
-                String requestUrl = "/api/member/update";
+                String requestUrl = "/api/admin/member";
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("change@gmail.com")
@@ -288,7 +288,7 @@ public class MemberControllerTest {
             @DisplayName("변경하려는 이메일이 중복되는 경우 예외 발생")
             public void duplicateEmailTest() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/member/update";
+                String requestUrl = "/api/admin/member";
                 RequestChangeMemberInfoDto requestChangeMemberInfoDto = RequestChangeMemberInfoDto.builder()
                         .id(1L)
                         .email("tes1@gmail.com")

@@ -29,9 +29,9 @@ public class RequestBookController {
      * @param requestBookInfoDto
      * @return 도서 구매 요청 성공 여부
      */
-    @PostMapping(value = "/admin/request-book/create")
+    @PostMapping(value = "/admin/request-book")
     public ResponseResultDto<Object> createRequestBook(@RequestBody @Valid RequestBookInfoDto requestBookInfoDto) {
-        log.info("도서 구매 요청: [POST] /request-book/create");
+        log.info("도서 구매 요청: [POST] /request-book");
         requestBookService.createRequestBook(requestBookInfoDto);
 
         log.info("도서 구매 요청에 성공하였습니다");
@@ -95,9 +95,9 @@ public class RequestBookController {
      * @param requestBookId
      * @return "도서 구매 요청 삭제에 성공하였습니다" 메시지
      */
-    @DeleteMapping(value = "/admin/request-book/{requestBookId}/delete")
+    @DeleteMapping(value = "/admin/request-book/{requestBookId}")
     public ResponseResultDto<Object> deleteRequestBook(@PathVariable Long requestBookId) {
-        log.info("도서 구매 요청 삭제: [DELETE] /request-book/delete/{}", requestBookId);
+        log.info("도서 구매 요청 삭제: [DELETE] /request-book/{}", requestBookId);
         requestBookService.deleteRequestBook(requestBookId);
 
         log.info("도서 구매 요청 삭제에 성공하였습니다");

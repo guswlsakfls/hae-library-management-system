@@ -73,7 +73,6 @@ public class CategoryService {
     public void updateCategory(RequestUpdateCategoryDto categoryDto) {
         // 카테고리가 중복되면 예외를 발생시킵니다.
         if (categoryRepo.existsByCategoryName(categoryDto.getUpdatedCategoryName())) {
-            log.error("카테고리가 중복됩니다.");
             throw new RestApiException(CategoryErrorCode.DUPLICATE_CATEGORY);
         }
 
@@ -109,7 +108,7 @@ public class CategoryService {
         }
 
         // 참조하는 도서가 없으면 카테고리를 삭제합니다.
-        categoryRepo.deleteById(categoryId);
+        categoryRepo.delete(category);
     }
 
 }

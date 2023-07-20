@@ -3,6 +3,7 @@ package com.hae.library.dto.Lending.Response;
 import com.hae.library.domain.Lending;
 import lombok.Getter;
 
+// 대출 조회에 대한 응답 DTO입니다
 @Getter
 public class ResponseLendingDto {
     private Long id;

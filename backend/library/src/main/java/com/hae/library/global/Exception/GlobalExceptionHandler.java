@@ -71,16 +71,10 @@ public class GlobalExceptionHandler {
 
 
     // ConstraintViolationException 타입의 예외를 처리하는 메소드입니다.
-    // 이 메소드는 발생한 ConstraintViolationException을 인자로 받아,
-    // ErrorCode를 사용하여 해당 오류의 HttpStatus를 설정하고,
-    // 에러 메시지를 JSON 형태로 변환하여 ResponseEntity에 담아 반환합니다.
     private ResponseEntity<Object> handleExceptionInternal(ConstraintViolationException e, ErrorCode errorCode) {
-        // 발생한 예외로부터 첫 번째 ConstraintViolation 메시지를 가져옵니다.
         String error = e.getConstraintViolations().iterator().next().getMessage();
         log.info("ConstraintViolationException : {}", error);
 
-        // HttpStatus, 콘텐츠 타입, 바디에 ErrorResponse를 설정하여 ResponseEntity를 생성하고 반환합니다.
-        // ErrorResponse는 ErrorCode와 error 메시지를 사용하여 만들어집니다.
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(makeErrorResponse(errorCode, error));

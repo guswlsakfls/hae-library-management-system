@@ -125,7 +125,7 @@ public class MemberContorller {
      * @param requestChangeMemberInfoDto
      * @return 수정된 회원 정보
      */
-    @PutMapping(value = "/admin/member/update")
+    @PutMapping(value = "/admin/member")
     public ResponseResultDto<Object> modifyMemberInfo(@RequestBody @Valid RequestChangeMemberInfoDto requestChangeMemberInfoDto) {
         log.info("회원 정보 수정: [PUT] /member/update - {}", requestChangeMemberInfoDto.toString());
         ResponseMemberDto responseMemberDto =
@@ -181,9 +181,9 @@ public class MemberContorller {
      * @param memberId
      * @return "회원 삭제에 성공하였습니다" 메시지
      */
-    @DeleteMapping(value = "/admin/member/{memberId}/delete")
+    @DeleteMapping(value = "/admin/member/{memberId}")
     public ResponseResultDto<Object> deleteMember(@PathVariable Long memberId) {
-        log.info("회원 삭제: [DELETE] /member/delete - {}", memberId);
+        log.info("회원 삭제: [DELETE] /member - {}", memberId);
         memberService.deleteMember(memberId);
 
         log.info("회원 삭제에 성공하였습니다");

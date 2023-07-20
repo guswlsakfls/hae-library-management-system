@@ -115,7 +115,7 @@ public class BookControllerTest {
             @DisplayName("도서 등록 성공")
             public void createBookSuccess() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/book/create";
+                String requestUrl = "/api/admin/book";
                 String callSign = "111.111-11-11.c100";
                 String isbn = "1234567890113";
                 String title = "테스트용 책 제목";
@@ -150,7 +150,7 @@ public class BookControllerTest {
             @DisplayName("청구기호가 중복되는 경우 예외 발생")
             public void testCreateBookFailBecauseAlreadyExistBook() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/book/create";
+                String requestUrl = "/api/admin/book";
                 String callSign = "111.111-11-11.c1";
                 String isbn = "1234567890123";
                 String title = "테스트용 책 제목";
@@ -243,7 +243,7 @@ public class BookControllerTest {
             @DisplayName("도서 수정 성공")
             public void testUpdateBookSuccess() throws Exception {
                 // Given
-                String rquestUrl = "/api/admin/book/update";
+                String rquestUrl = "/api/admin/book";
 
                 // bookId는 @BeforeEach에서 생성
                 String callSign = "111.111-11-11.c100";
@@ -280,7 +280,7 @@ public class BookControllerTest {
             @DisplayName("도서 수정시 이미 존재하는 청구기호로 수정하면 예외 발생")
             public void testUpdateBookFailBecauseDuplicateCallSign() throws Exception {
                 // Given
-                String rquestUrl = "/api/admin/book/update";
+                String rquestUrl = "/api/admin/book";
 
                 // bookId는 @BeforeEach에서 생성
                 String callSign = "111.111-11-11.c2"; // 이미 존재하는 청구기호
@@ -323,7 +323,7 @@ public class BookControllerTest {
             @DisplayName("도서 삭제 성공")
             public void testDeleteBookSuccess() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/book/{bookId}/delete";
+                String requestUrl = "/api/admin/book/{bookId}";
                 String authorizationHeader = "Bearer " + token;
 
                 // When
@@ -343,7 +343,7 @@ public class BookControllerTest {
             @DisplayName("도서 삭제시 청구기호가 존재하지 않으면 예외 발생 ")
             public void testDeleteBookFailBecauseNotExistBook() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/book/{bookId}/delete";
+                String requestUrl = "/api/admin/book/{bookId}";
                 Long bookId = 10000L; // 존재하지 않는 도서의 ID를 적절히 설정해주세요.
                 String authorizationHeader = "Bearer " + token;
 

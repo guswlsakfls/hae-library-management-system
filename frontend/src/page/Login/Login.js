@@ -17,7 +17,6 @@ export default function Login() {
         window.location.href = '/';
       })
       .catch(err => {
-        console.log(err);
         if (err.response.status && err.response.status === 404) {
           alert('아이디와 비밀번호가 일치하지 않습니다.');
         } else if (err.response.status && err.response.status === 400) {

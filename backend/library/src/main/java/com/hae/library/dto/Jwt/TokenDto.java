@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 토큰 응답 DTO입니다
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

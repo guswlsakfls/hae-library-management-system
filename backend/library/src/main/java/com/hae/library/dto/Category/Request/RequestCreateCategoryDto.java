@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 카테고리 생성에 대한 요청 DTO입니다
 @Getter
 @NoArgsConstructor
 public class RequestCreateCategoryDto {

@@ -31,7 +31,7 @@ public class RequestBookApiDto {
         this.result = result;
     }
 
-    // text/json으로 받아온 데이터를 반환값에 맞게 변환 합니다.
+    // text/json로 받아온 데이터를 반환값에 맞게 변환 합니다.
     public ResponseBookInfoWithBookDto toResponseBookInfoWithBookDto() {
         // result 리스트의 첫 번째 항목만 사용합니다.
         String isbn = this.result.get(0).getIsbn();
@@ -48,6 +48,7 @@ public class RequestBookApiDto {
                 .build();
     }
 
+    // 교보문고에서 제공하는 이미지 URL을 생성합니다.
     private String generateImageUrl(String isbn) {
         return String.format("https://image.kyobobook.co.kr/images/book/xlarge/%s/x%s.jpg",
                     isbn.substring(isbn.length() - 3), isbn);

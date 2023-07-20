@@ -6,6 +6,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+// 다른 도메인, 프로토콜 또는 포트에서 실행되는 웹 페이지에서 현재 도메인의 리소스에 접근할 수 있는 권한을 부여합니다.
 @Configuration
 public class CorsConfig {
     @Bean

@@ -101,7 +101,7 @@ public class RequestBookContorllerTest {
     }
 
     @Nested
-    @DisplayName("도서 구매 요청")
+    @DisplayName("도서 구매 요청 생성")
     class RequestBookTest {
         @Nested
         @DisplayName("성공 케이스")
@@ -110,7 +110,7 @@ public class RequestBookContorllerTest {
             @DisplayName("도서 구매 요청을 저장")
             void saveRequestBook() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/request-book/create";
+                String requestUrl = "/api/admin/request-book";
 
                 String isbn = "1234567890113";
                 String title = "테스트용 책 제목";
@@ -150,7 +150,7 @@ public class RequestBookContorllerTest {
             @DisplayName("중복되는 isbn으로 도서 구매 요청시 예외 발생")
             void saveRequestBookWithDuplicateIsbn() throws Exception {
                 // Given
-                String requestUrl = "/api/admin/request-book/create";
+                String requestUrl = "/api/admin/request-book";
 
                 String isbn = "1234567890113";
                 String title = "테스트용 책 제목";
@@ -181,7 +181,7 @@ public class RequestBookContorllerTest {
 
                 // When
                 // 중복된 도서를 구매 요청합니다.
-                ResultActions resultActions = mockMvc.perform(post("/api/admin/request-book/create")
+                ResultActions resultActions = mockMvc.perform(post("/api/admin/request-book")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson)
                                 .header("Authorization", "Bearer " + token));
@@ -240,7 +240,7 @@ public class RequestBookContorllerTest {
                         .member(member)
                         .isApproved(false)
                         .build());
-                String requestUrl = "/api/admin/request-book/" + requestBook.getId() + "/delete";
+                String requestUrl = "/api/admin/request-book/" + requestBook.getId();
 
                 // When
                 ResultActions resultActions = mockMvc.perform(delete(requestUrl)
@@ -260,7 +260,7 @@ public class RequestBookContorllerTest {
             void deleteRequestBook() throws Exception {
                 // Given
                 long nonExistRequestBookId = 1000L;
-                String requestUrl = "/api/admin/request-book/" + nonExistRequestBookId + "/delete";
+                String requestUrl = "/api/admin/request-book/" + nonExistRequestBookId;
 
                 // When
                 ResultActions resultActions = mockMvc.perform(delete(requestUrl)

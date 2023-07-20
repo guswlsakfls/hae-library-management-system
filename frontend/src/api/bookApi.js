@@ -16,7 +16,7 @@ const postAddBook = async (
   status
 ) => {
   const res = await axios.post(
-    serverIp + '/admin/book/create',
+    serverIp + '/admin/book',
     {
       title: title,
       image: image,
@@ -46,7 +46,7 @@ const postRequestBookApi = async (
   category
 ) => {
   const res = await axios.post(
-    serverIp + '/admin/request-book/create',
+    serverIp + '/admin/request-book',
     {
       title: title,
       image: image,
@@ -65,7 +65,6 @@ const postRequestBookApi = async (
 
 // freeBoard 해당 페이지 게시판 리스트 받아오기.
 const getBookListApi = async (search, page, size, category, sort) => {
-  console.log(search, page, size, category, sort);
   const res = await axios.get(serverIp + '/bookinfo/all', {
     params: {
       search: search,
@@ -87,7 +86,6 @@ const getRequestBookListApi = async (
   sort,
   approved
 ) => {
-  console.log(search, page, size, category, sort);
   const res = await axios.get(serverIp + '/admin/request-book/all', {
     params: {
       search: search,
@@ -110,7 +108,6 @@ const getLendingListApi = async (
   isLendingOrReturning,
   sort
 ) => {
-  console.log(search, page, size, isLendingOrReturning, sort);
   const res = await axios.get(serverIp + '/admin/lending/all', {
     params: {
       search: search,
@@ -152,7 +149,7 @@ const addBookByIsbnApi = async isbn => {
 
 const lendingBookApi = async (bookId, userId, lendingCondition) => {
   const res = await axios.post(
-    serverIp + '/admin/lending/create',
+    serverIp + '/admin/lending',
     {
       bookId: bookId,
       userId: userId,
@@ -184,9 +181,8 @@ const getBookStockListApi = async id => {
 };
 
 const updateBookStockApi = async editBook => {
-  console.log(editBook);
   const res = await axios.put(
-    serverIp + '/admin/book/update',
+    serverIp + '/admin/book',
     {
       id: editBook.id,
       title: editBook.title,
@@ -236,19 +232,16 @@ const getLendgingInfoApi = async callsign => {
 };
 
 const deleteBookApi = async id => {
-  const res = await axios.delete(serverIp + `/admin/book/${id}/delete`, {
+  const res = await axios.delete(serverIp + `/admin/book/${id}`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;
 };
 
 const deleteRequestBookApi = async id => {
-  const res = await axios.delete(
-    serverIp + `/admin/request-book/${id}/delete`,
-    {
-      headers: { authorization: `Bearer ${accessToken}` },
-    }
-  );
+  const res = await axios.delete(serverIp + `/admin/request-book/${id}`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
   return res.data;
 };
 

@@ -33,9 +33,9 @@ public class LendingController {
      * @param requestLendingDto
      * @return "책 대여에 성공하였습니다" 메시지
      */
-    @PostMapping(value = "/admin/lending/create")
+    @PostMapping(value = "/admin/lending")
     public ResponseResultDto<Object> LendingBook(@RequestBody @Valid RequestLendingDto requestLendingDto) {
-        log.info("책 대여 요청: [POST] /lending/create - {}", requestLendingDto.toString());
+        log.info("책 대여 요청: [POST] /lending - {}", requestLendingDto.toString());
         lendingService.lendingBook(requestLendingDto);
 
         log.info("책 대여에 성공하였습니다");
@@ -166,9 +166,9 @@ public class LendingController {
      * @param lendingId
      * @return 책 대여 기록 삭제
      */
-    @DeleteMapping(value = "/admin/lending/{lendingId}/delete")
+    @DeleteMapping(value = "/admin/lending/{lendingId}")
     public ResponseResultDto<Object> deleteLending(@PathVariable Long lendingId) {
-        log.info("책 대여 기록 삭제: [DELETE] /lending/{lendingId}/delete - lendingId: {}", lendingId);
+        log.info("책 대여 기록 삭제: [DELETE] /lending/{lendingId} - lendingId: {}", lendingId);
         lendingService.deleteLending(lendingId);
 
         log.info("책 대여 기록 삭제에 성공하였습니다");

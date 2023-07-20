@@ -89,7 +89,6 @@ export default function LendingHistory() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
       })
       .catch(err => {
         if (err.response.status === 401 || err.response.status === 403) {
@@ -97,17 +96,16 @@ export default function LendingHistory() {
           window.location.href = '/login';
           return;
         }
-        console.log(err.response);
         alert(err.response.data.message);
       });
   }, [search, page, size, isLendingOrReturning, sort]);
 
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
-      <div className="flex justify-center items-center my-10 mx-48">
-        <h1 className="text-4xl font-bold">대출/반납 기록</h1>
+      <div className="flex justify-center items-center my-10 mx-24">
+        <h1 className="text-4xl font-bold">대출/반납 현황</h1>
       </div>
-      <div className="flex justify-between items-center my-10 mx-48">
+      <div className="flex justify-between items-center my-10 mx-32">
         <h1 className="text-2xl font-bold mr-2">대출/반납 검색</h1>
         <SearchBar
           text="이메일 또는 도서 제목으로 검색해 주세요."

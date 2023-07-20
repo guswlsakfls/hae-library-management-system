@@ -1,8 +1,6 @@
 package com.hae.library.dto.Lending.Request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +9,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+// 대출에 대한 요청 DTO입니다
 @Getter
 @NoArgsConstructor
 @ToString

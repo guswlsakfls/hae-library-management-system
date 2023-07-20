@@ -3,6 +3,7 @@ package com.hae.library.dto.Common;
 import lombok.Builder;
 import lombok.Getter;
 
+// 공통 응답 DTO입니다
 @Getter
 @Builder
 public class ResponseResultDto<T> {

@@ -27,6 +27,7 @@ export default function Lending() {
       .catch(err => {
         setBook({});
         setUser({});
+        setReturningAt('');
         alert(err.response.data.message);
         let errors = err.response.data.errors;
         if (!errors) {
@@ -79,14 +80,12 @@ export default function Lending() {
     getLendgingInfoApi(searchCallSign)
       .then(res => {
         setLendingInfo(res.data);
-        console.log(res);
       })
       .catch(err => {
         setBook({});
         setUser({});
         setReturningAt('');
         alert(err.response.data.message);
-        console.log(err.response.data);
         let errors = err.response.data.errors;
         if (!errors) {
           return;

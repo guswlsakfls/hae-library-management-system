@@ -38,7 +38,7 @@ public class AuthController {
     @PostMapping("/auth")
     public ResponseResultDto<Object> authorize(@RequestBody @Valid RequestLoginDto loginDto) {
 
-        // 사용자의 계정이 휴면 상태인지 확인합니다. // TODO: 403 에러를 뱉는다. 추우 확인 필요
+        // 사용자의 계정이 휴면 상태인지 확인합니다.
         memberRepo.findByEmail(loginDto.getEmail()).ifPresent(member -> {
             if (!member.isActivated()) {
                 throw new RestApiException(MemberErrorCode.MEMBER_DISABLED);

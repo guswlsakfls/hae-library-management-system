@@ -44,10 +44,8 @@ const memberLoginApi = async (email, password) => {
 };
 
 const updateMemberApi = async editMember => {
-  console.log(editMember);
-
   const res = await axios.put(
-    serverIp + `/admin/member/update`,
+    serverIp + `/admin/member`,
     {
       id: editMember.id,
       email: editMember.email,
@@ -91,7 +89,7 @@ const putMemberWidthdrawalApi = async () => {
 };
 
 const deleteMemberApi = async id => {
-  const res = await axios.delete(serverIp + `/admin/member/${id}/delete`, {
+  const res = await axios.delete(serverIp + `/admin/member/${id}`, {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   return res.data;

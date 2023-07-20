@@ -30,7 +30,6 @@ export default function ManagingCategory() {
           window.location.reload();
         })
         .catch(err => {
-          console.log(err.response);
           alert(err.response.data.message);
 
           let errors = err.response.data.errors;
@@ -52,7 +51,6 @@ export default function ManagingCategory() {
       // 만약 취소 버튼이 눌리지 않았다면
       updateCategoryApi(id, newCategoryName)
         .then(res => {
-          console.log(res);
           alert('카테고리를 성공적으로 수정했습니다.');
           window.location.reload();
         })

@@ -412,7 +412,7 @@ public class BookServiceTest {
                 bookService.deleteBookById(existingBookId);
 
                 // Then
-                verify(bookRepo, times(1)).deleteById(existingBookId);
+                verify(bookRepo, times(1)).delete(mockBook);
             }
         }
 

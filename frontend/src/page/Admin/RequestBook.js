@@ -119,7 +119,7 @@ export default function ManagingBook() {
   return (
     <main className="flex-grow h-screen overflow-y-scroll">
       <div className="flex justify-center items-center my-10 mx-18">
-        <h1 className="text-4xl font-bold">도서 구매 목록</h1>
+        <h1 className="text-4xl font-bold">도서 구매 요청 목록</h1>
       </div>
       <div className="flex justify-between items-center my-10 mx-24">
         <h1 className="text-2xl font-bold">도서 검색</h1>

@@ -112,9 +112,9 @@ public class BookInfoController {
      * @param bookInfoId
      * @return "책 정보 삭제에 성공하였습니다" 메시지
      */
-    @DeleteMapping(value = "/admin/bookinfo/{bookInfoId}/delete")
+    @DeleteMapping(value = "/admin/bookinfo/{bookInfoId}")
     public ResponseResultDto<Object> deleteBookInfoById(@PathVariable Long bookInfoId) {
-        log.info("책 삭제: [DELETE] /bookinfo/{}/delete - ID로 책 정보 삭제", bookInfoId);
+        log.info("책 삭제: [DELETE] /bookinfo/{} - ID로 책 정보 삭제", bookInfoId);
         bookInfoService.deleteBookInfoById(bookInfoId);
 
         log.info("ID로 책 정보 삭제에 성공하였습니다 {}", bookInfoId);

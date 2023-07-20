@@ -36,6 +36,7 @@ export default function ManagingBook() {
   // 수정할 책 정보를 관리하는 state 추가
   const [editBook, setEditBook] = useState(null);
   const [categoryList, setCategoryList] = useState([]);
+  const [modifyCategoryList, setModifyCategoryList] = useState([]);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
@@ -52,7 +53,6 @@ export default function ManagingBook() {
 
   // 도서 목록을 조회하는 함수
   const handleEditClick = (bookStockList, id) => {
-    console.log('bookStockList: ', bookStockList);
     toggleEditModal();
 
     // bookStockList에서 bookList를 제거하고 bookInfo로 이름을 바꾸는 부분
@@ -66,7 +66,6 @@ export default function ManagingBook() {
     }
 
     setEditBook(editBook);
-    console.log('editBook: ', editBook);
   };
 
   // 수정 버튼 클릭 시 호출되는 함수
@@ -74,11 +73,9 @@ export default function ManagingBook() {
     // // 책 정보 조회 합니다.
     getBookStockListApi(id)
       .then(res => {
-        console.log(res);
         setBookStockList(res.data);
       })
       .catch(err => {
-        console.log(err.response);
         alert(err.response.data.message);
       });
 
@@ -91,25 +88,21 @@ export default function ManagingBook() {
   };
 
   const handleInputChange = event => {
-    console.log(event.target.name, event.target.value);
     const { name, value } = event.target;
     setEditBook({
       ...editBook,
       [name]: value,
     });
-    console.log(editBook);
   };
 
   const onSubmit = e => {
     updateBookStockApi(editBook)
       .then(res => {
-        console.log(res);
         alert(res.message);
         toggleModal();
         window.location.reload();
       })
       .catch(err => {
-        console.log(err.response);
         if (err.response.status === 401 || err.response.status === 403) {
           alert('로그인이 필요합니다.');
           window.location.href = '/login';
@@ -129,7 +122,6 @@ export default function ManagingBook() {
 
   // 도서 삭제 신청
   const handleDeleteClick = id => {
-    console.log(id);
     if (
       window.confirm(
         '[!주의!] 대출 관련 기록도 삭제됩니다. 정말 삭제하시겠습니까?'
@@ -137,12 +129,10 @@ export default function ManagingBook() {
     ) {
       deleteBookApi(id)
         .then(res => {
-          console.log(res);
           alert(res.message);
           window.location.reload();
         })
         .catch(err => {
-          console.log(err.response);
           alert(err.response.data.message);
         });
     }
@@ -155,7 +145,6 @@ export default function ManagingBook() {
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
         setSize(res.data.size);
-        console.log(res);
       })
       .catch(err => {
         if (err.response.status === 401 || err.response.status === 403) {
@@ -163,18 +152,16 @@ export default function ManagingBook() {
           window.location.href = '/login';
           return;
         }
-        console.log(err.response);
         alert(err.response.data.message);
       });
 
     // 카테고리 목록을 불러오는 함수
     getCategoryListApi()
       .then(res => {
-        console.log('selecti: ', res);
         setCategoryList([{ value: 0, categoryName: '전체' }, ...res.data]);
+        setModifyCategoryList([...res.data]);
       })
       .catch(err => {
-        console.log(err);
         alert('카테고리 목록을 불러오는데 실패했습니다.');
       });
   }, [search, page, size, category, sort]);
@@ -207,8 +194,6 @@ export default function ManagingBook() {
       </td>
     </tr>
   );
-
-  console.log('bookInfoList: ', bookInfoList);
 
   return (
     <>
@@ -519,7 +504,7 @@ export default function ManagingBook() {
                       value={editBook.category}
                       onChange={handleInputChange}
                     >
-                      {categoryList.map((category, index) => (
+                      {modifyCategoryList.map((category, index) => (
                         <option key={index} value={category.categoryName}>
                           {category.categoryName}
                         </option>

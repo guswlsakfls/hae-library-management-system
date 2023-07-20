@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-// 반납을 위한 대출 정보를 반환하는 DTO
+// 반납을 위한 대출 정보를 반환하는 DTO입니다
 @Getter
 @NoArgsConstructor
 public class ResponseLendingInfoForReturningDto {

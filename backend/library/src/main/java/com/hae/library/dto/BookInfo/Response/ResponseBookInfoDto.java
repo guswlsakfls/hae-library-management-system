@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+// 도서 정보를 반환하는 DTO입니다
 @Getter
 @Builder
 public class ResponseBookInfoDto {
