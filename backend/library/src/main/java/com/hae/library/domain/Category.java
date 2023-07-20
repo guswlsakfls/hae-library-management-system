@@ -21,7 +21,7 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "category")
     private List<BookInfo> bookInfoList = new ArrayList<BookInfo>();
 
-    @Column(name = "category_name")
+    @Column(name = "category_name", nullable = false, length = 20)
     private String categoryName;
 
     @Builder

@@ -253,7 +253,7 @@ public class CategoryServiceTest {
 
                 // Then
                 verify(categoryRepo, times(1)).findById(any(Long.class));
-                verify(categoryRepo, times(1)).deleteById(any(Long.class));
+                verify(categoryRepo, times(1)).delete(any(Category.class));
             }
         }
 

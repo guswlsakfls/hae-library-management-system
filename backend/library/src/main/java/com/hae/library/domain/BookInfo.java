@@ -28,7 +28,7 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "title", nullable = false, length = 300)
     private String title;
 
-    @Column(name = "isbn", nullable = false)
+    @Column(name = "isbn", nullable = false, length = 13)
     private String isbn;
 
     @Column(name = "author", nullable = false, length = 300)
@@ -37,10 +37,10 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "publisher", length = 100)
     private String publisher;
 
-    @Column(name = "image")
+    @Column(name = "image", length = 200)
     private String image;
 
-    @Column(name = "published_at")
+    @Column(name = "published_at", length = 20)
     private String publishedAt;
 
     @OneToOne(mappedBy = "bookInfo", cascade = CascadeType.ALL)

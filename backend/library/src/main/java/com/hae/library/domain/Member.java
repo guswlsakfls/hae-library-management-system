@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 30)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String password;
 
     @Column(name = "penalty_end_date")
