@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+// 책과 관련된 에러 코드입니다
 @Getter
 @RequiredArgsConstructor
 public enum BookErrorCode implements ErrorCode {
-    // 도서
+    // 책
     BAD_REQUEST_BOOK(HttpStatus.BAD_REQUEST, "존재하지 않는 책입니다."),
     BAD_REQUEST_BOOKINFO(HttpStatus.BAD_REQUEST, "존재하지 않는 책 정보입니다."),
     NOTHING_REQUEST_INPUT(HttpStatus.BAD_REQUEST, "값을 입력해주세요."),

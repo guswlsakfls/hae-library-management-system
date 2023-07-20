@@ -14,15 +14,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
+// 책 레포지토리입니다
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
     // 청구기호로 책이 존재하는지 확인하는 메서드입니다.
     @EntityGraph(attributePaths = {"bookInfo"})
     boolean existsByCallSign(String callSign);
-
-    @Query("SELECT b FROM Book b WHERE b.bookInfo.title LIKE CONCAT('%',:search,'%')")
-    @EntityGraph(attributePaths = {"lending"})
-    Page<Book> findAll(@Param("search") String search, Pageable pageable);
 
     // 청구기호로 책을 찾는 메서드입니다.
     Optional<Book> findByCallSign(String callSign);

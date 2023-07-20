@@ -66,7 +66,7 @@ public class BookService {
             // 새로 생성한 BookInfo를 사용하여 책을 저장합니다.
             saveBookWithBookInfo(requestBookWithBookInfoDto, bookInfo);
         } else {
-            // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.(다른 곳에서 매개변수가 따로 쓰이기 때문에)
+            // BookInfo가 존재하지 않는 경우 새로운 BookInfo를 생성합니다.(다른 곳에서 매개변수가 따로 쓰이기 때문에 새로 생성합니다)
             RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
                     .isbn(requestBookWithBookInfoDto.getIsbn())
                     .title(requestBookWithBookInfoDto.getTitle())
@@ -189,17 +189,17 @@ public class BookService {
         // 삭제할 도서를 ID를 이용하여 검색합니다. 도서를 찾지 못하면 예외를 발생시킵니다.
         Book book = bookRepo.findById(bookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
 
-        // TODO: 도서가 대여중인지 확인합니다.
+        // 도서가 대여중인지 확인합니다.
         if (book.isLendingStatus() == true) {
             throw new RestApiException(BookErrorCode.NOT_DELETE_BECAUSE_RENT_BOOK);
         }
 
-        // TODO: 마지막 도서이면 BookInfo도 삭제합니다.
+        // 마지막 도서이면 BookInfo도 삭제합니다.
         if (bookRepo.countByBookInfo(book.getBookInfo()) == 1) {
             bookInfoRepo.delete(book.getBookInfo());
         }
 
         // 찾은 도서를 데이터베이스에서 삭제합니다.
-        bookRepo.deleteById(bookId);
+        bookRepo.delete(book);
     }
 }

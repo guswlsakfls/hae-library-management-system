@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+// 도서 대출을 나타내는 도메인 입니다
 @Entity
 @Getter
 @NoArgsConstructor()

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 카테고리 수정에 대한 요청 DTO입니다
 @Getter
 @NoArgsConstructor
 public class RequestUpdateCategoryDto {

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 책 정보에 대한 요청 DTO입니다
 @Getter
 @Setter
 @NoArgsConstructor

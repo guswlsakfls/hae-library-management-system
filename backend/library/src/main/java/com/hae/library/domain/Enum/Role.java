@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 // 사용자 권한을 나타내는 enum
 @RequiredArgsConstructor
 @Getter
-
 // USER: 일반 사용자, ADMIN: 관리자
 public enum Role {
     ROLE_USER, ROLE_ADMIN

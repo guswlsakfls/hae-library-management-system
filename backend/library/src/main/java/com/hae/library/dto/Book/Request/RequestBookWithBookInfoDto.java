@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+// 책과 책 정보를 함께 요청할 때 사용하는 DTO입니다
 @Getter
 @ToString
 @NoArgsConstructor

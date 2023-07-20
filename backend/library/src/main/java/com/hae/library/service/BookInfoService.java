@@ -12,6 +12,7 @@ import com.hae.library.dto.BookInfo.Response.ResponseBookInfoDto;
 import com.hae.library.dto.BookInfo.Response.ResponseBookInfoWithBookDto;
 import com.hae.library.global.Exception.RestApiException;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
+import com.hae.library.global.Exception.errorCode.CommonErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.CategoryRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// 책 정보 서비스입니다
 @Slf4j
 @Service
 public class BookInfoService {
@@ -38,12 +40,11 @@ public class BookInfoService {
     private final BookInfoRepository bookInfoRepo;
     private final CategoryRepository categoryRepo;
 
-    // TODO: @Value로 주입받아서 @RequiredArgsConstructor 에러가 나는 현상?
+    // @Value로 주입받아서 @RequiredArgsConstructor 에러가 나는 현상 때문에 생성자를 만들어서 주입받았습니다.
     BookInfoService(BookInfoRepository bookInfoRepo, CategoryRepository categoryRepo) {
         this.bookInfoRepo = bookInfoRepo;
         this.categoryRepo = categoryRepo;
     }
-
 
     @Value("${nationalIsbnApiKey}")
     private String nationalIsbnApiKey;
@@ -54,18 +55,17 @@ public class BookInfoService {
      * @param requestBookDto 새로운 책 정보 요청 DTO
      * @return 저장된 책 정보 응답 DTO
      *
-     * @throws BookErrorCode.DUPLICATE_ISBN 책 정보 중복
-     * @throws BookErrorCode.CATEGORY_NOT_FOUND 카테고리를 찾을 수 없음
+     * @throws BookErrorCode 책 정보 중복
+     * @throws BookErrorCode 카테고리를 찾을 수 없음
      */
     @Transactional
     public BookInfo createBookInfo(RequestBookInfoDto requestBookDto) {
         // 중복되는 책 정보가 있는지 확인합니다.
-        Optional<BookInfo> bookInfoOptional =
-                bookInfoRepo.findByIsbn(requestBookDto.getIsbn());
-        if (bookInfoOptional.isPresent()) {
+        if (bookInfoRepo.existsByIsbn(requestBookDto.getIsbn()) == true) {
             throw new RestApiException(BookErrorCode.DUPLICATE_ISBN);
         }
 
+        // 새로운 책 정보 객체를 생성합니다.
         BookInfo bookInfo = BookInfo.builder()
                 .title(requestBookDto.getTitle())
                 .author(requestBookDto.getAuthor())
@@ -134,10 +134,6 @@ public class BookInfoService {
         return responseBookInfoDtoList;
     }
 
-
-
-
-
     /**
      * ID로 책 정보를 가져옵니다.
      *
@@ -146,16 +142,17 @@ public class BookInfoService {
      */
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoById(Long bookInfoId) {
-        // bookInfoId가 null이라면 예외를 발생시킵니다.
+        // bookInfo가 존재하는지 않으면 예외를 발생시킵니다.
         BookInfo bookInfo =
                 bookInfoRepo.findById(bookInfoId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
+
         // 책 정보에 속한 실물 책들을 가져옵니다.
-        List<Book> bookList = bookInfo.getBookList();
         return ResponseBookInfoWithBookDto.from(bookInfo);
     }
 
     /**
      * ISBN으로 책 정보를 가져옵니다.
+     * 국립중앙도서관 API를 이용하여 책 정보를 가져옵니다.
      *
      * @param requestIsbnDto ISBN 정보 요청 DTO
      * @return 책 정보와 관련된 책 응답 DTO
@@ -163,7 +160,7 @@ public class BookInfoService {
     @Transactional
     public ResponseBookInfoWithBookDto getBookInfoByIsbn(RequestIsbnDto requestIsbnDto) {
         String isbn = requestIsbnDto.getIsbn();
-        // isbn이 null이거나 공백이라면
+        // isbn이 null이거나 공백이라면 예외를 발생시킵니다.
         if (isbn == null || isbn.trim().isEmpty()) {
             throw new RestApiException(BookErrorCode.NOTHING_REQUEST_INPUT);
         }
@@ -175,12 +172,11 @@ public class BookInfoService {
         if (bookInfoOptional.isEmpty()) {
             // 국립중앙도서관 API로 책 정보를 가져옵니다.
             RequestBookApiDto requestBookApiDto = searchByIsbn(isbn);
-            log.error("requestBookApiDto: {}", requestBookApiDto.toString());
-            if (requestBookApiDto.getResult() == null) { // api 못받으면 에러처리(result가 null이면, 값이 들어오는
-                // 필드들이 있다.)
+            // api 못받으면 에러처리(result가 null이면)
+            if (requestBookApiDto.getResult() == null) {
                 throw new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO);
             }
-            // 가져온 책 정보를 bookInfo에 저장한다
+            // 가져온 책 정보를 bookInfo에 저장합니다.
             return requestBookApiDto.toResponseBookInfoWithBookDto();
         // 책 정보가 있다면 그대로 가져옵니다.
         } else {
@@ -198,28 +194,29 @@ public class BookInfoService {
     public RequestBookApiDto searchByIsbn(String isbn) {
         log.info("BookService - isbn : {}",isbn);
 
-        // 헤더 설정
+        // 헤더 설정을 합니다.
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
 
-        // 국립 중앙 도서관api 이용 url
+        // 국립 중앙 도서관api 이용 url입니다.
         String seojiUrl =
                 "https://www.nl.go.kr/NL/search/openApi/search.do?key=" + nationalIsbnApiKey +
                         "&detailSearch=true&apiType=json&isbnOp=isbn&isbnCode=" + isbn;
         RestTemplate restTemplate = new RestTemplate();
 
-        //국립도서관 api 호출
+        //국립도서관 api 호출합니다.
         ResponseEntity<String> response = restTemplate.exchange(seojiUrl, HttpMethod.GET,
                 new HttpEntity<>(headers), String.class);
 
         String jsonString = response.getBody();  // ResponseEntity에서 JSON 문자열 가져오기
         ObjectMapper mapper = new ObjectMapper();  // ObjectMapper 객체 생성
 
+        // JSON 문자열을 RequestBookApiDto 객체로 변환합니다.
         RequestBookApiDto requestBookApiDto = null;
         try {
-            requestBookApiDto = mapper.readValue(jsonString, RequestBookApiDto.class);  // JSON 문자열을 RequestBookApiDto 객체로 변환;  // 변환된 객체에서 데이터를 가져와 출력
+            requestBookApiDto = mapper.readValue(jsonString, RequestBookApiDto.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new RestApiException(CommonErrorCode.JSON_PROCESSING_EXCEPTION);
         }
 
         return requestBookApiDto;
@@ -232,7 +229,8 @@ public class BookInfoService {
      */
     @Transactional
     public void deleteBookInfoById(Long id) {
+        // bookInfo가 존재하는지 않으면 예외를 발생시킵니다.
         BookInfo bookInfo = bookInfoRepo.findById(id).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOK));
-        bookInfoRepo.deleteById(id);
+        bookInfoRepo.delete(bookInfo);
     }
 }

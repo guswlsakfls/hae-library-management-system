@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+// 책 정보를 나타내는 도메인입니다
 @Entity
 @Getter
 @Table(name = "BOOK_INFO")

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// 청구기호에 대한 요청 DTO입니다
 @Getter
 @Setter
 @NoArgsConstructor

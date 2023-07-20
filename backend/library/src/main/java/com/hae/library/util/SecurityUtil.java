@@ -17,8 +17,7 @@ public class SecurityUtil {
     public static String getCurrentMemberEmail() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        log.error("authentication: {}", authentication);
-        log.error("authentication.getName(): {}", authentication.getName());
+        log.info("authentication.getName(): {}", authentication.getName());
 
         if (authentication == null || authentication.getName() == null) {
             throw new RuntimeException("Security Context에 인증 정보가 없습니다.");

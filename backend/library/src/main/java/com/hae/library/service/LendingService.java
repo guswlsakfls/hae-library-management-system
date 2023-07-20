@@ -74,7 +74,7 @@ public class LendingService {
         // 대출받는 유저가 회원인지 확인하고 가져옵니다.
         Member user = memberRepo.findById(requestLendingDto.getUserId())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.USER_NOT_FOUND));
-        // 대출받는 유저가 비회원인지 확인하고 가져옵니다.
+        // 대출받는 유저가 휴면계정인지 확인합니다.
         if (user.isActivated() == false) {
             throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
         }
@@ -98,9 +98,6 @@ public class LendingService {
         // 대출 사서가 회원인지 확인하고 가져옵니다.
         Member lendingLibrarian = memberRepo.findByEmail(SecurityUtil.getCurrentMemberEmail())
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.ADMIN_NOT_FOUND));
-
-        // 대출일을 2주뒤 00:00:00으로 설정합니다.
-        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusWeeks(2);
 
         Lending newLending = Lending.builder()
                 .lendingUser(user)
@@ -156,7 +153,7 @@ public class LendingService {
             // 연체일을 계산합니다.
             long daysOverdue = ChronoUnit.DAYS.between(returningEndAt, now);
             LocalDateTime newPenaltyEndDate = user.getPenaltyEndDate();
-            // 연체일이 없거나, 이미지난 연체일이 있으면 현재 시간부터 연체일을 부과합니다.
+            // 연체일이 없거나, 이미 지난 연체일이 있으면 현재 시간부터 연체일을 부과합니다.
             if (newPenaltyEndDate == null || newPenaltyEndDate.isBefore(now)) {
                 newPenaltyEndDate = now.plusDays(daysOverdue);
             } else { // 연체일이 있으면 현재 연체일에 부과합니다.
@@ -178,6 +175,9 @@ public class LendingService {
      *
      * @param requestCallsignDto 청구기호 DTO
      * @return 대출 정보 DTO
+     *
+     * @throws BookErrorCode 책이 존재하지 않을 때
+     * @throws BookErrorCode 책이 대출 중이 아닐 때
      */
     @Transactional
     public ResponseLendingInfoForReturningDto getLendingInfoByCallSign(RequestCallsignDto requestCallsignDto) {

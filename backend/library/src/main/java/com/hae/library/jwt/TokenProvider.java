@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+// JWT 토큰 생성 및 유효성 검증을 담당하는 클래스입니다.
 @Slf4j
 @Configuration
 public class TokenProvider {

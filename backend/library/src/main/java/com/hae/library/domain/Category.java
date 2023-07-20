@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// 책의 카테고리를 나타내는 도메인 입니다
 @Entity
 @Getter
 @Table(name = "CATEGORY")

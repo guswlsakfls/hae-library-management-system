@@ -8,6 +8,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// 책과 책 정보를 조회한 결과를 반환하는 DTO입니다.
 @Getter
 @Builder
 public class ResponseBookInfoWithBookDto {

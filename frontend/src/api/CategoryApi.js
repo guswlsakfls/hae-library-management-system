@@ -5,7 +5,7 @@ const accessToken = localStorage.getItem('accessToken');
 
 const createCategoryApi = async name => {
   const res = await axios.post(
-    serverIp + '/admin/category/create',
+    serverIp + '/admin/category',
     {
       categoryName: name,
     },
@@ -23,7 +23,7 @@ const getCategoryListApi = async () => {
 
 const updateCategoryApi = async (id, name) => {
   const res = await axios.put(
-    serverIp + '/admin/category/update',
+    serverIp + '/admin/category',
     {
       categoryId: id,
       updatedCategoryName: name,

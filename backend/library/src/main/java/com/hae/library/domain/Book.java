@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// 실물 책에 대한 정보를 담고 있는 도메인입니다.
+// 실물 책에 대한 정보를 담고 있는 도메인입니다(청구기호로 구분)
 @Entity
 @Getter
 @NoArgsConstructor()

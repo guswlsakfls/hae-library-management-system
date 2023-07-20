@@ -291,7 +291,7 @@ public class BookInfoServiceTest {
                 bookInfoService.deleteBookInfoById(1L);
 
                 // Then
-                verify(bookInfoRepo, times(1)).deleteById(anyLong());
+                verify(bookInfoRepo, times(1)).delete(any(BookInfo.class));
             }
         }
 

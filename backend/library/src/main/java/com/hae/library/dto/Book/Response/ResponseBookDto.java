@@ -5,6 +5,7 @@ import com.hae.library.domain.Enum.BookStatus;
 import lombok.Builder;
 import lombok.Getter;
 
+// ResponseBookDto는 Book 엔티티를 조회한 결과를 반환하는 DTO입니다.
 @Getter
 public class ResponseBookDto {
     private Long id;

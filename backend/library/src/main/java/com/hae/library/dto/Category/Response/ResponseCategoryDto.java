@@ -4,6 +4,7 @@ import com.hae.library.domain.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 카테고리 조회에 대한 응답 DTO입니다
 @Getter
 @NoArgsConstructor
 public class ResponseCategoryDto {

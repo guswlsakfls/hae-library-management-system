@@ -13,10 +13,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 import java.util.Optional;
 
+// 책 정보 레포지토리입니다
 public interface BookInfoRepository extends JpaRepository<BookInfo, Long>,
         JpaSpecificationExecutor<BookInfo> {
     Optional<BookInfo> findByIsbn(String isbn);
-    List<BookInfo> findByTitleContaining(String search);
+
+    boolean existsByIsbn(String isbn);
 
     List<BookInfo> findByCategory(Category category);
 }

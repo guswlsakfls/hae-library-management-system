@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+// 회원과 관련된 에러 코드입니다
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// 회원 정보를 저장하는 클래스입니다.
+// 회원 정보를 저장하는 클래스입니다
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
