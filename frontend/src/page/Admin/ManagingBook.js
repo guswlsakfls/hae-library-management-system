@@ -141,6 +141,7 @@ export default function ManagingBook() {
   useEffect(() => {
     getBookListApi(search, page, size, category, sort)
       .then(res => {
+        console.log(res.data);
         setBookInfoList(res.data.bookInfoList);
         setTotal(res.data.totalElements);
         setPage(res.data.currentPage);
@@ -182,6 +183,9 @@ export default function ManagingBook() {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {book.createdAt && book.createdAt.split('T')[0]}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
+        {book.updatedAt && book.updatedAt.split('T')[0]}
       </td>
       <td className="py-4 whitespace-nowrap text-sm text-black-500">
         <DefaultButton
@@ -276,6 +280,12 @@ export default function ManagingBook() {
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
                 등록일
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                수정일
               </th>
               <th
                 scope="col"

@@ -16,7 +16,7 @@ import SelectBar from '../../component/common/SelectBar';
 const roleList = ['전체', '일반회원', '관리자'];
 
 // 정렬 기준
-const sortList = ['최신순', '오랜된순'];
+const sortList = ['최신순', '오래된순'];
 
 export default function ManagingMember() {
   const [modifyIsOpen, modifySetIsOpen] = useState(false);

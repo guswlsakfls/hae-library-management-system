@@ -21,4 +21,6 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long>,
     boolean existsByIsbn(String isbn);
 
     List<BookInfo> findByCategory(Category category);
+
+    boolean existsByIsbnAndIdIsNot(String isbn, Long id);
 }

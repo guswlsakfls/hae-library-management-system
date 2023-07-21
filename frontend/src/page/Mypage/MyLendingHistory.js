@@ -10,7 +10,7 @@ import SelectBar from '../../component/common/SelectBar';
 const isLendingOrReturningList = ['전체', '대출 중', '반납 완료'];
 
 // 정렬 기준
-const sortList = ['최신순', '오랜된순'];
+const sortList = ['최신순', '오래된순'];
 
 // TODO: 2번 렌더링 되는 문제가 있다
 export default function MyLendingHistory() {

@@ -104,15 +104,19 @@ export default function ManagingBook() {
       <td className="px-6 py-4 whitespace-nowrap text-sm text-black-500">
         {book.approved ? '구매완료' : '미승인'}
       </td>
-      <td className="py-4 whitespace-nowrap text-sm text-black-500">
-        <DefaultButton
-          color={'red'}
-          size="small"
-          onClick={() => handleDeleteClick(book.id)}
-        >
-          삭제
-        </DefaultButton>
-      </td>
+      {!book.approved ? (
+        <td className="py-4 whitespace-nowrap text-sm text-black-500">
+          <DefaultButton
+            color={'red'}
+            size="small"
+            onClick={() => handleDeleteClick(book.id)}
+          >
+            삭제
+          </DefaultButton>
+        </td>
+      ) : (
+        ''
+      )}
     </tr>
   );
 

@@ -156,6 +156,12 @@ public class BookService {
             throw new RestApiException(BookErrorCode.DUPLICATE_CALLSIGN);
         }
 
+        // 자신을 제외한 isbn이 중복되는지 확인합니다.
+        if (bookInfoRepo.existsByIsbnAndIdIsNot(requestBookWithBookInfoDto.getIsbn(),
+                bookInfo.getId())) {
+            throw new RestApiException(BookErrorCode.DUPLICATE_ISBN);
+        }
+
         // 카테고리를 조회하고 카테고리가 존재하지 않는다면 예외를 발생시킵니다.
         Category category =
                 categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName()).orElseThrow(() -> new RestApiException(CategoryErrorCode.BAD_REQUEST_CATEGORY));
