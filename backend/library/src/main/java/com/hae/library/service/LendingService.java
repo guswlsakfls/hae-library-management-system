@@ -87,6 +87,7 @@ public class LendingService {
         if (user.isPenalty()) {
             throw new RestApiException(MemberErrorCode.USER_OVERDUE);
         }
+
         // 연체일이 지난상태에서 대출받으면 연체일을 초기화 해줍니다.
         if (user.getPenaltyEndDate() != null) {
             user.resetPenaltyEndDate();

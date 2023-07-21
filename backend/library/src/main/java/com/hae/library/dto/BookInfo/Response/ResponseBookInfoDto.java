@@ -40,6 +40,7 @@ public class ResponseBookInfoDto {
                 .publisher(bookInfo.getPublisher())
                 .publishedAt(bookInfo.getPublishedAt())
                 .createdAt(bookInfo.getCreatedAt())
+                .updatedAt(bookInfo.getUpdatedAt())
                 .build();
     }
 

@@ -2,7 +2,6 @@ package com.hae.library.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hae.library.domain.Book;
 import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.dto.Book.Request.RequestBookApiDto;

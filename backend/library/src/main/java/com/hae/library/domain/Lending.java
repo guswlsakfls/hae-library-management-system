@@ -59,14 +59,6 @@ public class Lending extends BaseTimeEntity{
     }
 
     /**
-     * ID를 업데이트합니다.
-     * @param id 새로운 ID
-     */
-    public void updateIdTest(Long id) {
-        this.id = id;
-    }
-
-    /**
      * 대출 조건의 길이를 확인합니다.
      * @param condition 대출 조건
      * @throws IllegalArgumentException 대출 조건 길이가 유효하지 않을 경우 예외를 던집니다.

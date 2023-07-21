@@ -121,6 +121,10 @@ public class RequestBookService {
         RequestBook requestBook =
                 requestBookRepo.findById(requestBookId).orElseThrow(() -> new RestApiException(BookErrorCode.BAD_REQUEST_BOOKINFO));
 
+        if (requestBook.isApproved()) {
+            throw new RestApiException(BookErrorCode.ALREADY_APPROVED);
+        }
+
         // 요청 도서 정보를 삭제합니다.
         requestBookRepo.delete(requestBook);
     }

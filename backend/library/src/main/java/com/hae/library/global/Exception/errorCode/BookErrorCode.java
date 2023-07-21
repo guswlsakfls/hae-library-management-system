@@ -18,6 +18,7 @@ public enum BookErrorCode implements ErrorCode {
     DUPLICATE_CALLSIGN(HttpStatus.BAD_REQUEST, "이미 존재하는 청구기호입니다."),
     CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."),
     NOT_DELETE_BECAUSE_RENT_BOOK(HttpStatus.BAD_REQUEST, "대충중인 책은 삭제할 수 없습니다."),
+    ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "이미 승인된 책입니다."),
 
     // 대출
     BAD_REQUEST_LENDING(HttpStatus.BAD_REQUEST, "존재하지 않는 대출 정보입니다."),
