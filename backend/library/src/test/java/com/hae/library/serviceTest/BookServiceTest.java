@@ -59,6 +59,8 @@ public class BookServiceTest {
         donator = "John Doe";
         status = "FINE";
 
+        Category category = Category.builder().categoryName("총류").build();
+
         requestBookWithBookInfoDto = RequestBookWithBookInfoDto.builder()
                 .id(existingBookId)
                 .callSign(callSign)
@@ -73,14 +75,26 @@ public class BookServiceTest {
                 .categoryName("총류")
                 .build();
 
+        BookInfo mockBookInfo = BookInfo.builder()
+                .title(requestBookWithBookInfoDto.getTitle())
+                .author(requestBookWithBookInfoDto.getAuthor())
+                .isbn(requestBookWithBookInfoDto.getIsbn())
+                .image(requestBookWithBookInfoDto.getImage())
+                .publisher(requestBookWithBookInfoDto.getPublisher())
+                .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
+                .category(category)
+                .build();
+
         mockBook = Book.builder()
                 .id(existingBookId)
                 .callSign(callSign)
                 .status(BookStatus.valueOf(status))
                 .donator(donator)
                 .lendingStatus(false)
-                .bookInfo(new BookInfo())  // 필요한 BookInfo 정보 설정
+                .bookInfo(mockBookInfo)  // 필요한 BookInfo 정보 설정
                 .build();
+        mockBook.setCreatedAt(LocalDateTime.now());
+        mockBook.setUpdatedAt(LocalDateTime.now());
     }
 
     @Nested
@@ -90,7 +104,7 @@ public class BookServiceTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("BookInfo가 이미 존재하는 경우 책 추가")
+            @DisplayName("BookInfo가 이미 존재하는 경우 DB에서 정보 가져와 책 추가")
             public void createBookWithExistingBookInfoTest() {
                 // Given
                 BookInfo newBookInfo = BookInfo.builder()
@@ -118,12 +132,11 @@ public class BookServiceTest {
             }
 
             @Test
-            @DisplayName("BookInfo가 존재하지 않는 경우 책 추가")
+            @DisplayName("BookInfo가 존재하지 않는 경우 국립중앙도서관api정보 가져와 책 추가")
             public void createBookWithNewBookInfoTest() {
                 // Given
                 Category mockCategory = Category.builder()
                         .categoryName(requestBookWithBookInfoDto.getCategoryName())
-//                        .bookInfoList(new ArrayList<>())
                         .build();
 
                 BookInfo newBookInfo = BookInfo.builder()
@@ -182,22 +195,6 @@ public class BookServiceTest {
                 // Given
                 Long validBookId = 1L;  // 존재하는 책 ID로 가정
 
-                Book mockBook = Book.builder()
-                                .id(validBookId)
-                                .callSign("12345")
-                                .status(BookStatus.valueOf("FINE"))
-                                .donator("John Doe")
-                                .lendingStatus(false)
-                                .bookInfo(BookInfo.builder()
-                                        .title("Java Programming")
-                                        .author("John Smith")
-                                        .isbn("9781234567890")
-                                        .image("book-image.jpg")
-                                        .publisher("ABC Publishing")
-                                        .publishedAt("2022-01-01")
-                                        .category(Category.builder().categoryName("총류").build())
-                                        .build())
-                                .build();
                 mockBook.setCreatedAt(LocalDateTime.now());
                 mockBook.setUpdatedAt(LocalDateTime.now());
 
@@ -219,28 +216,8 @@ public class BookServiceTest {
             public void getBookByValidCallSignTest() {
                 // Given
                 RequestCallsignDto requestCallsignDto = RequestCallsignDto.builder()
-                        .callsign("12345")
+                        .callsign(mockBook.getCallSign())
                         .build();
-
-
-                Book mockBook = Book.builder()
-                        .id(1L)
-                        .callSign(requestCallsignDto.getCallsign())
-                        .status(BookStatus.valueOf("FINE"))
-                        .donator("John Doe")
-                        .lendingStatus(false)
-                        .bookInfo(BookInfo.builder()
-                                .title("Java Programming")
-                                .author("John Smith")
-                                .isbn("9781234567890")
-                                .image("book-image.jpg")
-                                .publisher("ABC Publishing")
-                                .publishedAt("2022-01-01")
-                                .category(Category.builder().categoryName("총류").build())
-                                .build())
-                        .build();
-                mockBook.setCreatedAt(LocalDateTime.now());
-                mockBook.setUpdatedAt(LocalDateTime.now());
 
                 ResponseBookWithBookInfoDto expectedResponse = ResponseBookWithBookInfoDto.from(mockBook);
 
@@ -395,17 +372,6 @@ public class BookServiceTest {
                 // Given
                 Long existingBookId = 1L;  // 존재하는 책 ID로 가정
 
-                Book mockBook = Book.builder()
-                        .id(existingBookId)
-                        .callSign("12345")
-                        .status(BookStatus.FINE)
-                        .donator("John Doe")
-                        .lendingStatus(false)
-                        .bookInfo(new BookInfo())  // 기타 필요한 BookInfo 정보 설정
-                        .build();
-                mockBook.setCreatedAt(LocalDateTime.now());
-                mockBook.setUpdatedAt(LocalDateTime.now());
-
                 when(bookRepo.findById(existingBookId)).thenReturn(Optional.of(mockBook));
 
                 // When
@@ -437,17 +403,7 @@ public class BookServiceTest {
             public void deleteBookInUseTest() {
                 // Given
                 Long existingBookId = 1L;  // 존재하는 책 ID로 가정
-
-                Book mockBook = Book.builder()
-                        .id(existingBookId)
-                        .callSign("12345")
-                        .lendingStatus(true)
-                        .donator("John Doe")
-                        .bookInfo(new BookInfo())  // 기타 필요한 BookInfo 정보 설정
-                        .build();
-                mockBook.setCreatedAt(LocalDateTime.now());
-                mockBook.setUpdatedAt(LocalDateTime.now());
-
+                mockBook.updateLendingStatus(); // 책 대여중으로 설정
                 when(bookRepo.findById(existingBookId)).thenReturn(Optional.of(mockBook));
 
                 // Then

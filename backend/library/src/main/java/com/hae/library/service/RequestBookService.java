@@ -59,8 +59,7 @@ public class RequestBookService {
      * @param search
      * @param page
      * @param size
-     * @param category
-     * @param sort
+     * @param categoryName
      * @return Page<ResponseBookInfoWithBookDto>
      */
 

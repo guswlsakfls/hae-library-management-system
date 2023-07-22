@@ -68,6 +68,17 @@ public class LendingServiceTest {
 
     @BeforeEach
     public void setUp() {
+        // SecurityContext 설정
+        // 대출 사서 정보를 SecurityContext에 설정
+        UserDetails userDetails = User.withDefaultPasswordEncoder()
+                .username("admin@gmail.com")
+                .password("password")
+                .roles("USER")
+                .build();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         lendingUser = Member.builder()
                 .email("hyujo@gmail.com")
                 .password("1234")
@@ -125,17 +136,6 @@ public class LendingServiceTest {
                         .bookId(book.getId())
                         .lendingCondition(lending.getLendingCondition())
                         .build();
-
-                // SecurityContext 설정
-                // 대출 사서 정보를 SecurityContext에 설정
-                UserDetails userDetails = User.withDefaultPasswordEncoder()
-                        .username("admin@gmail.com")
-                        .password("password")
-                        .roles("USER")
-                        .build();
-
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // When
                 // 대출 사서 객체가 레포지토리에서 반환되도록 합니다.

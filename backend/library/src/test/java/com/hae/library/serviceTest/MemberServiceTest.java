@@ -433,55 +433,6 @@ public class MemberServiceTest {
     }
 
     @Nested
-    @DisplayName("회원 비밀번호 변경")
-    class ChangePasswordTest {
-//        @Nested
-//        @DisplayName("성공 케이스")
-//        class SuccessCaseTest {
-//            @Test
-//            @DisplayName("회원 비밀번호 변경")
-//            public void changePasswordTest() {
-//                // Given
-//                Long memberId = 1L;
-//                String email = "test1@gmail.com";
-//                String password = "password123";
-//                String newPassword = "newPassword";
-//
-//                Member member = Member.builder()
-//                        .id(memberId)
-//                        .email(email)
-//                        .role(Role.ROLE_ADMIN)
-//                        .password(password)
-//                        .activated(true)
-//                        .build();
-//
-//                RequestChangePasswordDto requestChangePasswordDto = RequestChangePasswordDto.builder()
-//                        .nowPassword(password)
-//                        .newPassword(newPassword)
-//                        .build();
-//
-//                // Authentication 객체를 생성하고 SecurityContext에 설정하여
-//                // 자신이 로그인한 것처럼 만들어줍니다.
-//                Authentication authentication =
-//                        new UsernamePasswordAuthenticationToken(email, password);
-//                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-//                securityContext.setAuthentication(authentication);
-//                SecurityContextHolder.setContext(securityContext);
-//
-//                when(memberRepository.findByEmail(email)).thenReturn(Optional.ofNullable(member));
-//                when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
-//
-//                // When
-//                memberService.changeMemberPassword(requestChangePasswordDto);
-//
-//                // Then
-//                assertEquals(newPassword, member.getPassword());
-//            }
-//        }
-    }
-
-
-    @Nested
     @DisplayName("회원 탈퇴")
     class WithDrawalMemberTest {
         @Nested
