@@ -251,7 +251,7 @@ public class LendingControllerTest {
 
 
             @Test
-            @DisplayName("회원이 정지 상태일 때 예외 발생")
+            @DisplayName("회원이 휴면계정일 때 예외 발생")
             public void createLendingWhenUserIsSuspended() throws Exception {
                 // Given
                 Member member = memberRepository.findById(1L).get();

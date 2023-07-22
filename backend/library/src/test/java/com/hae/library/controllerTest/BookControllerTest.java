@@ -8,6 +8,7 @@ import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.global.Exception.errorCode.BookErrorCode;
+import com.hae.library.global.Exception.errorCode.CommonErrorCode;
 import com.hae.library.repository.BookInfoRepository;
 import com.hae.library.repository.BookRepository;
 import com.hae.library.repository.CategoryRepository;
@@ -48,6 +49,7 @@ public class BookControllerTest {
     private Long categoryId;
 
     private Long bookId;
+    private Book book;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -86,7 +88,19 @@ public class BookControllerTest {
                 .build();
         bookInfoRepository.save(bookInfo);
 
-        Book book1 = bookRepository.save(Book.builder()
+        // 테스트용 도서 정보를 등록합니다.
+        BookInfo bookInfo1 = BookInfo.builder()
+                .isbn("1234567890121")
+                .title("테스트용 책 제목")
+                .author("테스트용 책 저자")
+                .publisher("테스트용 출판사")
+                .image("http://example.com/test.jpg")
+                .publishedAt("2023")
+                .category(category)
+                .build();
+        bookInfoRepository.save(bookInfo1);
+
+        book = bookRepository.save(Book.builder()
                 .callSign("111.111-11-11.c1")
                 .bookInfo(bookInfo)
                 .status(BookStatus.valueOf("FINE"))
@@ -101,8 +115,6 @@ public class BookControllerTest {
                 .lendingStatus(false)
                 .donator("테스트 기증자")
                 .build());
-
-        this.bookId = book1.getId();
     }
 
     @Nested
@@ -148,7 +160,7 @@ public class BookControllerTest {
         public class FaileTest {
             @Test
             @DisplayName("청구기호가 중복되는 경우 예외 발생")
-            public void testCreateBookFailBecauseAlreadyExistBook() throws Exception {
+            public void createBookFailBecauseAlreadyExistCallsign() throws Exception {
                 // Given
                 String requestUrl = "/api/admin/book";
                 String callSign = "111.111-11-11.c1";
@@ -179,6 +191,39 @@ public class BookControllerTest {
                         .andExpect(jsonPath("$.message").value(BookErrorCode.DUPLICATE_BOOK.getMessage()));
             }
 
+            @Test
+            @DisplayName("요청되는 변수들이 올바르지 않은 경우 예외 발생")
+            public void requestedVariablesIncorrect() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/book";
+                String callSign = "";
+                String isbn = "";
+                String title = "";
+                String author = "";
+                String publisher = "";
+                String image = "";
+                String publishedAt = "";
+                String categoryName = "";
+                String status = "";
+                String donator = "";
+
+                String content = String.format("{\"callSign\":\"%s\", \"isbn\":\"%s\", " +
+                                "\"title\":\"%s\", \"author\":\"%s\", \"publisher\":\"%s\", \"image\":\"%s\", \"publishedAt\":\"%s\", \"categoryName\":\"%s\", \"status\":\"%s\", \"donator\":\"%s\"}",
+                        callSign, isbn, title, author, publisher, image, publishedAt, categoryName, status, donator);
+
+                String authorizationHeader = "Bearer " + token;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(post(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message").value(CommonErrorCode.INVALID_PARAMETER.getMessage()))
+                        .andExpect(jsonPath("$.errors.size()").value(10));
+            }
         }
     }
 
@@ -258,7 +303,8 @@ public class BookControllerTest {
                 String donator = "테스트 기증자";
 
                 String content = String.format("{\"id\":\"%s\", \"callSign\":\"%s\", \"isbn\":\"%s\", \"title\":\"%s\", \"author\":\"%s\", \"publisher\":\"%s\", \"image\":\"%s\", \"publishedAt\":\"%s\", \"categoryName\":\"%s\", \"status\":\"%s\", \"donator\":\"%s\"}",
-                        bookId, callSign, isbn, title, author, publisher, image, publishedAt, categoryName, status, donator);
+                        book.getId(), callSign, isbn, title, author, publisher, image, publishedAt,
+                        categoryName, status, donator);
 
                 String authorizationHeader = "Bearer " + token;
 
@@ -310,6 +356,40 @@ public class BookControllerTest {
                         .andExpect(jsonPath("$.message").value(BookErrorCode.DUPLICATE_CALLSIGN.getMessage()));
             }
 
+            @Test
+            @DisplayName("도서 수정시 이미 존재하는 isbn로 수정하면 예외 발생")
+            public void testUpdateBookFailBecauseDuplicateISBN() throws Exception {
+                // Given
+                String rquestUrl = "/api/admin/book";
+
+                // bookId는 @BeforeEach에서 생성
+                String callSign = "111.111-11-11.c1"; // 이미 존재하는 청구기호
+                String isbn = "1234567890121";
+                String title = "테스트용 책 제목";
+                String author = "테스트용 책 저자";
+                String publisher = "테스트용 출판사";
+                String image = "http://example.com/test.jpg";
+                String publishedAt = "2023";
+                String categoryName = "테스트";
+                String status = "FINE";
+                String donator = "테스트 기증자";
+
+                String authorizationHeader = "Bearer " + token;
+
+                String content = String.format("{\"id\":\"%s\", \"callSign\":\"%s\", \"isbn\":\"%s\", \"title\":\"%s\", \"author\":\"%s\", \"publisher\":\"%s\", \"image\":\"%s\", \"publishedAt\":\"%s\", \"categoryName\":\"%s\", \"status\":\"%s\", \"donator\":\"%s\"}",
+                        book.getId(), callSign, isbn, title, author, publisher, image, publishedAt,
+                        categoryName, status, donator);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(put(rquestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message").value(BookErrorCode.DUPLICATE_ISBN.getMessage()));
+            }
         }
     }
 
@@ -327,7 +407,7 @@ public class BookControllerTest {
                 String authorizationHeader = "Bearer " + token;
 
                 // When
-                ResultActions resultActions = mockMvc.perform(delete(requestUrl, bookId)
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl, book.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", authorizationHeader));
 
@@ -357,6 +437,25 @@ public class BookControllerTest {
                         .andExpect(jsonPath("$.message").value(BookErrorCode.BAD_REQUEST_BOOK.getMessage()));
             }
 
+            @Test
+            @DisplayName("도서 삭제시 대여중인 도서일 시 예외발생")
+            public void testDeleteBookFailBecauseExistRentBook() throws Exception {
+                // Given
+                String requestUrl = "/api/admin/book/{bookId}";
+                String authorizationHeader = "Bearer " + token;
+
+                book.updateLendingStatus();
+                bookRepository.save(book);
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl, book.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", authorizationHeader));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message").value(BookErrorCode.NOT_DELETE_BECAUSE_RENT_BOOK.getMessage()));
+            }
         }
     }
 }

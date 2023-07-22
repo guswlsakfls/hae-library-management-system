@@ -2,9 +2,17 @@ package com.hae.library.controllerTest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hae.library.domain.Book;
+import com.hae.library.domain.BookInfo;
+import com.hae.library.domain.Category;
+import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.domain.Enum.Role;
+import com.hae.library.dto.Lending.Request.RequestLendingDto;
 import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
 import com.hae.library.dto.Member.Request.RequestSignupDto;
+import com.hae.library.repository.BookInfoRepository;
+import com.hae.library.repository.BookRepository;
+import com.hae.library.repository.CategoryRepository;
 import com.hae.library.repository.MemberRepository;
 import com.hae.library.service.MemberService;
 import jakarta.transaction.Transactional;
@@ -41,7 +49,17 @@ public class MemberControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private BookInfoRepository bookInfoRepository;
+
+    @Autowired
+    private BookRepository bookRepository;
+
     private String token;
+    private Book book;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -64,11 +82,35 @@ public class MemberControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        System.out.println("loginResponse = " + loginResponse);
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode responseJson = objectMapper.readTree(loginResponse);
         this.token = responseJson.get("data").get("accessToken").asText();
+
+        // 테스트용 카테고리를 등록합니다.
+        Category category = categoryRepository.save(Category.builder()
+                .categoryName("테스트")
+                .build());
+
+        // 테스트용 도서 정보를 등록합니다.
+        BookInfo bookInfo = BookInfo.builder()
+                .isbn("1234567890123")
+                .title("테스트용 책 제목")
+                .author("테스트용 책 저자")
+                .publisher("테스트용 출판사")
+                .image("http://example.com/test.jpg")
+                .publishedAt("2023")
+                .category(category)
+                .build();
+        BookInfo bookInfo1 = bookInfoRepository.save(bookInfo);
+
+        bookRepository.save(Book.builder()
+                .callSign("111.111-11-11.c1")
+                .bookInfo(bookInfo)
+                .status(BookStatus.valueOf("FINE"))
+                .lendingStatus(false)
+                .donator("테스트 기증자")
+                .build());
     }
 
     @Nested
@@ -309,6 +351,102 @@ public class MemberControllerTest {
                 // Then
                 resultActions.andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.message", is("이미 존재하는 이메일입니다")));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 탈퇴 및 삭제")
+    public class DeleteMemberTest {
+        @Nested
+        @DisplayName("성공 케이스")
+        public class SuccessCaseTest {
+            @Nested
+            @DisplayName("회원 휴면계정 전환")
+            public class InactivateMemberTest {
+                @Test
+                @DisplayName("id에 해당하는 회원 휴면계정 전환")
+                public void inactivateMemberTest() throws Exception {
+                    // Given
+                    String requestUrl = "/api/member/withdrawal/me";
+
+                    // When
+                    ResultActions resultActions = mockMvc.perform(put(requestUrl)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header("Authorization", "Bearer " + token));
+
+                    // Then
+                    resultActions.andExpect(status().isOk())
+                            .andDo(print());
+                }
+            }
+
+            @Test
+            @DisplayName("id에 해당하는 회원 삭제")
+            public void deleteMemberTest() throws Exception {
+                // Given
+                long memberId = 1L;
+                String requestUrl = "/api/admin/member/" + memberId;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isOk())
+                        .andDo(print());
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        public class FailCaseTest {
+            @Test
+            @DisplayName("대출이 있는 회원은 휴면계정 처리시 예외 발생")
+            public void existLoanTest() throws Exception {
+                // Given
+                String requestUrl = "/api/member/withdrawal/me";
+
+                // 대출 중인 도서가 있는 회원으로 변경
+                RequestLendingDto requestLendingDto = RequestLendingDto.builder()
+                        .bookId(1L)
+                        .userId(1L)
+                        .lendingCondition("이상없음")
+                        .build();
+
+                mockMvc.perform(post("/api/admin/lending")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(requestLendingDto))
+                        .header("Authorization", "Bearer " + token));
+
+                // When
+                ResultActions resultActions = mockMvc.perform(put(requestUrl)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message", is("대출중인 도서가 있습니다")))
+                        .andDo(print());
+            }
+
+            @Test
+            @DisplayName("존재하지 않는 회원 삭제 시 예외 발생")
+            public void notExistMemberTest() throws Exception {
+                // Given
+                long memberId = 1000L;
+                String requestUrl = "/api/admin/member/" + memberId;
+
+                // When
+                ResultActions resultActions = mockMvc.perform(delete(requestUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token));
+
+                // Then
+                resultActions.andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.message", is("회원을 찾을 수 없습니다")))
+                        .andDo(print());
             }
         }
     }
