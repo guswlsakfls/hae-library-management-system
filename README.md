@@ -5,6 +5,10 @@
 </div>
 
 ---
+## 🗓 일정관리
+<img width="1248" alt="스크린샷 2023-07-22 오후 6 22 40" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/edba2bfd-baf5-4971-b3ab-841d85dd1e0e">
+
+---
 ## 📦 주요 기능
 
 ### 도서 검색
@@ -63,7 +67,7 @@
 ![JPA](https://img.shields.io/badge/JPA-000000?style=for-the-badge&logo=&logoColor=white)
 
 ---
-## 🗒 ERD (Updated at 2023.06.12)
+## 🗒 ERD
 ![도서관리시스템 (7)](https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/d8309971-aba4-4465-8b48-ed02060b2797)
 
 ## 📺 화면 구성
