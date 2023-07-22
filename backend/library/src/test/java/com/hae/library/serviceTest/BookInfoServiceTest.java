@@ -46,6 +46,10 @@ public class BookInfoServiceTest {
 
     private RequestBookWithBookInfoDto requestBookWithBookInfoDto;
 
+    private Category category;
+    private BookInfo bookInfo1;
+    private BookInfo bookInfo2;
+
     @BeforeEach
     public void setup() {
          requestBookWithBookInfoDto = RequestBookWithBookInfoDto.builder()
@@ -60,6 +64,30 @@ public class BookInfoServiceTest {
                             .publishedAt("2022-01-01")
                             .categoryName("총류")
                             .build();
+
+        Category category = Category.builder()
+                .categoryName("전체")
+                .build();
+
+        bookInfo1 = BookInfo.builder()
+                .title("Java Programming")
+                .author("John Smith")
+                .isbn("9781234567890")
+                .image("book-image.jpg")
+                .publisher("ABC Publishing")
+                .publishedAt("2022-01-01")
+                .category(category)
+                .build();
+
+        bookInfo2 = BookInfo.builder()
+                .title("Python Programming")
+                .author("Jane Doe")
+                .isbn("9780987654321")
+                .image("book-image.jpg")
+                .publisher("DEF Publishing")
+                .publishedAt("2022-01-01")
+                .category(category)
+                .build();
     }
 
     @Nested
@@ -70,18 +98,9 @@ public class BookInfoServiceTest {
         @DisplayName("성공 케이스")
         public class Success {
             @Test
-            @DisplayName("책 정보를 입력받아 책 정보를 생성한다.")
+            @DisplayName("책 정보를 입력받아 책 정보를 생성")
             void createBookInfoSuccess() {
                 // Given
-                BookInfo bookInfo = BookInfo.builder()
-                        .title(requestBookWithBookInfoDto.getTitle())
-                        .author(requestBookWithBookInfoDto.getAuthor())
-                        .isbn(requestBookWithBookInfoDto.getIsbn())
-                        .image(requestBookWithBookInfoDto.getImage())
-                        .publisher(requestBookWithBookInfoDto.getPublisher())
-                        .publishedAt(requestBookWithBookInfoDto.getPublishedAt())
-                        .build();
-
                 RequestBookInfoDto requestBookInfoDto = RequestBookInfoDto.builder()
                         .title(requestBookWithBookInfoDto.getTitle())
                         .author(requestBookWithBookInfoDto.getAuthor())
@@ -98,7 +117,7 @@ public class BookInfoServiceTest {
                         .build();
 
                 when(categoryRepo.findByCategoryName(requestBookWithBookInfoDto.getCategoryName())).thenReturn(Optional.of(mockCategory));
-                when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(bookInfo);
+                when(bookInfoRepo.save(any(BookInfo.class))).thenReturn(bookInfo1);
 
                 // When
                 BookInfo createdBookInfo =
@@ -108,7 +127,6 @@ public class BookInfoServiceTest {
                 Assertions.assertThat(createdBookInfo).isNotNull();
                 Assertions.assertThat(createdBookInfo.getTitle()).isEqualTo(requestBookWithBookInfoDto.getTitle());
             }
-
         }
 
         @Nested
@@ -153,30 +171,6 @@ public class BookInfoServiceTest {
             @DisplayName("모든 책 정보 조회")
             void getAllBookInfoTest() {
                 // Given
-                Category category = Category.builder()
-                        .categoryName("전체")
-                        .build();
-
-                BookInfo bookInfo1 = BookInfo.builder()
-                        .title("Java Programming")
-                        .author("John Smith")
-                        .isbn("9781234567890")
-                        .image("book-image.jpg")
-                        .publisher("ABC Publishing")
-                        .publishedAt("2022-01-01")
-                        .category(category)
-                        .build();
-
-                BookInfo bookInfo2 = BookInfo.builder()
-                        .title("Python Programming")
-                        .author("Jane Doe")
-                        .isbn("9780987654321")
-                        .image("book-image.jpg")
-                        .publisher("DEF Publishing")
-                        .publishedAt("2022-01-01")
-                        .category(category)
-                        .build();
-
                 Page<BookInfo> pageOfBookInfo = new PageImpl<>(List.of(bookInfo1, bookInfo2));
 
                 int page = 0;
@@ -207,32 +201,9 @@ public class BookInfoServiceTest {
             }
 
 
-            @Test
-            @DisplayName("id로 책 정보 조회")
-            void getBookInfoByIdTest() {
-                // Given
-                BookInfo bookInfo = BookInfo.builder()
-                        .title("Java Programming")
-                        .author("John Smith")
-                        .isbn("9781234567890")
-                        .image("book-image.jpg")
-                        .publisher("ABC Publishing")
-                        .publishedAt("2022-01-01")
-                        .category(Category.builder().categoryName("총류").build())
-                        .build();
-
-                when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.ofNullable(bookInfo));
-
-                // When
-                ResponseBookInfoWithBookDto bookInfoDto = bookInfoService.getBookInfoById(1L);
-
-                // Then
-                Assertions.assertThat(bookInfoDto).isNotNull();
-                Assertions.assertThat(bookInfoDto.getTitle()).isEqualTo(bookInfo.getTitle());
-            }
 
             @Test
-            @DisplayName("책 정보가 한 개도 없을 경우")
+            @DisplayName("책 정보가 한 개도 없을 경우 빈 리스트 조회")
             void getAllBookInfoEmptyTest() {
                 // Given
                 // 빈 페이지를 반환합니다.
@@ -257,11 +228,38 @@ public class BookInfoServiceTest {
                 // 빈 페이지가 반환되는지 확인합니다.
                 Assertions.assertThat(bookInfoList.getContent()).isEmpty();
             }
+            @Test
+            @DisplayName("id로 책 정보 조회")
+            void getBookInfoByIdTest() {
+                // Given
+                when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.ofNullable(bookInfo1));
+
+                // When
+                ResponseBookInfoWithBookDto bookInfoDto = bookInfoService.getBookInfoById(1L);
+
+                // Then
+                Assertions.assertThat(bookInfoDto).isNotNull();
+                Assertions.assertThat(bookInfoDto.getTitle()).isEqualTo(bookInfo1.getTitle());
+            }
         }
 
         @Nested
         @DisplayName("실패 케이스")
         public class Fail {
+            @Test
+            @DisplayName("id에 해당하는 책 정보가 없으면 예외 발생")
+            void getBookInfoByIdFail_NotFound() {
+                // Given
+                when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.empty());
+
+                // When
+                Exception exception = assertThrows(RestApiException.class, () -> {
+                    bookInfoService.getBookInfoById(1000L);
+                });
+
+                // Then
+                Assertions.assertThat(((RestApiException) exception).getErrorCode().getMessage()).contains(BookErrorCode.BAD_REQUEST_BOOKINFO.getMessage());
+            }
         }
     }
 
@@ -276,16 +274,7 @@ public class BookInfoServiceTest {
             @DisplayName("id로 책 정보 삭제 성공")
             void deleteBookInfoById() {
                 // Given
-                BookInfo bookInfo = BookInfo.builder()
-                        .title("Java Programming")
-                        .author("John Smith")
-                        .isbn("9781234567890")
-                        .image("book-image.jpg")
-                        .publisher("ABC Publishing")
-                        .publishedAt("2022-01-01")
-                        .build();
-
-                when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.ofNullable(bookInfo));
+                when(bookInfoRepo.findById(anyLong())).thenReturn(Optional.ofNullable(bookInfo1));
 
                 // When
                 bookInfoService.deleteBookInfoById(1L);
