@@ -1,7 +1,7 @@
 # 📚 도서관리시스템 프로젝트
 기업 내 도서 및 자료를 효율적으로 관리하기 위한 도서관리시스템 개발
 <div align="left">
-<img width="300" alt="스크린샷 2023-07-19 오전 2 08 58" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/46eb6ed3-a9e9-4e01-9baa-f83c1ab1d39a">
+<img width="250" alt="스크린샷 2023-07-19 오전 2 08 58" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/46eb6ed3-a9e9-4e01-9baa-f83c1ab1d39a">
 <img width="300" alt="스크린샷 2023-07-19 오전 2 14 19" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/59863ac4-b3a7-4e34-9dc0-8ba38d3f7e44">
 <img width="300" alt="스크린샷 2023-07-19 오전 2 10 27" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/6735d8df-78fc-4568-8aa3-1788f72f216c">
 
