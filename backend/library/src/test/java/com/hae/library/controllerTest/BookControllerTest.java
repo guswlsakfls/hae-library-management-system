@@ -343,7 +343,8 @@ public class BookControllerTest {
                 String authorizationHeader = "Bearer " + token;
 
                 String content = String.format("{\"id\":\"%s\", \"callSign\":\"%s\", \"isbn\":\"%s\", \"title\":\"%s\", \"author\":\"%s\", \"publisher\":\"%s\", \"image\":\"%s\", \"publishedAt\":\"%s\", \"categoryName\":\"%s\", \"status\":\"%s\", \"donator\":\"%s\"}",
-                        bookId, callSign, isbn, title, author, publisher, image, publishedAt, categoryName, status, donator);
+                        book.getId(), callSign, isbn, title, author, publisher, image, publishedAt,
+                        categoryName, status, donator);
 
                 // When
                 ResultActions resultActions = mockMvc.perform(put(rquestUrl)

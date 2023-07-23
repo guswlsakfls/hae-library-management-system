@@ -7,6 +7,7 @@ import com.hae.library.domain.BookInfo;
 import com.hae.library.domain.Category;
 import com.hae.library.domain.Enum.BookStatus;
 import com.hae.library.domain.Enum.Role;
+import com.hae.library.domain.Member;
 import com.hae.library.dto.Lending.Request.RequestLendingDto;
 import com.hae.library.dto.Member.Request.RequestChangeMemberInfoDto;
 import com.hae.library.dto.Member.Request.RequestSignupDto;
@@ -26,6 +27,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import javax.swing.text.html.Option;
+
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -104,7 +109,7 @@ public class MemberControllerTest {
                 .build();
         BookInfo bookInfo1 = bookInfoRepository.save(bookInfo);
 
-        bookRepository.save(Book.builder()
+        book = bookRepository.save(Book.builder()
                 .callSign("111.111-11-11.c1")
                 .bookInfo(bookInfo)
                 .status(BookStatus.valueOf("FINE"))
@@ -408,10 +413,12 @@ public class MemberControllerTest {
                 // Given
                 String requestUrl = "/api/member/withdrawal/me";
 
+                Optional<Member> admin = memberRepository.findByEmail("admin@gmail.com");
+
                 // 대출 중인 도서가 있는 회원으로 변경
                 RequestLendingDto requestLendingDto = RequestLendingDto.builder()
-                        .bookId(1L)
-                        .userId(1L)
+                        .bookId(book.getId())
+                        .userId(admin.get().getId())
                         .lendingCondition("이상없음")
                         .build();
 
