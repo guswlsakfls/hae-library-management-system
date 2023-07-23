@@ -3,12 +3,9 @@ package com.hae.library.domain.Enum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// 책 상태를 나타내는 enum
 @RequiredArgsConstructor
 @Getter
 public enum BookStatus {
-    BREAK("BOOK_BREAK"),
-    FINE("BOOK_FINE"),
-    LOST("BOOK_LOST");
-
-    private final String type;
+    FINE, BREAK, LOST
 }

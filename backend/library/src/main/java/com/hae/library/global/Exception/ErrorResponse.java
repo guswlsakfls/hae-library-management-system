@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 
 import java.util.List;
 
+// 에러 응답입니다
 @Getter
 @Builder
 @RequiredArgsConstructor
