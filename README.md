@@ -75,18 +75,21 @@
 | 홈 페이지  |  도서 목록 페이지   |
 | :-------------------------------------------: | :------------: |
 |  <img width="1440" alt="스크린샷 2023-07-22 오후 4 54 31" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/196bdc53-ceff-469b-9e5b-f02981685b49"> |  <img width="1440" alt="스크린샷 2023-07-22 오후 4 54 57" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/14c90e0e-5bc3-49d9-9ac0-26c135818cac">|
-| 도서 정보 페이지 | 마이페이지 |
-| <img width="1440" alt="스크린샷 2023-07-22 오후 5 15 03" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/3a7c4475-2ecc-4609-a69c-097883d28ea3"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 43 50" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/fedf4ccc-5efc-41b4-9c0a-4ab31546d971">
-| 대출/반납 페이지 |  대출/반납 현황 페이지 |
-| <img width="1440" alt="스크린샷 2023-07-22 오후 4 55 16" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/8e12b8d1-50b2-4964-a877-a3c5adf737db"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 46 08" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/af2d5252-499d-4598-8c92-74f96b4a42f7"> |
+| 도서 정보 페이지 | 대출 페이지 |
+| <img width="1440" alt="스크린샷 2023-07-22 오후 5 15 03" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/3a7c4475-2ecc-4609-a69c-097883d28ea3"> | <img width="1440" alt="스크린샷 2023-07-22 오후 4 55 16" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/8e12b8d1-50b2-4964-a877-a3c5adf737db">
+| 반납 페이지 |  대출/반납 현황 페이지 |
+| <img width="1440" alt="스크린샷 2023-07-23 오후 10 34 21" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/2c68106a-f08f-4c01-871e-5d1b52e523d0"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 46 08" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/af2d5252-499d-4598-8c92-74f96b4a42f7"> |
 | 대출 추가 페이지 | 도서 구매 요청 목록 페이지 |
 | <img width="1440" alt="스크린샷 2023-07-22 오후 5 13 31" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/b74c6136-adb5-4f8c-ad94-de997993dbcb"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 48 09" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/2a350c63-d889-40a6-a79c-eda0925c6ea9"> |
 | 도서 관리 페이지 | 도서 관리 모달창 |
 | <img width="1440" alt="스크린샷 2023-07-22 오후 5 49 46" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/757c5073-db53-43f3-9880-d7813e0e966d"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 49 08" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/2c72f15a-64ee-4304-aa4b-86c731e7ab79"> |
 | 도서 카테고리 페이지 | 회원관리 페이지 |
 | <img width="1440" alt="스크린샷 2023-07-22 오후 4 55 55" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/69b6b8ac-77d8-4e71-8de7-ea48c30ccc57"> | <img width="1440" alt="스크린샷 2023-07-22 오후 5 52 02" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/190dc852-fb19-495a-880d-ffb9b56f46a5"> |
-| 회원관리 수정 모달창 | |
-| <img width="1440" alt="스크린샷 2023-07-22 오후 5 53 51" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/7892dffc-1ccc-4c23-b65e-78eec73bcd8e">
+| 회원관리 수정 모달창 | 마이페이지-내정보 |
+| <img width="1440" alt="스크린샷 2023-07-22 오후 5 53 51" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/7892dffc-1ccc-4c23-b65e-78eec73bcd8e"> | <img width="1440" alt="스크린샷 2023-07-23 오후 10 36 33" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/8f38b64c-af32-4af8-b23f-9ebe6fc7dceb"> |
+| 마이페이지-대출/반납기록 | |
+| <img width="1440" alt="스크린샷 2023-07-23 오후 10 29 18" src="https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/da46da93-4e41-44f3-8398-e8667ffd20dc"> | |
+
 
 
 ---
