@@ -69,7 +69,9 @@
 
 ---
 ## 🗒 ERD
-![도서관리시스템 (7)](https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/d8309971-aba4-4465-8b48-ed02060b2797)
+![도서관리시스템 (7)](https://github.com/guswlsakfls/hae-library-management-system/assets/46312017/1a95cc04-f28d-40b2-8526-5088b0bbdddb)
+
+
 
 ## 📺 화면 구성
 | 홈 페이지  |  도서 목록 페이지   |
