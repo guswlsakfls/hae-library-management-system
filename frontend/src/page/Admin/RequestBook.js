@@ -3,11 +3,7 @@ import Pagination from '../../component/common/Pagination';
 import SearchBar from '../../component/common/SearchBar';
 import DefaultButton from '../../component/common/DefaultButton';
 import { useSearchParams } from 'react-router-dom/dist';
-import {
-  getBookInfoByIdApi,
-  getRequestBookListApi,
-  deleteRequestBookApi,
-} from '../../api/BookApi';
+import { getRequestBookListApi, deleteRequestBookApi } from '../../api/BookApi';
 import { getCategoryListApi } from '../../api/CategoryApi';
 import SelectBar from '../../component/common/SelectBar';
 

@@ -1,19 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Footer from '../../component/Footer';
 import MyInfo from './MyInfo';
 import MyLendingHistory from './MyLendingHistory';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Mypage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [tab, setTab] = useState('userinfo');
-
-  // TODO: 새로고침시 tab이 초기화되는 문제(내정보 불러오고, 대출기록 불러온다)
-  // useEffect(() => {
-  //   const currentPath = location.pathname.split('/').pop();
-  //   setTab(currentPath);
-  // }, [location]);
 
   const handleTabClick = newTab => {
     setTab(newTab);

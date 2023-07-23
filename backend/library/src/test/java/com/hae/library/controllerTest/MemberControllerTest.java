@@ -403,7 +403,7 @@ public class MemberControllerTest {
         @DisplayName("실패 케이스")
         public class FailCaseTest {
             @Test
-            @DisplayName("대출이 있는 회원은 휴면계정 처리시 예외 발생")
+            @DisplayName("대출이 있는 회원은 탈퇴 처리시 예외 발생")
             public void existLoanTest() throws Exception {
                 // Given
                 String requestUrl = "/api/member/withdrawal/me";

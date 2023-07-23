@@ -41,6 +41,7 @@ function AdminRoutes() {
   }, [navigate, location]);
 
   return (
+    // 관리자 페이지
     <Routes>
       <Route path="" element={<LendingPage />} />
       <Route path="lending" element={<LendingPage />} />

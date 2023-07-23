@@ -18,6 +18,7 @@ const statusText = {
 
 const bookStatus = ['FINE', 'BREAK', 'LOST'];
 
+// 청구기호를 위한 카테고리 분류
 export default function AddBook() {
   const categorySet = {
     총류: '000',
