@@ -31,7 +31,7 @@ public class BookInfo extends BaseTimeEntity{
     @Column(name = "isbn", nullable = false, length = 13)
     private String isbn;
 
-    @Column(name = "author", nullable = false, length = 300)
+    @Column(name = "author", nullable = false, length = 100)
     private String author;
 
     @Column(name = "publisher", length = 100)

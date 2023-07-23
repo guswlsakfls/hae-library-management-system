@@ -28,7 +28,7 @@ public class Book extends BaseTimeEntity {
     @Column(name = "lending_status", nullable = false)
     private boolean lendingStatus = false;
 
-    @Column(name = "call_sign", nullable = false, length = 255) // 예시: 255자 제한
+    @Column(name = "call_sign", nullable = false, length = 100)
     private String callSign;
 
     @Enumerated(EnumType.STRING)
